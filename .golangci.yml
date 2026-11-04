@@ -12,6 +12,9 @@ linters:
     lll:
       line-length: 100
       tab-width: 4
+  exclusions:
+    paths:
+      - gen
 
 formatters:
   enable:

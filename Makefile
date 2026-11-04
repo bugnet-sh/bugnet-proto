@@ -1,4 +1,4 @@
-.PHONY: test lint build
+.PHONY: test lint build generate
 
 PKGS := $(shell go list ./... 2>/dev/null)
 
@@ -16,3 +16,6 @@ build:
 ifneq ($(PKGS),)
 	go build ./...
 endif
+
+generate:
+	buf generate

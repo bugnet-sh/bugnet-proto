@@ -1,0 +1,7 @@
+{
+  "name": "bugnet-proto",
+  "private": true,
+  "devDependencies": {
+    "@bufbuild/protoc-gen-es": "2.16.0"
+  }
+}

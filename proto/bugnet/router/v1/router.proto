@@ -1,0 +1,237 @@
+syntax = "proto3";
+
+package bugnet.router.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
+
+service SandboxRouterService {
+  rpc Estimate(EstimateRequest) returns (EstimateResponse);
+  rpc CreatePlacement(CreatePlacementRequest) returns (CreatePlacementResponse);
+  rpc GetPlacement(GetPlacementRequest) returns (GetPlacementResponse);
+  rpc WatchPlacement(WatchPlacementRequest) returns (stream WatchPlacementResponse);
+  rpc ExtendPlacement(ExtendPlacementRequest) returns (ExtendPlacementResponse);
+  rpc StopPlacement(StopPlacementRequest) returns (StopPlacementResponse);
+  rpc Exec(ExecRequest) returns (ExecResponse);
+  rpc WatchJob(WatchJobRequest) returns (stream WatchJobResponse);
+  rpc CancelJob(CancelJobRequest) returns (CancelJobResponse);
+  rpc ReadFile(ReadFileRequest) returns (ReadFileResponse);
+  rpc WriteFile(WriteFileRequest) returns (WriteFileResponse);
+  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
+}
+
+message Resources {
+  uint32 vcpu = 1;
+  uint32 memory_mib = 2;
+  uint32 disk_gib = 3;
+  uint32 gpu_count = 4;
+  uint32 gpu_memory_gib = 5;
+}
+
+message Requirements {
+  bool ssh = 1;
+  bool preview = 2;
+  bool gpu = 3;
+}
+
+message PackageOption {
+  string package_id = 1;
+  Resources resources = 2;
+  uint32 minutes = 3;
+  int64 price_micros = 4;
+  bool available = 5;
+  string unavailable_reason = 6;
+}
+
+message EstimateRequest {
+  Requirements requirements = 1;
+}
+
+message EstimateResponse {
+  repeated PackageOption options = 1;
+}
+
+enum PlacementState {
+  PLACEMENT_STATE_UNSPECIFIED = 0;
+  PLACEMENT_STATE_PLACING = 1;
+  PLACEMENT_STATE_READY = 2;
+  PLACEMENT_STATE_TERMINATING = 3;
+  PLACEMENT_STATE_TERMINATED = 4;
+  PLACEMENT_STATE_FAILED = 5;
+}
+
+message Placement {
+  string placement_id = 1;
+  PlacementState state = 2;
+  string package_id = 3;
+  google.protobuf.Timestamp deadline = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp ready_at = 6;
+  string failure_reason = 7;
+  bool refundable = 8;
+}
+
+message CreatePlacementRequest {
+  string order_token = 1;
+  Requirements requirements = 2;
+}
+
+message CreatePlacementResponse {
+  Placement placement = 1;
+  // The handle is returned only here
+  string handle = 2;
+}
+
+message GetPlacementRequest {
+  string handle = 1;
+  uint32 wait_ms = 2;
+  PlacementState known_state = 3;
+}
+
+message GetPlacementResponse {
+  Placement placement = 1;
+}
+
+message WatchPlacementRequest {
+  string handle = 1;
+}
+
+message WatchPlacementResponse {
+  Placement placement = 1;
+}
+
+message ExtendPlacementRequest {
+  string handle = 1;
+  string order_token = 2;
+}
+
+message ExtendPlacementResponse {
+  Placement placement = 1;
+}
+
+message StopPlacementRequest {
+  string handle = 1;
+}
+
+message StopPlacementResponse {
+  Placement placement = 1;
+}
+
+message Until {
+  bool exit = 1;
+  string output_pattern = 2;
+  uint32 idle_ms = 3;
+}
+
+enum JobState {
+  JOB_STATE_UNSPECIFIED = 0;
+  JOB_STATE_RUNNING = 1;
+  JOB_STATE_EXITED = 2;
+  JOB_STATE_CANCELLED = 3;
+  JOB_STATE_LOST = 4;
+}
+
+message ExecRequest {
+  string handle = 1;
+  repeated string argv = 2;
+  string cwd = 3;
+  map<string, string> env = 4;
+  string idempotency_key = 5;
+  uint32 wait_ms = 6;
+  Until until = 7;
+}
+
+message ExecResponse {
+  string job_id = 1;
+  JobState state = 2;
+  optional int32 exit_code = 3;
+  bytes stdout_tail = 4;
+  bytes stderr_tail = 5;
+  string cursor = 6;
+  bool truncated = 7;
+}
+
+enum OutputStream {
+  OUTPUT_STREAM_UNSPECIFIED = 0;
+  OUTPUT_STREAM_STDOUT = 1;
+  OUTPUT_STREAM_STDERR = 2;
+}
+
+message JobOutput {
+  OutputStream stream = 1;
+  uint64 offset = 2;
+  bytes data = 3;
+}
+
+message JobExit {
+  int32 exit_code = 1;
+  uint64 stdout_bytes = 2;
+  uint64 stderr_bytes = 3;
+}
+
+message WatchJobRequest {
+  string handle = 1;
+  string job_id = 2;
+  string cursor = 3;
+  Until until = 4;
+}
+
+message WatchJobResponse {
+  oneof frame {
+    JobOutput output = 1;
+    JobExit exit = 2;
+    bool heartbeat = 3;
+  }
+  string cursor = 4;
+}
+
+message CancelJobRequest {
+  string handle = 1;
+  string job_id = 2;
+}
+
+message CancelJobResponse {
+  JobState state = 1;
+}
+
+message ReadFileRequest {
+  string handle = 1;
+  string path = 2;
+  uint64 offset = 3;
+  uint32 length = 4;
+}
+
+message ReadFileResponse {
+  bytes data = 1;
+  bool eof = 2;
+}
+
+message WriteFileRequest {
+  string handle = 1;
+  string path = 2;
+  bytes data = 3;
+  uint32 mode = 4;
+}
+
+message WriteFileResponse {
+  uint64 size = 1;
+}
+
+message FileEntry {
+  string path = 1;
+  uint64 size = 2;
+  bool is_dir = 3;
+  uint32 mode = 4;
+  google.protobuf.Timestamp modified_at = 5;
+}
+
+message ListFilesRequest {
+  string handle = 1;
+  string path = 2;
+  uint32 depth = 3;
+}
+
+message ListFilesResponse {
+  repeated FileEntry entries = 1;
+}
