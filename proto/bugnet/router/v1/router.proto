@@ -170,6 +170,12 @@ message JobExit {
   uint64 stderr_bytes = 3;
 }
 
+// Output resumes at these offsets, the bytes skipped before them stay in the sandbox's job files
+message JobSkip {
+  uint64 stdout_offset = 1;
+  uint64 stderr_offset = 2;
+}
+
 message WatchJobRequest {
   string handle = 1;
   string job_id = 2;
@@ -182,6 +188,7 @@ message WatchJobResponse {
     JobOutput output = 1;
     JobExit exit = 2;
     bool heartbeat = 3;
+    JobSkip skip = 5;
   }
   string cursor = 4;
 }
@@ -234,4 +241,6 @@ message ListFilesRequest {
 
 message ListFilesResponse {
   repeated FileEntry entries = 1;
+  // The listing stopped at the router's entry or directory limit
+  bool truncated = 2;
 }
