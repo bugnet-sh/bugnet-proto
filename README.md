@@ -25,8 +25,9 @@ none of their services. Errors carry a `google.rpc.ErrorInfo` reason in domain `
 
 `make generate` runs `buf generate`. It writes the Go packages to `gen/go` with `protoc-gen-go`
 and `protoc-gen-connect-go` from `PATH`, and JavaScript with TypeScript declarations to `gen/ts`
-with `protoc-gen-es` from `node_modules`, so run `pnpm install` first. Run `make test`,
-`make lint` and `make build` for the Go code.
+with `protoc-gen-es` from `node_modules`, so run `pnpm install` first. Imports between the
+generated files end in `.js`, which Node's ESM loader needs. Run `make test`, `make lint` and
+`make build` for the Go code.
 
 ## TypeScript
 
