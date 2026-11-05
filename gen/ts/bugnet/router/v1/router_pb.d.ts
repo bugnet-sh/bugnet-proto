@@ -1435,6 +1435,13 @@ export declare type CreateTransferRequest = Message<"bugnet.router.v1.CreateTran
    * @generated from field: string idempotency_key = 7;
    */
   idempotencyKey: string;
+
+  /**
+   * Downloads only, asks for the file's SHA-256 at mint, ignored for uploads
+   *
+   * @generated from field: bool want_sha256 = 8;
+   */
+  wantSha256: boolean;
 };
 
 /**
@@ -1481,6 +1488,13 @@ export declare type CreateTransferResponse = Message<"bugnet.router.v1.CreateTra
    * @generated from field: google.protobuf.Timestamp modified_at = 5;
    */
   modifiedAt?: Timestamp | undefined;
+
+  /**
+   * The file's SHA-256 at mint when a download set want_sha256, empty otherwise
+   *
+   * @generated from field: bytes sha256 = 6;
+   */
+  sha256: Uint8Array;
 };
 
 /**

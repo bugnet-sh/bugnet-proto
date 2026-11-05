@@ -3876,8 +3876,10 @@ type CreateTransferRequest struct {
 	Sha256 []byte `protobuf:"bytes,6,opt,name=sha256,proto3" json:"sha256,omitempty"`
 	// A repeated key returns the same URL
 	IdempotencyKey string `protobuf:"bytes,7,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Downloads only, asks for the file's SHA-256 at mint, ignored for uploads
+	WantSha256    bool `protobuf:"varint,8,opt,name=want_sha256,json=wantSha256,proto3" json:"want_sha256,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateTransferRequest) Reset() {
@@ -3959,6 +3961,13 @@ func (x *CreateTransferRequest) GetIdempotencyKey() string {
 	return ""
 }
 
+func (x *CreateTransferRequest) GetWantSha256() bool {
+	if x != nil {
+		return x.WantSha256
+	}
+	return false
+}
+
 type CreateTransferResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// <transfer host>/<token>
@@ -3970,7 +3979,9 @@ type CreateTransferResponse struct {
 	// The per-file cap, the package's edge.transfer_max_bytes or else transfers.max_bytes
 	MaxBytes uint64 `protobuf:"varint,4,opt,name=max_bytes,json=maxBytes,proto3" json:"max_bytes,omitempty"`
 	// Downloads only, the file's modification time
-	ModifiedAt    *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=modified_at,json=modifiedAt,proto3" json:"modified_at,omitempty"`
+	ModifiedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=modified_at,json=modifiedAt,proto3" json:"modified_at,omitempty"`
+	// The file's SHA-256 at mint when a download set want_sha256, empty otherwise
+	Sha256        []byte `protobuf:"bytes,6,opt,name=sha256,proto3" json:"sha256,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4036,6 +4047,13 @@ func (x *CreateTransferResponse) GetMaxBytes() uint64 {
 func (x *CreateTransferResponse) GetModifiedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.ModifiedAt
+	}
+	return nil
+}
+
+func (x *CreateTransferResponse) GetSha256() []byte {
+	if x != nil {
+		return x.Sha256
 	}
 	return nil
 }
@@ -5582,7 +5600,7 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12\x1c\n" +
 	"\tlistening\x18\x04 \x01(\bR\tlistening\x12\x1d\n" +
 	"\n" +
-	"preview_id\x18\x05 \x01(\tR\tpreviewId\"\x8e\x02\n" +
+	"preview_id\x18\x05 \x01(\tR\tpreviewId\"\xaf\x02\n" +
 	"\x15CreateTransferRequest\x12\x16\n" +
 	"\x06handle\x18\x01 \x01(\tR\x06handle\x12A\n" +
 	"\tdirection\x18\x02 \x01(\x0e2#.bugnet.router.v1.TransferDirectionR\tdirection\x12\x12\n" +
@@ -5591,8 +5609,10 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"size_bytes\x18\x04 \x01(\x04H\x00R\tsizeBytes\x88\x01\x01\x12\x12\n" +
 	"\x04mode\x18\x05 \x01(\rR\x04mode\x12\x16\n" +
 	"\x06sha256\x18\x06 \x01(\fR\x06sha256\x12'\n" +
-	"\x0fidempotency_key\x18\a \x01(\tR\x0eidempotencyKeyB\r\n" +
-	"\v_size_bytes\"\xd3\x01\n" +
+	"\x0fidempotency_key\x18\a \x01(\tR\x0eidempotencyKey\x12\x1f\n" +
+	"\vwant_sha256\x18\b \x01(\bR\n" +
+	"wantSha256B\r\n" +
+	"\v_size_bytes\"\xeb\x01\n" +
 	"\x16CreateTransferResponse\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x129\n" +
 	"\n" +
@@ -5600,7 +5620,8 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"\x04size\x18\x03 \x01(\x04R\x04size\x12\x1b\n" +
 	"\tmax_bytes\x18\x04 \x01(\x04R\bmaxBytes\x12;\n" +
 	"\vmodified_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"modifiedAt\"\x98\x01\n" +
+	"modifiedAt\x12\x16\n" +
+	"\x06sha256\x18\x06 \x01(\fR\x06sha256\"\x98\x01\n" +
 	"\x10AddSshKeyRequest\x12\x16\n" +
 	"\x06handle\x18\x01 \x01(\tR\x06handle\x12\x1d\n" +
 	"\n" +

@@ -141,6 +141,14 @@ func TestPricePackageFollowsEstimate(t *testing.T) {
 	eq(t, string(methods.Get(1).Name()), "PricePackage")
 }
 
+func TestDownloadChecksumRoundTrips(t *testing.T) {
+	eq(t, roundTrip(t, &routerv1.CreateTransferRequest{WantSha256: true}).WantSha256, true)
+	sum := make([]byte, 32)
+	sum[0], sum[31] = 0xab, 0xcd
+	eq(t, roundTrip(t, &routerv1.CreateTransferResponse{Sha256: sum}).Sha256, sum)
+	eq(t, len(roundTrip(t, &routerv1.CreateTransferResponse{}).Sha256), 0)
+}
+
 func TestTransferSizePresenceSurvives(t *testing.T) {
 	out := roundTrip(t, &routerv1.CreateTransferRequest{SizeBytes: proto.Uint64(0)})
 	eq(t, out.SizeBytes != nil && *out.SizeBytes == 0, true)
@@ -334,6 +342,8 @@ func TestSpecFieldNumbers(t *testing.T) {
 		"ExecResponse.oom_killed":                  8,
 		"CreateTransferRequest.size_bytes":         4,
 		"CreateTransferRequest.idempotency_key":    7,
+		"CreateTransferRequest.want_sha256":        8,
+		"CreateTransferResponse.sha256":            6,
 		"PricePackageRequest.requirements":         2,
 		"PricePackageResponse.option":              1,
 		"ResolvePreviewResponse.started_at":        9,
