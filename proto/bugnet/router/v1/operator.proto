@@ -1,0 +1,350 @@
+syntax = "proto3";
+
+package bugnet.router.v1;
+
+import "bugnet/router/v1/router.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
+
+// Called by bugnet-dev with BUGNET_OPERATOR_TOKEN, never by the gateway or the edges
+service OperatorService {
+  rpc BlockWallet(BlockWalletRequest) returns (BlockWalletResponse);
+  rpc UnblockWallet(UnblockWalletRequest) returns (UnblockWalletResponse);
+  rpc GetWallet(GetWalletRequest) returns (GetWalletResponse);
+  rpc ListWallets(ListWalletsRequest) returns (ListWalletsResponse);
+  rpc FindPlacement(FindPlacementRequest) returns (FindPlacementResponse);
+  rpc EndPlacement(EndPlacementRequest) returns (EndPlacementResponse);
+  // Operators and abuse handling only, agents end a sandbox with StopPlacement
+  rpc RevokePreview(RevokePreviewRequest) returns (RevokePreviewResponse);
+  rpc ListSignals(ListSignalsRequest) returns (ListSignalsResponse);
+  rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse);
+  rpc StartBench(StartBenchRequest) returns (StartBenchResponse);
+  rpc ReportStarts(ReportStartsRequest) returns (ReportStartsResponse);
+  rpc GetEstimate(GetEstimateRequest) returns (GetEstimateResponse);
+}
+
+/* Placements */
+
+// A sandbox the provider names in a notice, by its own id
+message ProviderSandbox {
+  string provider = 1;
+  string sandbox_id = 2;
+}
+
+// A placement named the way an abuse report names it
+message PlacementTarget {
+  oneof target {
+    string placement_id = 1;
+    // The host label of a preview URL
+    string preview_id = 2;
+    // A whole transfer URL or its bnx_ token, found for 30 days through transfer_index
+    string transfer = 3;
+    ProviderSandbox provider_sandbox = 4;
+  }
+}
+
+message OperatorPlacement {
+  string placement_id = 1;
+  PlacementState state = 2;
+  string provider = 3;
+  string provider_sandbox_id = 4;
+  string package_id = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp deadline = 7;
+  // The start order's payer, empty when the token had none
+  string payer = 8;
+  // Payers of extension orders that differ from the start payer
+  repeated string extend_payers = 9;
+  string source_label = 10;
+  string termination_reason = 11;
+}
+
+message FindPlacementRequest {
+  PlacementTarget target = 1;
+}
+
+message FindPlacementResponse {
+  OperatorPlacement placement = 1;
+}
+
+enum OperatorEndReason {
+  OPERATOR_END_REASON_UNSPECIFIED = 0;
+  // Blocks every payer and refunds nothing, also on a placement that already ended
+  OPERATOR_END_REASON_ABUSE = 1;
+  // No wallet action, refundable as asked, live placements only
+  OPERATOR_END_REASON_OPERATOR = 2;
+}
+
+message EndPlacementRequest {
+  PlacementTarget target = 1;
+  OperatorEndReason reason = 2;
+  // Honoured for OPERATOR, ignored for ABUSE
+  bool refundable = 3;
+  // Free text kept as evidence
+  string note = 4;
+  string actor = 5;
+}
+
+message EndPlacementResponse {
+  // A terminated or failed placement keeps its state and reason
+  OperatorPlacement placement = 1;
+  repeated string blocked_payers = 2;
+}
+
+message RevokePreviewRequest {
+  string preview_id = 1;
+  // Free text kept in the router's log
+  string reason = 2;
+  string actor = 3;
+}
+
+message RevokePreviewResponse {}
+
+/* Wallets */
+
+message Wallet {
+  // Canonical base58
+  string payer = 1;
+  google.protobuf.Timestamp first_seen = 2;
+  google.protobuf.Timestamp last_seen = 3;
+  bool blocked = 4;
+  google.protobuf.Timestamp blocked_at = 5;
+  // Unset while blocked means until an operator lifts it
+  google.protobuf.Timestamp blocked_until = 6;
+  // abuse, strikes, refusals or operator
+  string blocked_reason = 7;
+  // router, or operator and a colon before the operator's actor name
+  string blocked_by = 8;
+  // Strikes inside wallets.strike_window
+  uint32 strikes = 9;
+  uint32 live_placements = 10;
+}
+
+message WalletEvent {
+  string id = 1;
+  // block, unblock, strike or note
+  string kind = 2;
+  string reason = 3;
+  string placement_id = 4;
+  string provider = 5;
+  // The evidence as JSON, never secrets
+  string evidence_json = 6;
+  string actor = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message BlockWalletRequest {
+  string payer = 1;
+  // Free text kept as evidence
+  string reason = 2;
+  // Unset blocks until an operator lifts it
+  google.protobuf.Timestamp until = 3;
+  // End the wallet's live placements with reason wallet_blocked
+  bool stop_live = 4;
+  string actor = 5;
+}
+
+message BlockWalletResponse {
+  Wallet wallet = 1;
+  // Placements queued for ending when stop_live was set
+  repeated string ending_placement_ids = 2;
+}
+
+message UnblockWalletRequest {
+  string payer = 1;
+  string note = 2;
+  string actor = 3;
+}
+
+message UnblockWalletResponse {
+  Wallet wallet = 1;
+}
+
+message GetWalletRequest {
+  string payer = 1;
+}
+
+message GetWalletResponse {
+  Wallet wallet = 1;
+  repeated OperatorPlacement live = 2;
+  // Newest first, at most 50
+  repeated WalletEvent events = 3;
+}
+
+message ListWalletsRequest {
+  bool blocked_only = 1;
+  // 100 when 0, at most 1,000
+  uint32 limit = 2;
+  string page_token = 3;
+}
+
+message ListWalletsResponse {
+  repeated Wallet wallets = 1;
+  string next_page_token = 2;
+}
+
+/* Signals and providers */
+
+enum SignalClass {
+  SIGNAL_CLASS_UNSPECIFIED = 0;
+  SIGNAL_CLASS_ABUSE = 1;
+  SIGNAL_CLASS_CONTROL_LOST = 2;
+  SIGNAL_CLASS_PROVIDER_FAILED = 3;
+  SIGNAL_CLASS_ACCOUNT = 4;
+  SIGNAL_CLASS_SANDBOX_EXITED = 5;
+}
+
+message Signal {
+  string id = 1;
+  SignalClass signal_class = 2;
+  string provider = 3;
+  // Empty for account signals
+  string placement_id = 4;
+  // hook, sweep, poll, account_check or operator
+  string source = 5;
+  // The state and the provider's words as JSON
+  string observed_json = 6;
+  // ended, struck, blocked, flagged, held, provider_blocked, provider_cleared or none
+  string action = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message ListSignalsRequest {
+  google.protobuf.Timestamp since = 1;
+  // Empty for every provider
+  string provider = 2;
+  // Unspecified for every class
+  SignalClass signal_class = 3;
+  // 100 when 0, at most 1,000
+  uint32 limit = 4;
+  // Only signals whose wallet actions the correlation guard held
+  bool held_only = 5;
+}
+
+message ListSignalsResponse {
+  repeated Signal signals = 1;
+}
+
+message ProviderStatus {
+  string provider = 1;
+  // ok, slow or down, from samples
+  string state = 2;
+  // banned, unfunded or auth, empty while the account reads healthy
+  string blocked = 3;
+  google.protobuf.Timestamp state_since = 4;
+  uint32 samples = 5;
+  double success_lower_bound = 6;
+  uint32 ready_p95_ms = 7;
+  uint32 max_concurrent = 8;
+  uint32 in_use = 9;
+  uint32 external_in_use = 10;
+  // provider, settings or default
+  string limit_source = 11;
+  google.protobuf.Timestamp polled_at = 12;
+  // Sandboxes on the account that no known deployment owns, at the last count
+  uint32 foreign_sandboxes = 13;
+}
+
+message ListProvidersRequest {}
+
+message ListProvidersResponse {
+  repeated ProviderStatus providers = 1;
+}
+
+/* Benchmarks and start reports */
+
+enum SampleKind {
+  SAMPLE_KIND_UNSPECIFIED = 0;
+  SAMPLE_KIND_PLACEMENT = 1;
+  SAMPLE_KIND_CANARY = 2;
+  SAMPLE_KIND_BENCH = 3;
+}
+
+message StartBenchRequest {
+  string provider = 1;
+  // A size name the provider sells, its smallest when empty
+  string size = 2;
+  // 1 to 200
+  uint32 runs = 3;
+  // 1 to health.probe_workers
+  uint32 concurrency = 4;
+  // Must be at least the estimate when the estimate is over bench.confirm_above_micros
+  int64 confirm_cost_micros = 5;
+  // Boat only, go on when a start costs a fee
+  bool allow_paid_starts = 6;
+  string actor = 7;
+}
+
+message StartBenchResponse {
+  string bench_id = 1;
+  int64 estimated_cost_micros = 2;
+}
+
+message StepStats {
+  uint32 samples = 1;
+  uint32 p50_ms = 2;
+  uint32 p90_ms = 3;
+  uint32 p99_ms = 4;
+}
+
+message StartReport {
+  string provider = 1;
+  string size = 2;
+  SampleKind kind = 3;
+  uint32 ok = 4;
+  uint32 failed = 5;
+  // Refused for capacity, not counted as failures
+  uint32 capacity = 6;
+  double success_rate = 7;
+  double success_lower_bound = 8;
+  StepStats create = 9;
+  StepStats ready = 10;
+  StepStats runner = 11;
+  StepStats gate = 12;
+  StepStats first_command = 13;
+  StepStats warm_command = 14;
+  StepStats destroy = 15;
+  StepStats total = 16;
+  int64 cost_micros = 17;
+  // Failures by provider error code
+  map<string, uint32> errors = 18;
+}
+
+message ReportStartsRequest {
+  // One benchmark, or every sample since a time
+  oneof window {
+    string bench_id = 1;
+    google.protobuf.Timestamp since = 2;
+  }
+  // Every kind when empty
+  repeated SampleKind kinds = 3;
+  // Every provider when empty
+  string provider = 4;
+}
+
+message ReportStartsResponse {
+  // One per provider, size and kind
+  repeated StartReport reports = 1;
+  // A benchmark's planned runs, 0 for a time window
+  uint32 planned = 2;
+}
+
+/* Estimates */
+
+message GetEstimateRequest {
+  string estimate_id = 1;
+}
+
+message GetEstimateResponse {
+  string estimate_id = 1;
+  string estimator_version = 2;
+  // RFC 8785 bytes of the inputs, with the facts they name filled in
+  bytes inputs = 3;
+  // RFC 8785 bytes of the answer
+  bytes output = 4;
+  string inputs_sha256 = 5;
+  google.protobuf.Timestamp created_at = 6;
+  // The catalog bytes the estimate saw, from the catalogs table
+  bytes catalog = 7;
+}

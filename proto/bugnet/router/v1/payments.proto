@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package bugnet.router.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
+
+// Called by Payments with BUGNET_PAYMENTS_TOKEN, never by the gateway or the edges
+service PaymentsService {
+  // Says whether the router would refuse this payer's order now, and changes nothing
+  rpc CheckPayer(CheckPayerRequest) returns (CheckPayerResponse);
+}
+
+enum PayerVerdict {
+  PAYER_VERDICT_UNSPECIFIED = 0;
+  // The router would take the order, or the payer counts as absent
+  PAYER_VERDICT_OK = 1;
+  PAYER_VERDICT_BLOCKED = 2;
+  // At wallets.max_concurrent live placements, start orders only
+  PAYER_VERDICT_BUSY = 3;
+  // A start bucket is empty, start orders only
+  PAYER_VERDICT_RATE_LIMITED = 4;
+}
+
+message CheckPayerRequest {
+  // Canonical base58, as the order token will carry it
+  string payer = 1;
+  // The payment requirements' extra.feePayer, as the token's fee_payer claim will carry it
+  string fee_payer = 2;
+  string package_id = 3;
+  // start or extend
+  string kind = 4;
+}
+
+message CheckPayerResponse {
+  PayerVerdict verdict = 1;
+  // Set for BLOCKED, unset when the block lasts until an operator lifts it
+  google.protobuf.Timestamp blocked_until = 2;
+  // Set for RATE_LIMITED, the bucket's wait
+  google.protobuf.Duration retry_after = 3;
+}

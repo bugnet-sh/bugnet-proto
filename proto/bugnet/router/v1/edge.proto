@@ -1,0 +1,546 @@
+syntax = "proto3";
+
+package bugnet.router.v1;
+
+import "bugnet/router/v1/router.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
+
+// Called by bugnet-edge with BUGNET_EDGE_TOKEN
+service EdgeService {
+  rpc ResolvePreview(ResolvePreviewRequest) returns (ResolvePreviewResponse);
+  rpc RepairPreview(RepairPreviewRequest) returns (RepairPreviewResponse);
+  rpc OpenTransfer(OpenTransferRequest) returns (OpenTransferResponse);
+  rpc ReadTransfer(ReadTransferRequest) returns (stream ReadTransferResponse);
+  rpc WriteTransfer(stream WriteTransferRequest) returns (WriteTransferResponse);
+  rpc DeliverHook(DeliverHookRequest) returns (DeliverHookResponse);
+  rpc ReportEdgeUsage(ReportEdgeUsageRequest) returns (ReportEdgeUsageResponse);
+  rpc CheckEdgeLeases(CheckEdgeLeasesRequest) returns (CheckEdgeLeasesResponse);
+  rpc WatchEdgeEvents(WatchEdgeEventsRequest) returns (stream WatchEdgeEventsResponse);
+}
+
+// Called by bugnet-secrets (bugnet-edge --role secrets) with BUGNET_SECRETS_TOKEN
+service SecretsRouteService {
+  rpc GetSecretLink(GetSecretLinkRequest) returns (GetSecretLinkResponse);
+  rpc SubmitSecretLink(SubmitSecretLinkRequest) returns (SubmitSecretLinkResponse);
+  rpc GetBridgeSealingKey(GetBridgeSealingKeyRequest) returns (GetBridgeSealingKeyResponse);
+  rpc PutBridgeSecret(PutBridgeSecretRequest) returns (PutBridgeSecretResponse);
+}
+
+// Called by bugnet-ssh with BUGNET_SSH_TOKEN
+service SshGatewayService {
+  rpc AuthorizeSshKey(AuthorizeSshKeyRequest) returns (AuthorizeSshKeyResponse);
+  rpc AcquireSshConnection(AcquireSshConnectionRequest) returns (AcquireSshConnectionResponse);
+  rpc RenewSshConnection(RenewSshConnectionRequest) returns (RenewSshConnectionResponse);
+  rpc ReleaseSshConnection(ReleaseSshConnectionRequest) returns (ReleaseSshConnectionResponse);
+  rpc OpenSshUpstream(OpenSshUpstreamRequest) returns (OpenSshUpstreamResponse);
+  rpc CheckSshGrants(CheckSshGrantsRequest) returns (CheckSshGrantsResponse);
+  rpc ReportSshUsage(ReportSshUsageRequest) returns (ReportSshUsageResponse);
+  rpc WatchSshEvents(WatchSshEventsRequest) returns (stream WatchSshEventsResponse);
+}
+
+// Called by bugnet-egress with BUGNET_EGRESS_TOKEN
+service EgressService {
+  rpc ResolveTunnel(ResolveTunnelRequest) returns (ResolveTunnelResponse);
+  rpc ReportEgressUsage(ReportEgressUsageRequest) returns (ReportEgressUsageResponse);
+  rpc CheckEgressLeases(CheckEgressLeasesRequest) returns (CheckEgressLeasesResponse);
+  rpc WatchEgressEvents(WatchEgressEventsRequest) returns (stream WatchEgressEventsResponse);
+}
+
+/* Shared */
+
+message HeaderValue {
+  string name = 1;
+  string value = 2;
+}
+
+// The provider's route to the gate in one sandbox, never shown to users
+message GateUpstream {
+  // The route's https origin, host and optional port
+  string base_url = 1;
+  // Provider credential headers and Bugnet-Gate
+  repeated HeaderValue headers = 2;
+  // Provider credential cookies, Boat's _port_auth
+  repeated HeaderValue cookies = 3;
+  // Paths never forwarded, Koyeb's /koyeb-sandbox/
+  repeated string blocked_path_prefixes = 4;
+}
+
+message EdgeBudget {
+  // Previews, transfers and SSH together
+  uint64 bytes_remaining = 1;
+  // Each way, the starting pace until a usage report answers another
+  uint64 bytes_per_second = 2;
+  uint32 queued_requests = 3;
+  uint32 websockets = 4;
+  // Preview requests a second
+  uint32 requests_per_second = 5;
+  // The burst of requests_per_second
+  uint32 requests_burst = 6;
+}
+
+message PlacementUsage {
+  string placement_id = 1;
+  // Toward the sandbox since the last report
+  uint64 bytes_in = 2;
+  // From the sandbox since the last report
+  uint64 bytes_out = 3;
+}
+
+enum EndReason {
+  END_REASON_UNSPECIFIED = 0;
+  END_REASON_STOPPED = 1;
+  END_REASON_EXPIRED = 2;
+  END_REASON_ABUSE = 3;
+  END_REASON_PROVIDER_FAILED = 4;
+  END_REASON_SETTLEMENT_FAILED = 5;
+  END_REASON_CONTROL_LOST = 6;
+  END_REASON_OPERATOR = 7;
+  END_REASON_SANDBOX_EXITED = 8;
+}
+
+enum BudgetKind {
+  BUDGET_KIND_UNSPECIFIED = 0;
+  // Previews, transfers and SSH
+  BUDGET_KIND_EDGE = 1;
+  BUDGET_KIND_EGRESS = 2;
+}
+
+message PlacementEnded {
+  string placement_id = 1;
+  EndReason reason = 2;
+}
+
+message DeadlineMoved {
+  string placement_id = 1;
+  google.protobuf.Timestamp deadline = 2;
+  // After the extension's budget, the smaller of the placement's and its wallet's
+  uint64 edge_bytes_remaining = 3;
+  uint64 egress_bytes_remaining = 4;
+}
+
+message PreviewRevoked {
+  string placement_id = 1;
+  string preview_id = 2;
+}
+
+message SshKeyRemoved {
+  string placement_id = 1;
+  string fingerprint = 2;
+}
+
+message BudgetSpent {
+  string placement_id = 1;
+  BudgetKind kind = 2;
+}
+
+message SecretsChanged {
+  string placement_id = 1;
+}
+
+// The cursor is older than the stream keeps, re-check every live lease
+message Resync {}
+
+message EdgeEvent {
+  oneof event {
+    PlacementEnded placement_ended = 1;
+    DeadlineMoved deadline_moved = 2;
+    PreviewRevoked preview_revoked = 3;
+    SshKeyRemoved ssh_key_removed = 4;
+    BudgetSpent budget_spent = 5;
+    SecretsChanged secrets_changed = 6;
+    Resync resync = 7;
+  }
+}
+
+/* Previews */
+
+message ResolvePreviewRequest {
+  // The host label
+  string preview_id = 1;
+  // As received, the router recomputes and compares
+  string token = 2;
+}
+
+message ResolvePreviewResponse {
+  // Internal id, never the handle
+  string placement_id = 1;
+  uint32 port = 2;
+  GateUpstream upstream = 3;
+  // The paid deadline
+  google.protobuf.Timestamp expires_at = 4;
+  uint32 generation = 5;
+  EdgeBudget budget = 6;
+  // Whether browsers see the warning page first
+  bool interstitial = 7;
+  // The repository or model the sandbox runs, when known
+  string source_label = 8;
+  google.protobuf.Timestamp started_at = 9;
+}
+
+message RepairPreviewRequest {
+  string preview_id = 1;
+  string token = 2;
+}
+
+message RepairPreviewResponse {
+  // False when a repair ran in the last minute
+  bool repaired = 1;
+}
+
+/* Transfers */
+
+message OpenTransferRequest {
+  // As received, the router hashes it
+  string token = 1;
+  // From the HTTP method
+  TransferDirection direction = 2;
+  // A HEAD request, which reports without claiming
+  bool probe = 3;
+  string edge_id = 4;
+}
+
+message OpenTransferResponse {
+  string transfer_id = 1;
+  // Proves this edge holds the claim, sent with every stream
+  string lease = 2;
+  string placement_id = 3;
+  // Base name for Content-Disposition
+  string file_name = 4;
+  uint64 size = 5;
+  // Strong validator from size and modification time
+  string etag = 6;
+  google.protobuf.Timestamp modified_at = 7;
+  // The earlier of the placement deadline and the maximum duration
+  google.protobuf.Timestamp hard_stop = 8;
+  // The paid deadline, for the placement's lease
+  google.protobuf.Timestamp expires_at = 9;
+  EdgeBudget budget = 10;
+}
+
+message ReadTransferRequest {
+  string transfer_id = 1;
+  string lease = 2;
+  uint64 offset = 3;
+  // 0 reads to the size at open
+  uint64 length = 4;
+}
+
+message ReadTransferResponse {
+  // At most 256 KiB
+  bytes data = 1;
+  // Only on the last message, once the router's end check passed
+  bool verified = 2;
+}
+
+message WriteTransferRequest {
+  // Set on the first message only
+  string transfer_id = 1;
+  // Set on the first message only
+  string lease = 2;
+  // At most 256 KiB
+  bytes data = 3;
+}
+
+message WriteTransferResponse {
+  string path = 1;
+  uint64 size = 2;
+  bytes sha256 = 3;
+}
+
+/* Secrets */
+
+message GetSecretLinkRequest {
+  string link_token = 1;
+}
+
+message GetSecretLinkResponse {
+  string pairing_code = 1;
+  string source_label = 2;
+  google.protobuf.Timestamp sandbox_created_at = 3;
+  google.protobuf.Timestamp expires_at = 4;
+  // Name and preset hosts the page prefills
+  SecretSpec suggested = 5;
+  // Every current key, newest first, the page seals with the newest one it pinned
+  repeated SealingKey sealing_keys = 6;
+}
+
+message SubmitSecretLinkRequest {
+  string link_token = 1;
+  SecretSpec spec = 2;
+  SealedValue value = 3;
+  // A retried submit is answered, not refused
+  string submission_id = 4;
+  string client_ip = 5;
+}
+
+message SubmitSecretLinkResponse {
+  SecretInfo secret = 1;
+}
+
+// The bridge's calls carry a put grant from CreateSecretPutGrant, never a handle
+message GetBridgeSealingKeyRequest {
+  // bnsp_..., as received
+  string put_grant = 1;
+  string client_ip = 2;
+}
+
+message GetBridgeSealingKeyResponse {
+  repeated SealingKey sealing_keys = 1;
+}
+
+message PutBridgeSecretRequest {
+  // bnsp_..., as received
+  string put_grant = 1;
+  SecretSpec spec = 2;
+  SealedValue value = 3;
+  string idempotency_key = 4;
+  string client_ip = 5;
+}
+
+message PutBridgeSecretResponse {
+  SecretInfo secret = 1;
+  bool replaced = 2;
+}
+
+/* Hooks */
+
+message DeliverHookRequest {
+  // The {provider} path segment
+  string provider = 1;
+  // Every request header, names lower-cased
+  repeated HeaderValue headers = 2;
+  // The exact body, at most 64 KiB, after the edge checked the path secret
+  bytes body = 3;
+  string client_ip = 4;
+}
+
+message DeliverHookResponse {
+  // The HTTP status the edge answers with
+  uint32 status = 1;
+}
+
+/* Usage, leases and events */
+
+message ReportEdgeUsageRequest {
+  string reporter_id = 1;
+  repeated PlacementUsage usage = 2;
+}
+
+message ReportEdgeUsageResponse {
+  // Bytes left by placement id, 0 once spent, absent once ended
+  map<string, uint64> bytes_remaining = 1;
+  // Pace each way by placement id, half while the SSH gateway also carries its traffic
+  map<string, uint64> bytes_per_second = 2;
+}
+
+message ReportSshUsageRequest {
+  string reporter_id = 1;
+  repeated PlacementUsage usage = 2;
+}
+
+message ReportSshUsageResponse {
+  map<string, uint64> bytes_remaining = 1;
+  // Half while the edge also carries the placement's traffic
+  map<string, uint64> bytes_per_second = 2;
+}
+
+message ReportEgressUsageRequest {
+  string reporter_id = 1;
+  repeated PlacementUsage usage = 2;
+}
+
+message ReportEgressUsageResponse {
+  // The egress budget, not the edge one
+  map<string, uint64> bytes_remaining = 1;
+}
+
+message HeldPreview {
+  string preview_id = 1;
+  uint32 generation = 2;
+}
+
+message CheckEdgeLeasesRequest {
+  repeated string placement_ids = 1;
+  // Every preview route the edge holds, so a lost PreviewRevoked is repaired
+  repeated HeldPreview previews = 2;
+}
+
+message EdgeLease {
+  google.protobuf.Timestamp deadline = 1;
+  // The smaller of the placement's and its wallet's edge bytes left
+  uint64 bytes_remaining = 2;
+}
+
+message CheckEdgeLeasesResponse {
+  // Each placement still ready, ended ones are absent
+  map<string, EdgeLease> leases = 1;
+  // Held previews that were revoked or whose generation moved
+  repeated string revoked_preview_ids = 2;
+}
+
+message CheckEgressLeasesRequest {
+  repeated string placement_ids = 1;
+}
+
+message EgressLease {
+  google.protobuf.Timestamp deadline = 1;
+  uint64 bytes_remaining = 2;
+  // Moves whenever the placement's secrets change, a stale cached set is dropped
+  uint64 secrets_version = 3;
+}
+
+message CheckEgressLeasesResponse {
+  map<string, EgressLease> leases = 1;
+}
+
+message WatchEdgeEventsRequest {
+  // Resume after this stream position, empty starts from now
+  string cursor = 1;
+}
+
+message WatchEdgeEventsResponse {
+  string cursor = 1;
+  EdgeEvent event = 2;
+}
+
+message WatchSshEventsRequest {
+  string cursor = 1;
+}
+
+message WatchSshEventsResponse {
+  string cursor = 1;
+  EdgeEvent event = 2;
+}
+
+message WatchEgressEventsRequest {
+  string cursor = 1;
+}
+
+message WatchEgressEventsResponse {
+  string cursor = 1;
+  EdgeEvent event = 2;
+}
+
+/* SSH */
+
+message AuthorizeSshKeyRequest {
+  // The user name the client sent
+  string alias = 1;
+  // SSH wire format
+  bytes public_key = 2;
+  string client_ip = 3;
+}
+
+message AuthorizeSshKeyResponse {
+  // Opaque, names the placement and the key
+  string grant_id = 1;
+  string placement_id = 2;
+  google.protobuf.Timestamp deadline = 3;
+  uint32 max_sessions = 4;
+  uint32 max_forwards = 5;
+}
+
+message AcquireSshConnectionRequest {
+  string grant_id = 1;
+  string gateway_id = 2;
+}
+
+message AcquireSshConnectionResponse {
+  string lease_id = 1;
+  google.protobuf.Timestamp lease_expires_at = 2;
+  EdgeBudget budget = 3;
+}
+
+message RenewSshConnectionRequest {
+  string grant_id = 1;
+  string lease_id = 2;
+}
+
+message RenewSshConnectionResponse {
+  google.protobuf.Timestamp lease_expires_at = 1;
+}
+
+message ReleaseSshConnectionRequest {
+  string grant_id = 1;
+  string lease_id = 2;
+}
+
+message ReleaseSshConnectionResponse {}
+
+message OpenSshUpstreamRequest {
+  string grant_id = 1;
+  // The key the gateway derived for this placement, SSH wire format, ed25519 only
+  bytes gateway_public_key = 2;
+}
+
+// The gate's SSH path, every provider
+message WebSocketUpstream {
+  // A wss URL to <route host>/__bugnet/ssh
+  string url = 1;
+  repeated HeaderValue headers = 2;
+  repeated HeaderValue cookies = 3;
+}
+
+// A provider's own SSH server, Boat's fallback
+message TcpUpstream {
+  // The server's host and port
+  string address = 1;
+}
+
+message OpenSshUpstreamResponse {
+  oneof transport {
+    WebSocketUpstream websocket = 1;
+    TcpUpstream tcp = 2;
+  }
+  // Capabilities.ExecUser, or NativeSSH.User on Boat native, never the sandbox's own output
+  string user = 3;
+  // authorized_keys format, any one may match
+  repeated string host_keys = 4;
+  google.protobuf.Timestamp deadline = 5;
+}
+
+message CheckSshGrantsRequest {
+  repeated string grant_ids = 1;
+}
+
+message CheckSshGrantsResponse {
+  // Deadline of each grant still valid, revoked ones are absent
+  map<string, google.protobuf.Timestamp> deadlines = 1;
+}
+
+/* Egress */
+
+message ResolveTunnelRequest {
+  oneof caller {
+    // SHA-256 of the bnt_ token a sandbox's forwarder presented
+    bytes token_sha256 = 1;
+    // The router's repository fetcher, acting for this placement
+    string fetch_placement_id = 2;
+  }
+}
+
+message EgressSecret {
+  bytes placeholder_sha256 = 1;
+  SecretSpec spec = 2;
+  SealedValue value = 3;
+  // Hosts of spec.hosts outside every preset, forwarded only when a placeholder was swapped
+  repeated string custom_hosts = 4;
+}
+
+message ResolveTunnelResponse {
+  string placement_id = 1;
+  google.protobuf.Timestamp deadline = 2;
+  // The CA version the sandbox trusts
+  uint32 ca_version = 3;
+  // Sandbox callers never get fetch_only secrets
+  repeated EgressSecret secrets = 4;
+  uint64 bytes_remaining = 5;
+  uint32 max_tunnels = 6;
+  // Moves whenever the placement's secrets change
+  uint64 secrets_version = 7;
+  // Each way, per placement
+  uint64 bytes_per_second = 8;
+  uint32 requests_in_flight = 9;
+}

@@ -65,6 +65,13 @@ export declare type Requirements = Message<"bugnet.router.v1.Requirements"> & {
    * @generated from field: bool gpu = 3;
    */
   gpu: boolean;
+
+  /**
+   * The order will add secrets, so the provider's secret path must be proven
+   *
+   * @generated from field: bool secrets = 4;
+   */
+  secrets: boolean;
 };
 
 /**
@@ -106,6 +113,41 @@ export declare type PackageOption = Message<"bugnet.router.v1.PackageOption"> & 
    * @generated from field: string unavailable_reason = 6;
    */
   unavailableReason: string;
+
+  /**
+   * The package covers the floor, counting the extensions below
+   *
+   * @generated from field: bool fits = 7;
+   */
+  fits: boolean;
+
+  /**
+   * Extensions needed to cover the floor's minutes
+   *
+   * @generated from field: uint32 extensions_needed = 8;
+   */
+  extensionsNeeded: number;
+
+  /**
+   * What the package lacks when it does not fit
+   *
+   * @generated from field: repeated bugnet.router.v1.Dimension short_on = 9;
+   */
+  shortOn: Dimension[];
+
+  /**
+   * The extension package counted above, empty when none is needed
+   *
+   * @generated from field: string extension_package_id = 10;
+   */
+  extensionPackageId: string;
+
+  /**
+   * price_micros plus the extensions needed
+   *
+   * @generated from field: int64 total_price_micros = 11;
+   */
+  totalPriceMicros: bigint;
 };
 
 /**
@@ -119,9 +161,42 @@ export declare const PackageOptionSchema: GenMessage<PackageOption>;
  */
 export declare type EstimateRequest = Message<"bugnet.router.v1.EstimateRequest"> & {
   /**
+   * Still honoured, merged with needs
+   *
    * @generated from field: bugnet.router.v1.Requirements requirements = 1;
    */
   requirements?: Requirements | undefined;
+
+  /**
+   * A GitHub URL with an optional ref, a Hugging Face model id, or empty, as the agent gave it
+   *
+   * @generated from field: string source = 2;
+   */
+  source: string;
+
+  /**
+   * @generated from field: bugnet.router.v1.Workload workload = 3;
+   */
+  workload: Workload;
+
+  /**
+   * The command the agent plans to run, at most 1,000 bytes, read for hints, never run or stored
+   *
+   * @generated from field: string entry_command = 4;
+   */
+  entryCommand: string;
+
+  /**
+   * Minutes the agent expects, 1 to 1,440, absent when unknown
+   *
+   * @generated from field: optional uint32 expected_minutes = 5;
+   */
+  expectedMinutes?: number | undefined;
+
+  /**
+   * @generated from field: repeated bugnet.router.v1.Need needs = 6;
+   */
+  needs: Need[];
 };
 
 /**
@@ -131,6 +206,141 @@ export declare type EstimateRequest = Message<"bugnet.router.v1.EstimateRequest"
 export declare const EstimateRequestSchema: GenMessage<EstimateRequest>;
 
 /**
+ * @generated from message bugnet.router.v1.ResolvedSource
+ */
+export declare type ResolvedSource = Message<"bugnet.router.v1.ResolvedSource"> & {
+  /**
+   * @generated from field: bugnet.router.v1.SourceKind kind = 1;
+   */
+  kind: SourceKind;
+
+  /**
+   * github.com/owner/repo plus any subdirectory, huggingface.co/org/model, or a URL's origin
+   *
+   * @generated from field: string canonical = 2;
+   */
+  canonical: string;
+
+  /**
+   * The ref or revision asked for, empty for the default branch
+   *
+   * @generated from field: string ref = 3;
+   */
+  ref: string;
+
+  /**
+   * The commit or revision SHA the estimate read, empty when it read nothing
+   *
+   * @generated from field: string revision = 4;
+   */
+  revision: string;
+
+  /**
+   * @generated from field: bool read = 5;
+   */
+  read: boolean;
+
+  /**
+   * Set when read is false
+   *
+   * @generated from field: bugnet.router.v1.UnreadReason unread_reason = 6;
+   */
+  unreadReason: UnreadReason;
+};
+
+/**
+ * Describes the message bugnet.router.v1.ResolvedSource.
+ * Use `create(ResolvedSourceSchema)` to create a new message.
+ */
+export declare const ResolvedSourceSchema: GenMessage<ResolvedSource>;
+
+/**
+ * @generated from message bugnet.router.v1.ResourceFloor
+ */
+export declare type ResourceFloor = Message<"bugnet.router.v1.ResourceFloor"> & {
+  /**
+   * @generated from field: bugnet.router.v1.Resources resources = 1;
+   */
+  resources?: Resources | undefined;
+
+  /**
+   * @generated from field: uint32 minutes = 2;
+   */
+  minutes: number;
+
+  /**
+   * Bytes the run is expected to download, such as model weights
+   *
+   * @generated from field: uint64 download_bytes = 3;
+   */
+  downloadBytes: bigint;
+
+  /**
+   * @generated from field: bugnet.router.v1.GpuNeed gpu = 4;
+   */
+  gpu: GpuNeed;
+
+  /**
+   * The context length an inference floor assumes, 0 for other workloads
+   *
+   * @generated from field: uint32 context_tokens = 5;
+   */
+  contextTokens: number;
+};
+
+/**
+ * Describes the message bugnet.router.v1.ResourceFloor.
+ * Use `create(ResourceFloorSchema)` to create a new message.
+ */
+export declare const ResourceFloorSchema: GenMessage<ResourceFloor>;
+
+/**
+ * @generated from message bugnet.router.v1.EstimateWarning
+ */
+export declare type EstimateWarning = Message<"bugnet.router.v1.EstimateWarning"> & {
+  /**
+   * @generated from field: bugnet.router.v1.WarningCode code = 1;
+   */
+  code: WarningCode;
+
+  /**
+   * One short line built from typed values, never from repository text or provider names
+   *
+   * @generated from field: string message = 2;
+   */
+  message: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.EstimateWarning.
+ * Use `create(EstimateWarningSchema)` to create a new message.
+ */
+export declare const EstimateWarningSchema: GenMessage<EstimateWarning>;
+
+/**
+ * @generated from message bugnet.router.v1.EstimateReason
+ */
+export declare type EstimateReason = Message<"bugnet.router.v1.EstimateReason"> & {
+  /**
+   * Stable, such as dc.host or hf.weights
+   *
+   * @generated from field: string rule_id = 1;
+   */
+  ruleId: string;
+
+  /**
+   * @generated from field: string message = 2;
+   */
+  message: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.EstimateReason.
+ * Use `create(EstimateReasonSchema)` to create a new message.
+ */
+export declare const EstimateReasonSchema: GenMessage<EstimateReason>;
+
+/**
  * @generated from message bugnet.router.v1.EstimateResponse
  */
 export declare type EstimateResponse = Message<"bugnet.router.v1.EstimateResponse"> & {
@@ -138,6 +348,69 @@ export declare type EstimateResponse = Message<"bugnet.router.v1.EstimateRespons
    * @generated from field: repeated bugnet.router.v1.PackageOption options = 1;
    */
   options: PackageOption[];
+
+  /**
+   * Pass to CreatePlacement through the gateway's quote
+   *
+   * @generated from field: string estimate_id = 2;
+   */
+  estimateId: string;
+
+  /**
+   * @generated from field: string estimator_version = 3;
+   */
+  estimatorVersion: string;
+
+  /**
+   * Hex SHA-256 of the canonical inputs
+   *
+   * @generated from field: string inputs_sha256 = 4;
+   */
+  inputsSha256: string;
+
+  /**
+   * @generated from field: bugnet.router.v1.ResolvedSource source = 5;
+   */
+  source?: ResolvedSource | undefined;
+
+  /**
+   * @generated from field: bugnet.router.v1.ResourceFloor floor = 6;
+   */
+  floor?: ResourceFloor | undefined;
+
+  /**
+   * Empty when no package fits
+   *
+   * @generated from field: string recommended_package_id = 7;
+   */
+  recommendedPackageId: string;
+
+  /**
+   * @generated from field: repeated bugnet.router.v1.EstimateReason reasons = 8;
+   */
+  reasons: EstimateReason[];
+
+  /**
+   * @generated from field: repeated bugnet.router.v1.EstimateWarning warnings = 9;
+   */
+  warnings: EstimateWarning[];
+
+  /**
+   * @generated from field: bugnet.router.v1.EstimateBasis basis = 10;
+   */
+  basis: EstimateBasis;
+
+  /**
+   * @generated from field: bugnet.router.v1.Confidence confidence = 11;
+   */
+  confidence: Confidence;
+
+  /**
+   * Some source data could not be read within the time budget
+   *
+   * @generated from field: bool partial = 12;
+   */
+  partial: boolean;
 };
 
 /**
@@ -189,6 +462,27 @@ export declare type Placement = Message<"bugnet.router.v1.Placement"> & {
    * @generated from field: bool refundable = 8;
    */
   refundable: boolean;
+
+  /**
+   * Routing name for SSH, set at ready when the provider has SSH, empty otherwise
+   *
+   * @generated from field: string ssh_alias = 9;
+   */
+  sshAlias: string;
+
+  /**
+   * stop, deadline, abuse, control_lost, provider_failed, sandbox_exited, wallet_blocked, operator
+   *
+   * @generated from field: string termination_reason = 10;
+   */
+  terminationReason: string;
+
+  /**
+   * The repository the router placed in the sandbox
+   *
+   * @generated from field: bugnet.router.v1.Bootstrap bootstrap = 11;
+   */
+  bootstrap?: Bootstrap | undefined;
 };
 
 /**
@@ -210,6 +504,13 @@ export declare type CreatePlacementRequest = Message<"bugnet.router.v1.CreatePla
    * @generated from field: bugnet.router.v1.Requirements requirements = 2;
    */
   requirements?: Requirements | undefined;
+
+  /**
+   * The estimate behind the quote, which ties the run to its source
+   *
+   * @generated from field: string estimate_id = 3;
+   */
+  estimateId: string;
 };
 
 /**
@@ -579,6 +880,13 @@ export declare type ExecResponse = Message<"bugnet.router.v1.ExecResponse"> & {
    * @generated from field: bool truncated = 7;
    */
   truncated: boolean;
+
+  /**
+   * The kernel's OOM killer ended a process of this job
+   *
+   * @generated from field: bool oom_killed = 8;
+   */
+  oomKilled: boolean;
 };
 
 /**
@@ -631,6 +939,20 @@ export declare type JobExit = Message<"bugnet.router.v1.JobExit"> & {
    * @generated from field: uint64 stderr_bytes = 3;
    */
   stderrBytes: bigint;
+
+  /**
+   * The kernel's OOM killer ended a process of this job
+   *
+   * @generated from field: bool oom_killed = 4;
+   */
+  oomKilled: boolean;
+
+  /**
+   * The job's peak memory in MiB, 0 when the sandbox cannot measure it
+   *
+   * @generated from field: uint32 peak_memory_mib = 5;
+   */
+  peakMemoryMib: number;
 };
 
 /**
@@ -960,6 +1282,1159 @@ export declare type ListFilesResponse = Message<"bugnet.router.v1.ListFilesRespo
 export declare const ListFilesResponseSchema: GenMessage<ListFilesResponse>;
 
 /**
+ * @generated from message bugnet.router.v1.CreatePreviewRequest
+ */
+export declare type CreatePreviewRequest = Message<"bugnet.router.v1.CreatePreviewRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * @generated from field: uint32 port = 2;
+   */
+  port: number;
+};
+
+/**
+ * Describes the message bugnet.router.v1.CreatePreviewRequest.
+ * Use `create(CreatePreviewRequestSchema)` to create a new message.
+ */
+export declare const CreatePreviewRequestSchema: GenMessage<CreatePreviewRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.CreatePreviewResponse
+ */
+export declare type CreatePreviewResponse = Message<"bugnet.router.v1.CreatePreviewResponse"> & {
+  /**
+   * <id>.<preview domain>/?bugnet_token=bnp_...
+   *
+   * @generated from field: string url = 1;
+   */
+  url: string;
+
+  /**
+   * The same token, for the Bugnet-Token header
+   *
+   * @generated from field: string token = 2;
+   */
+  token: string;
+
+  /**
+   * The paid deadline
+   *
+   * @generated from field: google.protobuf.Timestamp expires_at = 3;
+   */
+  expiresAt?: Timestamp | undefined;
+
+  /**
+   * Something accepted a connection on the port when the router asked
+   *
+   * @generated from field: bool listening = 4;
+   */
+  listening: boolean;
+
+  /**
+   * @generated from field: string preview_id = 5;
+   */
+  previewId: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.CreatePreviewResponse.
+ * Use `create(CreatePreviewResponseSchema)` to create a new message.
+ */
+export declare const CreatePreviewResponseSchema: GenMessage<CreatePreviewResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.CreateTransferRequest
+ */
+export declare type CreateTransferRequest = Message<"bugnet.router.v1.CreateTransferRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * @generated from field: bugnet.router.v1.TransferDirection direction = 2;
+   */
+  direction: TransferDirection;
+
+  /**
+   * An absolute path, or ~ or ~/rest for the exec user's home
+   *
+   * @generated from field: string path = 3;
+   */
+  path: string;
+
+  /**
+   * Uploads only, the exact size in bytes, required with 0 allowed, optional so presence shows
+   *
+   * @generated from field: optional uint64 size_bytes = 4;
+   */
+  sizeBytes?: bigint | undefined;
+
+  /**
+   * Uploads only, permission bits, 0644 when 0
+   *
+   * @generated from field: uint32 mode = 5;
+   */
+  mode: number;
+
+  /**
+   * Uploads only, the expected SHA-256, checked before the file is replaced
+   *
+   * @generated from field: bytes sha256 = 6;
+   */
+  sha256: Uint8Array;
+
+  /**
+   * A repeated key returns the same URL
+   *
+   * @generated from field: string idempotency_key = 7;
+   */
+  idempotencyKey: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.CreateTransferRequest.
+ * Use `create(CreateTransferRequestSchema)` to create a new message.
+ */
+export declare const CreateTransferRequestSchema: GenMessage<CreateTransferRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.CreateTransferResponse
+ */
+export declare type CreateTransferResponse = Message<"bugnet.router.v1.CreateTransferResponse"> & {
+  /**
+   * <transfer host>/<token>
+   *
+   * @generated from field: string url = 1;
+   */
+  url: string;
+
+  /**
+   * The transfer must start before this
+   *
+   * @generated from field: google.protobuf.Timestamp expires_at = 2;
+   */
+  expiresAt?: Timestamp | undefined;
+
+  /**
+   * The file's size now for a download, the declared size for an upload
+   *
+   * @generated from field: uint64 size = 3;
+   */
+  size: bigint;
+
+  /**
+   * The per-file cap, the package's edge.transfer_max_bytes or else transfers.max_bytes
+   *
+   * @generated from field: uint64 max_bytes = 4;
+   */
+  maxBytes: bigint;
+
+  /**
+   * Downloads only, the file's modification time
+   *
+   * @generated from field: google.protobuf.Timestamp modified_at = 5;
+   */
+  modifiedAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.CreateTransferResponse.
+ * Use `create(CreateTransferResponseSchema)` to create a new message.
+ */
+export declare const CreateTransferResponseSchema: GenMessage<CreateTransferResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.AddSshKeyRequest
+ */
+export declare type AddSshKeyRequest = Message<"bugnet.router.v1.AddSshKeyRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * One authorized_keys line without options
+   *
+   * @generated from field: string public_key = 2;
+   */
+  publicKey: string;
+
+  /**
+   * Echoed in the command, ~/.ssh/bugnet_<alias> when empty
+   *
+   * @generated from field: string identity_file = 3;
+   */
+  identityFile: string;
+
+  /**
+   * Echoed in the command, ~/.ssh/bugnet_known_hosts when empty
+   *
+   * @generated from field: string known_hosts_file = 4;
+   */
+  knownHostsFile: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.AddSshKeyRequest.
+ * Use `create(AddSshKeyRequestSchema)` to create a new message.
+ */
+export declare const AddSshKeyRequestSchema: GenMessage<AddSshKeyRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.AddSshKeyResponse
+ */
+export declare type AddSshKeyResponse = Message<"bugnet.router.v1.AddSshKeyResponse"> & {
+  /**
+   * @generated from field: string alias = 1;
+   */
+  alias: string;
+
+  /**
+   * @generated from field: string host = 2;
+   */
+  host: string;
+
+  /**
+   * @generated from field: uint32 port = 3;
+   */
+  port: number;
+
+  /**
+   * SHA256 fingerprint of the added key
+   *
+   * @generated from field: string fingerprint = 4;
+   */
+  fingerprint: string;
+
+  /**
+   * One line per current gateway host key
+   *
+   * @generated from field: repeated string known_hosts = 5;
+   */
+  knownHosts: string[];
+
+  /**
+   * @generated from field: string command = 6;
+   */
+  command: string;
+
+  /**
+   * An optional ssh_config stanza
+   *
+   * @generated from field: string config = 7;
+   */
+  config: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp expires_at = 8;
+   */
+  expiresAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.AddSshKeyResponse.
+ * Use `create(AddSshKeyResponseSchema)` to create a new message.
+ */
+export declare const AddSshKeyResponseSchema: GenMessage<AddSshKeyResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.RemoveSshKeyRequest
+ */
+export declare type RemoveSshKeyRequest = Message<"bugnet.router.v1.RemoveSshKeyRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * @generated from field: string fingerprint = 2;
+   */
+  fingerprint: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.RemoveSshKeyRequest.
+ * Use `create(RemoveSshKeyRequestSchema)` to create a new message.
+ */
+export declare const RemoveSshKeyRequestSchema: GenMessage<RemoveSshKeyRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.RemoveSshKeyResponse
+ */
+export declare type RemoveSshKeyResponse = Message<"bugnet.router.v1.RemoveSshKeyResponse"> & {
+};
+
+/**
+ * Describes the message bugnet.router.v1.RemoveSshKeyResponse.
+ * Use `create(RemoveSshKeyResponseSchema)` to create a new message.
+ */
+export declare const RemoveSshKeyResponseSchema: GenMessage<RemoveSshKeyResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.SecretSpec
+ */
+export declare type SecretSpec = Message<"bugnet.router.v1.SecretSpec"> & {
+  /**
+   * ^[A-Za-z_][A-Za-z0-9_]{0,63}$, not a reserved name
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * Exact lower-case host names in punycode
+   *
+   * @generated from field: repeated string hosts = 2;
+   */
+  hosts: string[];
+
+  /**
+   * Header names besides Authorization that may carry the placeholder
+   *
+   * @generated from field: repeated string header_names = 3;
+   */
+  headerNames: string[];
+
+  /**
+   * Only the router's repository fetcher uses it, the sandbox gets no placeholder
+   *
+   * @generated from field: bool fetch_only = 4;
+   */
+  fetchOnly: boolean;
+};
+
+/**
+ * Describes the message bugnet.router.v1.SecretSpec.
+ * Use `create(SecretSpecSchema)` to create a new message.
+ */
+export declare const SecretSpecSchema: GenMessage<SecretSpec>;
+
+/**
+ * @generated from message bugnet.router.v1.SealedValue
+ */
+export declare type SealedValue = Message<"bugnet.router.v1.SealedValue"> & {
+  /**
+   * @generated from field: string key_id = 1;
+   */
+  keyId: string;
+
+  /**
+   * crypto_box_seal of the bound JSON payload, at most 70 KiB
+   *
+   * @generated from field: bytes box = 2;
+   */
+  box: Uint8Array;
+};
+
+/**
+ * Describes the message bugnet.router.v1.SealedValue.
+ * Use `create(SealedValueSchema)` to create a new message.
+ */
+export declare const SealedValueSchema: GenMessage<SealedValue>;
+
+/**
+ * @generated from message bugnet.router.v1.SealingKey
+ */
+export declare type SealingKey = Message<"bugnet.router.v1.SealingKey"> & {
+  /**
+   * @generated from field: string key_id = 1;
+   */
+  keyId: string;
+
+  /**
+   * X25519, 32 bytes
+   *
+   * @generated from field: bytes public_key = 2;
+   */
+  publicKey: Uint8Array;
+
+  /**
+   * Ties a sealed value to one placement
+   *
+   * @generated from field: string binding = 3;
+   */
+  binding: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.SealingKey.
+ * Use `create(SealingKeySchema)` to create a new message.
+ */
+export declare const SealingKeySchema: GenMessage<SealingKey>;
+
+/**
+ * @generated from message bugnet.router.v1.SecretInfo
+ */
+export declare type SecretInfo = Message<"bugnet.router.v1.SecretInfo"> & {
+  /**
+   * @generated from field: bugnet.router.v1.SecretSpec spec = 1;
+   */
+  spec?: SecretSpec | undefined;
+
+  /**
+   * @generated from field: bugnet.router.v1.SecretState state = 2;
+   */
+  state: SecretState;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp updated_at = 3;
+   */
+  updatedAt?: Timestamp | undefined;
+
+  /**
+   * A stable code when the state is failed, such as PORT_443_TAKEN
+   *
+   * @generated from field: string failure_reason = 4;
+   */
+  failureReason: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.SecretInfo.
+ * Use `create(SecretInfoSchema)` to create a new message.
+ */
+export declare const SecretInfoSchema: GenMessage<SecretInfo>;
+
+/**
+ * The page shows placements.source_label, never a label from the caller
+ *
+ * @generated from message bugnet.router.v1.CreateSecretLinkRequest
+ */
+export declare type CreateSecretLinkRequest = Message<"bugnet.router.v1.CreateSecretLinkRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * Suggested name, optional
+   *
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * Suggested hosts, kept only when they are the preset of the suggested name
+   *
+   * @generated from field: repeated string hosts = 3;
+   */
+  hosts: string[];
+
+  /**
+   * A repeated id returns the same link
+   *
+   * @generated from field: string request_id = 4;
+   */
+  requestId: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.CreateSecretLinkRequest.
+ * Use `create(CreateSecretLinkRequestSchema)` to create a new message.
+ */
+export declare const CreateSecretLinkRequestSchema: GenMessage<CreateSecretLinkRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.CreateSecretLinkResponse
+ */
+export declare type CreateSecretLinkResponse = Message<"bugnet.router.v1.CreateSecretLinkResponse"> & {
+  /**
+   * <secrets host>/l/<token>
+   *
+   * @generated from field: string url = 1;
+   */
+  url: string;
+
+  /**
+   * Six characters, shown in chat and on the page
+   *
+   * @generated from field: string pairing_code = 2;
+   */
+  pairingCode: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp expires_at = 3;
+   */
+  expiresAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.CreateSecretLinkResponse.
+ * Use `create(CreateSecretLinkResponseSchema)` to create a new message.
+ */
+export declare const CreateSecretLinkResponseSchema: GenMessage<CreateSecretLinkResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.CreateSecretPutGrantRequest
+ */
+export declare type CreateSecretPutGrantRequest = Message<"bugnet.router.v1.CreateSecretPutGrantRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.CreateSecretPutGrantRequest.
+ * Use `create(CreateSecretPutGrantRequestSchema)` to create a new message.
+ */
+export declare const CreateSecretPutGrantRequestSchema: GenMessage<CreateSecretPutGrantRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.CreateSecretPutGrantResponse
+ */
+export declare type CreateSecretPutGrantResponse = Message<"bugnet.router.v1.CreateSecretPutGrantResponse"> & {
+  /**
+   * bnsp_..., valid for GetBridgeSealingKey and PutBridgeSecret on this placement only
+   *
+   * @generated from field: string put_grant = 1;
+   */
+  putGrant: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp expires_at = 2;
+   */
+  expiresAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.CreateSecretPutGrantResponse.
+ * Use `create(CreateSecretPutGrantResponseSchema)` to create a new message.
+ */
+export declare const CreateSecretPutGrantResponseSchema: GenMessage<CreateSecretPutGrantResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.GetSecretSealingKeyRequest
+ */
+export declare type GetSecretSealingKeyRequest = Message<"bugnet.router.v1.GetSecretSealingKeyRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.GetSecretSealingKeyRequest.
+ * Use `create(GetSecretSealingKeyRequestSchema)` to create a new message.
+ */
+export declare const GetSecretSealingKeyRequestSchema: GenMessage<GetSecretSealingKeyRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.GetSecretSealingKeyResponse
+ */
+export declare type GetSecretSealingKeyResponse = Message<"bugnet.router.v1.GetSecretSealingKeyResponse"> & {
+  /**
+   * Every current key, newest first, the client seals with the newest one it pinned
+   *
+   * @generated from field: repeated bugnet.router.v1.SealingKey sealing_keys = 1;
+   */
+  sealingKeys: SealingKey[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.GetSecretSealingKeyResponse.
+ * Use `create(GetSecretSealingKeyResponseSchema)` to create a new message.
+ */
+export declare const GetSecretSealingKeyResponseSchema: GenMessage<GetSecretSealingKeyResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.PutSecretRequest
+ */
+export declare type PutSecretRequest = Message<"bugnet.router.v1.PutSecretRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * @generated from field: bugnet.router.v1.SecretSpec spec = 2;
+   */
+  spec?: SecretSpec | undefined;
+
+  /**
+   * @generated from field: bugnet.router.v1.SealedValue value = 3;
+   */
+  value?: SealedValue | undefined;
+
+  /**
+   * @generated from field: string idempotency_key = 4;
+   */
+  idempotencyKey: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.PutSecretRequest.
+ * Use `create(PutSecretRequestSchema)` to create a new message.
+ */
+export declare const PutSecretRequestSchema: GenMessage<PutSecretRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.PutSecretResponse
+ */
+export declare type PutSecretResponse = Message<"bugnet.router.v1.PutSecretResponse"> & {
+  /**
+   * @generated from field: bugnet.router.v1.SecretInfo secret = 1;
+   */
+  secret?: SecretInfo | undefined;
+
+  /**
+   * A secret of that name existed and now has the new value
+   *
+   * @generated from field: bool replaced = 2;
+   */
+  replaced: boolean;
+};
+
+/**
+ * Describes the message bugnet.router.v1.PutSecretResponse.
+ * Use `create(PutSecretResponseSchema)` to create a new message.
+ */
+export declare const PutSecretResponseSchema: GenMessage<PutSecretResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.ListSecretsRequest
+ */
+export declare type ListSecretsRequest = Message<"bugnet.router.v1.ListSecretsRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.ListSecretsRequest.
+ * Use `create(ListSecretsRequestSchema)` to create a new message.
+ */
+export declare const ListSecretsRequestSchema: GenMessage<ListSecretsRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.ListSecretsResponse
+ */
+export declare type ListSecretsResponse = Message<"bugnet.router.v1.ListSecretsResponse"> & {
+  /**
+   * @generated from field: repeated bugnet.router.v1.SecretInfo secrets = 1;
+   */
+  secrets: SecretInfo[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.ListSecretsResponse.
+ * Use `create(ListSecretsResponseSchema)` to create a new message.
+ */
+export declare const ListSecretsResponseSchema: GenMessage<ListSecretsResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.DeleteSecretRequest
+ */
+export declare type DeleteSecretRequest = Message<"bugnet.router.v1.DeleteSecretRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.DeleteSecretRequest.
+ * Use `create(DeleteSecretRequestSchema)` to create a new message.
+ */
+export declare const DeleteSecretRequestSchema: GenMessage<DeleteSecretRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.DeleteSecretResponse
+ */
+export declare type DeleteSecretResponse = Message<"bugnet.router.v1.DeleteSecretResponse"> & {
+};
+
+/**
+ * Describes the message bugnet.router.v1.DeleteSecretResponse.
+ * Use `create(DeleteSecretResponseSchema)` to create a new message.
+ */
+export declare const DeleteSecretResponseSchema: GenMessage<DeleteSecretResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.Bootstrap
+ */
+export declare type Bootstrap = Message<"bugnet.router.v1.Bootstrap"> & {
+  /**
+   * @generated from field: bugnet.router.v1.BootstrapState state = 1;
+   */
+  state: BootstrapState;
+
+  /**
+   * Path of the checkout under the exec user's home, as ~/src/<repo>, set once known
+   *
+   * @generated from field: string path = 2;
+   */
+  path: string;
+
+  /**
+   * The commit placed, empty until known
+   *
+   * @generated from field: string revision = 3;
+   */
+  revision: string;
+
+  /**
+   * The job that clones or unpacks it, for WatchJob
+   *
+   * @generated from field: string job_id = 4;
+   */
+  jobId: string;
+
+  /**
+   * CLONE_FAILED, FETCH_FAILED, TOO_LARGE, INTERRUPTED, TOOL_MISSING, BUDGET_SPENT, ATTEMPTS_SPENT
+   *
+   * @generated from field: string failure_reason = 5;
+   */
+  failureReason: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.Bootstrap.
+ * Use `create(BootstrapSchema)` to create a new message.
+ */
+export declare const BootstrapSchema: GenMessage<Bootstrap>;
+
+/**
+ * @generated from message bugnet.router.v1.FetchSourceRequest
+ */
+export declare type FetchSourceRequest = Message<"bugnet.router.v1.FetchSourceRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.FetchSourceRequest.
+ * Use `create(FetchSourceRequestSchema)` to create a new message.
+ */
+export declare const FetchSourceRequestSchema: GenMessage<FetchSourceRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.FetchSourceResponse
+ */
+export declare type FetchSourceResponse = Message<"bugnet.router.v1.FetchSourceResponse"> & {
+  /**
+   * @generated from field: bugnet.router.v1.Bootstrap bootstrap = 1;
+   */
+  bootstrap?: Bootstrap | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.FetchSourceResponse.
+ * Use `create(FetchSourceResponseSchema)` to create a new message.
+ */
+export declare const FetchSourceResponseSchema: GenMessage<FetchSourceResponse>;
+
+/**
+ * What the package lacks against a floor
+ *
+ * @generated from enum bugnet.router.v1.Dimension
+ */
+export enum Dimension {
+  /**
+   * @generated from enum value: DIMENSION_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: DIMENSION_VCPU = 1;
+   */
+  VCPU = 1,
+
+  /**
+   * @generated from enum value: DIMENSION_MEMORY = 2;
+   */
+  MEMORY = 2,
+
+  /**
+   * @generated from enum value: DIMENSION_DISK = 3;
+   */
+  DISK = 3,
+
+  /**
+   * @generated from enum value: DIMENSION_GPU = 4;
+   */
+  GPU = 4,
+
+  /**
+   * @generated from enum value: DIMENSION_GPU_MEMORY = 5;
+   */
+  GPU_MEMORY = 5,
+
+  /**
+   * @generated from enum value: DIMENSION_MINUTES = 6;
+   */
+  MINUTES = 6,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.Dimension.
+ */
+export declare const DimensionSchema: GenEnum<Dimension>;
+
+/**
+ * What the agent says it will run, bugnet_quote's workload
+ *
+ * @generated from enum bugnet.router.v1.Workload
+ */
+export enum Workload {
+  /**
+   * @generated from enum value: WORKLOAD_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: WORKLOAD_TESTS = 1;
+   */
+  TESTS = 1,
+
+  /**
+   * @generated from enum value: WORKLOAD_BUILD = 2;
+   */
+  BUILD = 2,
+
+  /**
+   * @generated from enum value: WORKLOAD_SCRIPT = 3;
+   */
+  SCRIPT = 3,
+
+  /**
+   * @generated from enum value: WORKLOAD_SERVE = 4;
+   */
+  SERVE = 4,
+
+  /**
+   * @generated from enum value: WORKLOAD_INFERENCE = 5;
+   */
+  INFERENCE = 5,
+
+  /**
+   * @generated from enum value: WORKLOAD_OTHER = 6;
+   */
+  OTHER = 6,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.Workload.
+ */
+export declare const WorkloadSchema: GenEnum<Workload>;
+
+/**
+ * A feature the work needs, bugnet_quote's needs
+ *
+ * @generated from enum bugnet.router.v1.Need
+ */
+export enum Need {
+  /**
+   * @generated from enum value: NEED_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: NEED_SSH = 1;
+   */
+  SSH = 1,
+
+  /**
+   * @generated from enum value: NEED_PREVIEW = 2;
+   */
+  PREVIEW = 2,
+
+  /**
+   * @generated from enum value: NEED_SECRETS = 3;
+   */
+  SECRETS = 3,
+
+  /**
+   * @generated from enum value: NEED_GPU = 4;
+   */
+  GPU = 4,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.Need.
+ */
+export declare const NeedSchema: GenEnum<Need>;
+
+/**
+ * @generated from enum bugnet.router.v1.SourceKind
+ */
+export enum SourceKind {
+  /**
+   * @generated from enum value: SOURCE_KIND_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: SOURCE_KIND_NONE = 1;
+   */
+  NONE = 1,
+
+  /**
+   * @generated from enum value: SOURCE_KIND_GITHUB = 2;
+   */
+  GITHUB = 2,
+
+  /**
+   * @generated from enum value: SOURCE_KIND_HUGGINGFACE_MODEL = 3;
+   */
+  HUGGINGFACE_MODEL = 3,
+
+  /**
+   * A URL the estimator never fetches
+   *
+   * @generated from enum value: SOURCE_KIND_URL = 4;
+   */
+  URL = 4,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.SourceKind.
+ */
+export declare const SourceKindSchema: GenEnum<SourceKind>;
+
+/**
+ * Why the estimator did not read a source
+ *
+ * @generated from enum bugnet.router.v1.UnreadReason
+ */
+export enum UnreadReason {
+  /**
+   * @generated from enum value: UNREAD_REASON_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * Missing or private, which GitHub and Hugging Face answer the same way
+   *
+   * @generated from enum value: UNREAD_REASON_NOT_FOUND = 1;
+   */
+  NOT_FOUND = 1,
+
+  /**
+   * Unavailable for legal reasons, HTTP 451
+   *
+   * @generated from enum value: UNREAD_REASON_LEGAL = 2;
+   */
+  LEGAL = 2,
+
+  /**
+   * Bugnet's share of the upstream rate limit is spent for now
+   *
+   * @generated from enum value: UNREAD_REASON_RATE_LIMITED = 3;
+   */
+  RATE_LIMITED = 3,
+
+  /**
+   * The fetch budget ended first
+   *
+   * @generated from enum value: UNREAD_REASON_TIMEOUT = 4;
+   */
+  TIMEOUT = 4,
+
+  /**
+   * A URL source, which is never fetched
+   *
+   * @generated from enum value: UNREAD_REASON_NOT_SUPPORTED = 5;
+   */
+  NOT_SUPPORTED = 5,
+
+  /**
+   * The upstream failed in another way
+   *
+   * @generated from enum value: UNREAD_REASON_UPSTREAM_ERROR = 6;
+   */
+  UPSTREAM_ERROR = 6,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.UnreadReason.
+ */
+export declare const UnreadReasonSchema: GenEnum<UnreadReason>;
+
+/**
+ * @generated from enum bugnet.router.v1.GpuNeed
+ */
+export enum GpuNeed {
+  /**
+   * @generated from enum value: GPU_NEED_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: GPU_NEED_NONE = 1;
+   */
+  NONE = 1,
+
+  /**
+   * @generated from enum value: GPU_NEED_RECOMMENDED = 2;
+   */
+  RECOMMENDED = 2,
+
+  /**
+   * @generated from enum value: GPU_NEED_REQUIRED = 3;
+   */
+  REQUIRED = 3,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.GpuNeed.
+ */
+export declare const GpuNeedSchema: GenEnum<GpuNeed>;
+
+/**
+ * @generated from enum bugnet.router.v1.EstimateBasis
+ */
+export enum EstimateBasis {
+  /**
+   * @generated from enum value: ESTIMATE_BASIS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: ESTIMATE_BASIS_DEFAULTS = 1;
+   */
+  DEFAULTS = 1,
+
+  /**
+   * @generated from enum value: ESTIMATE_BASIS_SIGNALS = 2;
+   */
+  SIGNALS = 2,
+
+  /**
+   * @generated from enum value: ESTIMATE_BASIS_HISTORY = 3;
+   */
+  HISTORY = 3,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.EstimateBasis.
+ */
+export declare const EstimateBasisSchema: GenEnum<EstimateBasis>;
+
+/**
+ * @generated from enum bugnet.router.v1.Confidence
+ */
+export enum Confidence {
+  /**
+   * @generated from enum value: CONFIDENCE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: CONFIDENCE_LOW = 1;
+   */
+  LOW = 1,
+
+  /**
+   * @generated from enum value: CONFIDENCE_MEDIUM = 2;
+   */
+  MEDIUM = 2,
+
+  /**
+   * @generated from enum value: CONFIDENCE_HIGH = 3;
+   */
+  HIGH = 3,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.Confidence.
+ */
+export declare const ConfidenceSchema: GenEnum<Confidence>;
+
+/**
+ * @generated from enum bugnet.router.v1.WarningCode
+ */
+export enum WarningCode {
+  /**
+   * @generated from enum value: WARNING_CODE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: WARNING_CODE_NEEDS_GPU = 1;
+   */
+  NEEDS_GPU = 1,
+
+  /**
+   * @generated from enum value: WARNING_CODE_GPU_RECOMMENDED = 2;
+   */
+  GPU_RECOMMENDED = 2,
+
+  /**
+   * @generated from enum value: WARNING_CODE_TOO_LARGE = 3;
+   */
+  TOO_LARGE = 3,
+
+  /**
+   * @generated from enum value: WARNING_CODE_TRY_QUANTIZED = 4;
+   */
+  TRY_QUANTIZED = 4,
+
+  /**
+   * @generated from enum value: WARNING_CODE_GATED_MODEL = 5;
+   */
+  GATED_MODEL = 5,
+
+  /**
+   * @generated from enum value: WARNING_CODE_SECRETS = 6;
+   */
+  SECRETS = 6,
+
+  /**
+   * @generated from enum value: WARNING_CODE_SOURCE_UNREAD = 7;
+   */
+  SOURCE_UNREAD = 7,
+
+  /**
+   * @generated from enum value: WARNING_CODE_NEEDS_DOCKER = 8;
+   */
+  NEEDS_DOCKER = 8,
+
+  /**
+   * @generated from enum value: WARNING_CODE_NEEDS_EXTENSION = 9;
+   */
+  NEEDS_EXTENSION = 9,
+
+  /**
+   * @generated from enum value: WARNING_CODE_PAST_MAX_LIFETIME = 10;
+   */
+  PAST_MAX_LIFETIME = 10,
+
+  /**
+   * @generated from enum value: WARNING_CODE_BUSY = 11;
+   */
+  BUSY = 11,
+
+  /**
+   * @generated from enum value: WARNING_CODE_CONTEXT_ASSUMED = 12;
+   */
+  CONTEXT_ASSUMED = 12,
+
+  /**
+   * @generated from enum value: WARNING_CODE_RAN_OUT_OF_MEMORY = 13;
+   */
+  RAN_OUT_OF_MEMORY = 13,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.WarningCode.
+ */
+export declare const WarningCodeSchema: GenEnum<WarningCode>;
+
+/**
  * @generated from enum bugnet.router.v1.PlacementState
  */
 export enum PlacementState {
@@ -1058,6 +2533,112 @@ export enum OutputStream {
  * Describes the enum bugnet.router.v1.OutputStream.
  */
 export declare const OutputStreamSchema: GenEnum<OutputStream>;
+
+/**
+ * @generated from enum bugnet.router.v1.TransferDirection
+ */
+export enum TransferDirection {
+  /**
+   * @generated from enum value: TRANSFER_DIRECTION_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: TRANSFER_DIRECTION_UPLOAD = 1;
+   */
+  UPLOAD = 1,
+
+  /**
+   * @generated from enum value: TRANSFER_DIRECTION_DOWNLOAD = 2;
+   */
+  DOWNLOAD = 2,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.TransferDirection.
+ */
+export declare const TransferDirectionSchema: GenEnum<TransferDirection>;
+
+/**
+ * @generated from enum bugnet.router.v1.SecretState
+ */
+export enum SecretState {
+  /**
+   * @generated from enum value: SECRET_STATE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: SECRET_STATE_APPLYING = 1;
+   */
+  APPLYING = 1,
+
+  /**
+   * @generated from enum value: SECRET_STATE_ACTIVE = 2;
+   */
+  ACTIVE = 2,
+
+  /**
+   * @generated from enum value: SECRET_STATE_FAILED = 3;
+   */
+  FAILED = 3,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.SecretState.
+ */
+export declare const SecretStateSchema: GenEnum<SecretState>;
+
+/**
+ * @generated from enum bugnet.router.v1.BootstrapState
+ */
+export enum BootstrapState {
+  /**
+   * @generated from enum value: BOOTSTRAP_STATE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * The placement has no GitHub source
+   *
+   * @generated from enum value: BOOTSTRAP_STATE_NONE = 1;
+   */
+  NONE = 1,
+
+  /**
+   * A GitHub source no one has fetched yet
+   *
+   * @generated from enum value: BOOTSTRAP_STATE_PENDING = 2;
+   */
+  PENDING = 2,
+
+  /**
+   * @generated from enum value: BOOTSTRAP_STATE_RUNNING = 3;
+   */
+  RUNNING = 3,
+
+  /**
+   * @generated from enum value: BOOTSTRAP_STATE_DONE = 4;
+   */
+  DONE = 4,
+
+  /**
+   * @generated from enum value: BOOTSTRAP_STATE_FAILED = 5;
+   */
+  FAILED = 5,
+
+  /**
+   * Not readable without a token, add a GitHub secret and call again
+   *
+   * @generated from enum value: BOOTSTRAP_STATE_NEEDS_SECRET = 6;
+   */
+  NEEDS_SECRET = 6,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.BootstrapState.
+ */
+export declare const BootstrapStateSchema: GenEnum<BootstrapState>;
 
 /**
  * @generated from service bugnet.router.v1.SandboxRouterService
@@ -1174,6 +2755,98 @@ export declare const SandboxRouterService: GenService<{
     methodKind: "unary";
     input: typeof ListFilesRequestSchema;
     output: typeof ListFilesResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.CreatePreview
+   */
+  createPreview: {
+    methodKind: "unary";
+    input: typeof CreatePreviewRequestSchema;
+    output: typeof CreatePreviewResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.CreateTransfer
+   */
+  createTransfer: {
+    methodKind: "unary";
+    input: typeof CreateTransferRequestSchema;
+    output: typeof CreateTransferResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.AddSshKey
+   */
+  addSshKey: {
+    methodKind: "unary";
+    input: typeof AddSshKeyRequestSchema;
+    output: typeof AddSshKeyResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.RemoveSshKey
+   */
+  removeSshKey: {
+    methodKind: "unary";
+    input: typeof RemoveSshKeyRequestSchema;
+    output: typeof RemoveSshKeyResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.CreateSecretLink
+   */
+  createSecretLink: {
+    methodKind: "unary";
+    input: typeof CreateSecretLinkRequestSchema;
+    output: typeof CreateSecretLinkResponseSchema;
+  },
+  /**
+   * A 10-minute grant the bridge sends to the secrets route instead of the handle
+   *
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant
+   */
+  createSecretPutGrant: {
+    methodKind: "unary";
+    input: typeof CreateSecretPutGrantRequestSchema;
+    output: typeof CreateSecretPutGrantResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.GetSecretSealingKey
+   */
+  getSecretSealingKey: {
+    methodKind: "unary";
+    input: typeof GetSecretSealingKeyRequestSchema;
+    output: typeof GetSecretSealingKeyResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.PutSecret
+   */
+  putSecret: {
+    methodKind: "unary";
+    input: typeof PutSecretRequestSchema;
+    output: typeof PutSecretResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.ListSecrets
+   */
+  listSecrets: {
+    methodKind: "unary";
+    input: typeof ListSecretsRequestSchema;
+    output: typeof ListSecretsResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.DeleteSecret
+   */
+  deleteSecret: {
+    methodKind: "unary";
+    input: typeof DeleteSecretRequestSchema;
+    output: typeof DeleteSecretResponseSchema;
+  },
+  /**
+   * Puts the placement's GitHub source in the sandbox, safe to call again
+   *
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.FetchSource
+   */
+  fetchSource: {
+    methodKind: "unary";
+    input: typeof FetchSourceRequestSchema;
+    output: typeof FetchSourceResponseSchema;
   },
 }>;
 

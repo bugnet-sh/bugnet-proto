@@ -21,7 +21,22 @@ service SandboxRouterService {
   rpc ReadFile(ReadFileRequest) returns (ReadFileResponse);
   rpc WriteFile(WriteFileRequest) returns (WriteFileResponse);
   rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
+  rpc CreatePreview(CreatePreviewRequest) returns (CreatePreviewResponse);
+  rpc CreateTransfer(CreateTransferRequest) returns (CreateTransferResponse);
+  rpc AddSshKey(AddSshKeyRequest) returns (AddSshKeyResponse);
+  rpc RemoveSshKey(RemoveSshKeyRequest) returns (RemoveSshKeyResponse);
+  rpc CreateSecretLink(CreateSecretLinkRequest) returns (CreateSecretLinkResponse);
+  // A 10-minute grant the bridge sends to the secrets route instead of the handle
+  rpc CreateSecretPutGrant(CreateSecretPutGrantRequest) returns (CreateSecretPutGrantResponse);
+  rpc GetSecretSealingKey(GetSecretSealingKeyRequest) returns (GetSecretSealingKeyResponse);
+  rpc PutSecret(PutSecretRequest) returns (PutSecretResponse);
+  rpc ListSecrets(ListSecretsRequest) returns (ListSecretsResponse);
+  rpc DeleteSecret(DeleteSecretRequest) returns (DeleteSecretResponse);
+  // Puts the placement's GitHub source in the sandbox, safe to call again
+  rpc FetchSource(FetchSourceRequest) returns (FetchSourceResponse);
 }
+
+/* Packages and estimates */
 
 message Resources {
   uint32 vcpu = 1;
@@ -35,6 +50,19 @@ message Requirements {
   bool ssh = 1;
   bool preview = 2;
   bool gpu = 3;
+  // The order will add secrets, so the provider's secret path must be proven
+  bool secrets = 4;
+}
+
+// What the package lacks against a floor
+enum Dimension {
+  DIMENSION_UNSPECIFIED = 0;
+  DIMENSION_VCPU = 1;
+  DIMENSION_MEMORY = 2;
+  DIMENSION_DISK = 3;
+  DIMENSION_GPU = 4;
+  DIMENSION_GPU_MEMORY = 5;
+  DIMENSION_MINUTES = 6;
 }
 
 message PackageOption {
@@ -44,15 +72,170 @@ message PackageOption {
   int64 price_micros = 4;
   bool available = 5;
   string unavailable_reason = 6;
+  // The package covers the floor, counting the extensions below
+  bool fits = 7;
+  // Extensions needed to cover the floor's minutes
+  uint32 extensions_needed = 8;
+  // What the package lacks when it does not fit
+  repeated Dimension short_on = 9;
+  // The extension package counted above, empty when none is needed
+  string extension_package_id = 10;
+  // price_micros plus the extensions needed
+  int64 total_price_micros = 11;
+}
+
+// What the agent says it will run, bugnet_quote's workload
+enum Workload {
+  WORKLOAD_UNSPECIFIED = 0;
+  WORKLOAD_TESTS = 1;
+  WORKLOAD_BUILD = 2;
+  WORKLOAD_SCRIPT = 3;
+  WORKLOAD_SERVE = 4;
+  WORKLOAD_INFERENCE = 5;
+  WORKLOAD_OTHER = 6;
+}
+
+// A feature the work needs, bugnet_quote's needs
+enum Need {
+  NEED_UNSPECIFIED = 0;
+  NEED_SSH = 1;
+  NEED_PREVIEW = 2;
+  NEED_SECRETS = 3;
+  NEED_GPU = 4;
 }
 
 message EstimateRequest {
+  // Still honoured, merged with needs
   Requirements requirements = 1;
+  // A GitHub URL with an optional ref, a Hugging Face model id, or empty, as the agent gave it
+  string source = 2;
+  Workload workload = 3;
+  // The command the agent plans to run, at most 1,000 bytes, read for hints, never run or stored
+  string entry_command = 4;
+  // Minutes the agent expects, 1 to 1,440, absent when unknown
+  optional uint32 expected_minutes = 5;
+  repeated Need needs = 6;
+}
+
+enum SourceKind {
+  SOURCE_KIND_UNSPECIFIED = 0;
+  SOURCE_KIND_NONE = 1;
+  SOURCE_KIND_GITHUB = 2;
+  SOURCE_KIND_HUGGINGFACE_MODEL = 3;
+  // A URL the estimator never fetches
+  SOURCE_KIND_URL = 4;
+}
+
+// Why the estimator did not read a source
+enum UnreadReason {
+  UNREAD_REASON_UNSPECIFIED = 0;
+  // Missing or private, which GitHub and Hugging Face answer the same way
+  UNREAD_REASON_NOT_FOUND = 1;
+  // Unavailable for legal reasons, HTTP 451
+  UNREAD_REASON_LEGAL = 2;
+  // Bugnet's share of the upstream rate limit is spent for now
+  UNREAD_REASON_RATE_LIMITED = 3;
+  // The fetch budget ended first
+  UNREAD_REASON_TIMEOUT = 4;
+  // A URL source, which is never fetched
+  UNREAD_REASON_NOT_SUPPORTED = 5;
+  // The upstream failed in another way
+  UNREAD_REASON_UPSTREAM_ERROR = 6;
+}
+
+message ResolvedSource {
+  SourceKind kind = 1;
+  // github.com/owner/repo plus any subdirectory, huggingface.co/org/model, or a URL's origin
+  string canonical = 2;
+  // The ref or revision asked for, empty for the default branch
+  string ref = 3;
+  // The commit or revision SHA the estimate read, empty when it read nothing
+  string revision = 4;
+  bool read = 5;
+  // Set when read is false
+  UnreadReason unread_reason = 6;
+}
+
+enum GpuNeed {
+  GPU_NEED_UNSPECIFIED = 0;
+  GPU_NEED_NONE = 1;
+  GPU_NEED_RECOMMENDED = 2;
+  GPU_NEED_REQUIRED = 3;
+}
+
+message ResourceFloor {
+  Resources resources = 1;
+  uint32 minutes = 2;
+  // Bytes the run is expected to download, such as model weights
+  uint64 download_bytes = 3;
+  GpuNeed gpu = 4;
+  // The context length an inference floor assumes, 0 for other workloads
+  uint32 context_tokens = 5;
+}
+
+enum EstimateBasis {
+  ESTIMATE_BASIS_UNSPECIFIED = 0;
+  ESTIMATE_BASIS_DEFAULTS = 1;
+  ESTIMATE_BASIS_SIGNALS = 2;
+  ESTIMATE_BASIS_HISTORY = 3;
+}
+
+enum Confidence {
+  CONFIDENCE_UNSPECIFIED = 0;
+  CONFIDENCE_LOW = 1;
+  CONFIDENCE_MEDIUM = 2;
+  CONFIDENCE_HIGH = 3;
+}
+
+enum WarningCode {
+  WARNING_CODE_UNSPECIFIED = 0;
+  WARNING_CODE_NEEDS_GPU = 1;
+  WARNING_CODE_GPU_RECOMMENDED = 2;
+  WARNING_CODE_TOO_LARGE = 3;
+  WARNING_CODE_TRY_QUANTIZED = 4;
+  WARNING_CODE_GATED_MODEL = 5;
+  WARNING_CODE_SECRETS = 6;
+  WARNING_CODE_SOURCE_UNREAD = 7;
+  WARNING_CODE_NEEDS_DOCKER = 8;
+  WARNING_CODE_NEEDS_EXTENSION = 9;
+  WARNING_CODE_PAST_MAX_LIFETIME = 10;
+  WARNING_CODE_BUSY = 11;
+  WARNING_CODE_CONTEXT_ASSUMED = 12;
+  WARNING_CODE_RAN_OUT_OF_MEMORY = 13;
+}
+
+message EstimateWarning {
+  WarningCode code = 1;
+  // One short line built from typed values, never from repository text or provider names
+  string message = 2;
+}
+
+message EstimateReason {
+  // Stable, such as dc.host or hf.weights
+  string rule_id = 1;
+  string message = 2;
 }
 
 message EstimateResponse {
   repeated PackageOption options = 1;
+  // Pass to CreatePlacement through the gateway's quote
+  string estimate_id = 2;
+  string estimator_version = 3;
+  // Hex SHA-256 of the canonical inputs
+  string inputs_sha256 = 4;
+  ResolvedSource source = 5;
+  ResourceFloor floor = 6;
+  // Empty when no package fits
+  string recommended_package_id = 7;
+  repeated EstimateReason reasons = 8;
+  repeated EstimateWarning warnings = 9;
+  EstimateBasis basis = 10;
+  Confidence confidence = 11;
+  // Some source data could not be read within the time budget
+  bool partial = 12;
 }
+
+/* Placements */
 
 enum PlacementState {
   PLACEMENT_STATE_UNSPECIFIED = 0;
@@ -72,11 +255,19 @@ message Placement {
   google.protobuf.Timestamp ready_at = 6;
   string failure_reason = 7;
   bool refundable = 8;
+  // Routing name for SSH, set at ready when the provider has SSH, empty otherwise
+  string ssh_alias = 9;
+  // stop, deadline, abuse, control_lost, provider_failed, sandbox_exited, wallet_blocked, operator
+  string termination_reason = 10;
+  // The repository the router placed in the sandbox
+  Bootstrap bootstrap = 11;
 }
 
 message CreatePlacementRequest {
   string order_token = 1;
   Requirements requirements = 2;
+  // The estimate behind the quote, which ties the run to its source
+  string estimate_id = 3;
 }
 
 message CreatePlacementResponse {
@@ -142,6 +333,8 @@ message StopPlacementResponse {
   Placement placement = 1;
 }
 
+/* Jobs */
+
 message Until {
   bool exit = 1;
   string output_pattern = 2;
@@ -174,6 +367,8 @@ message ExecResponse {
   bytes stderr_tail = 5;
   string cursor = 6;
   bool truncated = 7;
+  // The kernel's OOM killer ended a process of this job
+  bool oom_killed = 8;
 }
 
 enum OutputStream {
@@ -192,6 +387,10 @@ message JobExit {
   int32 exit_code = 1;
   uint64 stdout_bytes = 2;
   uint64 stderr_bytes = 3;
+  // The kernel's OOM killer ended a process of this job
+  bool oom_killed = 4;
+  // The job's peak memory in MiB, 0 when the sandbox cannot measure it
+  uint32 peak_memory_mib = 5;
 }
 
 // Output resumes at these offsets, the bytes skipped before them stay in the sandbox's job files
@@ -225,6 +424,8 @@ message CancelJobRequest {
 message CancelJobResponse {
   JobState state = 1;
 }
+
+/* Files */
 
 message ReadFileRequest {
   string handle = 1;
@@ -267,4 +468,235 @@ message ListFilesResponse {
   repeated FileEntry entries = 1;
   // The listing stopped at the router's entry or directory limit
   bool truncated = 2;
+}
+
+/* Previews */
+
+message CreatePreviewRequest {
+  string handle = 1;
+  uint32 port = 2;
+}
+
+message CreatePreviewResponse {
+  // <id>.<preview domain>/?bugnet_token=bnp_...
+  string url = 1;
+  // The same token, for the Bugnet-Token header
+  string token = 2;
+  // The paid deadline
+  google.protobuf.Timestamp expires_at = 3;
+  // Something accepted a connection on the port when the router asked
+  bool listening = 4;
+  string preview_id = 5;
+}
+
+/* Transfers */
+
+enum TransferDirection {
+  TRANSFER_DIRECTION_UNSPECIFIED = 0;
+  TRANSFER_DIRECTION_UPLOAD = 1;
+  TRANSFER_DIRECTION_DOWNLOAD = 2;
+}
+
+message CreateTransferRequest {
+  string handle = 1;
+  TransferDirection direction = 2;
+  // An absolute path, or ~ or ~/rest for the exec user's home
+  string path = 3;
+  // Uploads only, the exact size in bytes, required with 0 allowed, optional so presence shows
+  optional uint64 size_bytes = 4;
+  // Uploads only, permission bits, 0644 when 0
+  uint32 mode = 5;
+  // Uploads only, the expected SHA-256, checked before the file is replaced
+  bytes sha256 = 6;
+  // A repeated key returns the same URL
+  string idempotency_key = 7;
+}
+
+message CreateTransferResponse {
+  // <transfer host>/<token>
+  string url = 1;
+  // The transfer must start before this
+  google.protobuf.Timestamp expires_at = 2;
+  // The file's size now for a download, the declared size for an upload
+  uint64 size = 3;
+  // The per-file cap, the package's edge.transfer_max_bytes or else transfers.max_bytes
+  uint64 max_bytes = 4;
+  // Downloads only, the file's modification time
+  google.protobuf.Timestamp modified_at = 5;
+}
+
+/* SSH */
+
+message AddSshKeyRequest {
+  string handle = 1;
+  // One authorized_keys line without options
+  string public_key = 2;
+  // Echoed in the command, ~/.ssh/bugnet_<alias> when empty
+  string identity_file = 3;
+  // Echoed in the command, ~/.ssh/bugnet_known_hosts when empty
+  string known_hosts_file = 4;
+}
+
+message AddSshKeyResponse {
+  string alias = 1;
+  string host = 2;
+  uint32 port = 3;
+  // SHA256 fingerprint of the added key
+  string fingerprint = 4;
+  // One line per current gateway host key
+  repeated string known_hosts = 5;
+  string command = 6;
+  // An optional ssh_config stanza
+  string config = 7;
+  google.protobuf.Timestamp expires_at = 8;
+}
+
+message RemoveSshKeyRequest {
+  string handle = 1;
+  string fingerprint = 2;
+}
+
+message RemoveSshKeyResponse {}
+
+/* Secrets */
+
+message SecretSpec {
+  // ^[A-Za-z_][A-Za-z0-9_]{0,63}$, not a reserved name
+  string name = 1;
+  // Exact lower-case host names in punycode
+  repeated string hosts = 2;
+  // Header names besides Authorization that may carry the placeholder
+  repeated string header_names = 3;
+  // Only the router's repository fetcher uses it, the sandbox gets no placeholder
+  bool fetch_only = 4;
+}
+
+message SealedValue {
+  string key_id = 1;
+  // crypto_box_seal of the bound JSON payload, at most 70 KiB
+  bytes box = 2;
+}
+
+message SealingKey {
+  string key_id = 1;
+  // X25519, 32 bytes
+  bytes public_key = 2;
+  // Ties a sealed value to one placement
+  string binding = 3;
+}
+
+enum SecretState {
+  SECRET_STATE_UNSPECIFIED = 0;
+  SECRET_STATE_APPLYING = 1;
+  SECRET_STATE_ACTIVE = 2;
+  SECRET_STATE_FAILED = 3;
+}
+
+message SecretInfo {
+  SecretSpec spec = 1;
+  SecretState state = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  // A stable code when the state is failed, such as PORT_443_TAKEN
+  string failure_reason = 4;
+}
+
+// The page shows placements.source_label, never a label from the caller
+message CreateSecretLinkRequest {
+  string handle = 1;
+  // Suggested name, optional
+  string name = 2;
+  // Suggested hosts, kept only when they are the preset of the suggested name
+  repeated string hosts = 3;
+  // A repeated id returns the same link
+  string request_id = 4;
+}
+
+message CreateSecretLinkResponse {
+  // <secrets host>/l/<token>
+  string url = 1;
+  // Six characters, shown in chat and on the page
+  string pairing_code = 2;
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+message CreateSecretPutGrantRequest {
+  string handle = 1;
+}
+
+message CreateSecretPutGrantResponse {
+  // bnsp_..., valid for GetBridgeSealingKey and PutBridgeSecret on this placement only
+  string put_grant = 1;
+  google.protobuf.Timestamp expires_at = 2;
+}
+
+message GetSecretSealingKeyRequest {
+  string handle = 1;
+}
+
+message GetSecretSealingKeyResponse {
+  // Every current key, newest first, the client seals with the newest one it pinned
+  repeated SealingKey sealing_keys = 1;
+}
+
+message PutSecretRequest {
+  string handle = 1;
+  SecretSpec spec = 2;
+  SealedValue value = 3;
+  string idempotency_key = 4;
+}
+
+message PutSecretResponse {
+  SecretInfo secret = 1;
+  // A secret of that name existed and now has the new value
+  bool replaced = 2;
+}
+
+message ListSecretsRequest {
+  string handle = 1;
+}
+
+message ListSecretsResponse {
+  repeated SecretInfo secrets = 1;
+}
+
+message DeleteSecretRequest {
+  string handle = 1;
+  string name = 2;
+}
+
+message DeleteSecretResponse {}
+
+/* Sources */
+
+enum BootstrapState {
+  BOOTSTRAP_STATE_UNSPECIFIED = 0;
+  // The placement has no GitHub source
+  BOOTSTRAP_STATE_NONE = 1;
+  // A GitHub source no one has fetched yet
+  BOOTSTRAP_STATE_PENDING = 2;
+  BOOTSTRAP_STATE_RUNNING = 3;
+  BOOTSTRAP_STATE_DONE = 4;
+  BOOTSTRAP_STATE_FAILED = 5;
+  // Not readable without a token, add a GitHub secret and call again
+  BOOTSTRAP_STATE_NEEDS_SECRET = 6;
+}
+
+message Bootstrap {
+  BootstrapState state = 1;
+  // Path of the checkout under the exec user's home, as ~/src/<repo>, set once known
+  string path = 2;
+  // The commit placed, empty until known
+  string revision = 3;
+  // The job that clones or unpacks it, for WatchJob
+  string job_id = 4;
+  // CLONE_FAILED, FETCH_FAILED, TOO_LARGE, INTERRUPTED, TOOL_MISSING, BUDGET_SPENT, ATTEMPTS_SPENT
+  string failure_reason = 5;
+}
+
+message FetchSourceRequest {
+  string handle = 1;
+}
+
+message FetchSourceResponse {
+  Bootstrap bootstrap = 1;
 }

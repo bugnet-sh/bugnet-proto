@@ -75,6 +75,39 @@ const (
 	// SandboxRouterServiceListFilesProcedure is the fully-qualified name of the SandboxRouterService's
 	// ListFiles RPC.
 	SandboxRouterServiceListFilesProcedure = "/bugnet.router.v1.SandboxRouterService/ListFiles"
+	// SandboxRouterServiceCreatePreviewProcedure is the fully-qualified name of the
+	// SandboxRouterService's CreatePreview RPC.
+	SandboxRouterServiceCreatePreviewProcedure = "/bugnet.router.v1.SandboxRouterService/CreatePreview"
+	// SandboxRouterServiceCreateTransferProcedure is the fully-qualified name of the
+	// SandboxRouterService's CreateTransfer RPC.
+	SandboxRouterServiceCreateTransferProcedure = "/bugnet.router.v1.SandboxRouterService/CreateTransfer"
+	// SandboxRouterServiceAddSshKeyProcedure is the fully-qualified name of the SandboxRouterService's
+	// AddSshKey RPC.
+	SandboxRouterServiceAddSshKeyProcedure = "/bugnet.router.v1.SandboxRouterService/AddSshKey"
+	// SandboxRouterServiceRemoveSshKeyProcedure is the fully-qualified name of the
+	// SandboxRouterService's RemoveSshKey RPC.
+	SandboxRouterServiceRemoveSshKeyProcedure = "/bugnet.router.v1.SandboxRouterService/RemoveSshKey"
+	// SandboxRouterServiceCreateSecretLinkProcedure is the fully-qualified name of the
+	// SandboxRouterService's CreateSecretLink RPC.
+	SandboxRouterServiceCreateSecretLinkProcedure = "/bugnet.router.v1.SandboxRouterService/CreateSecretLink"
+	// SandboxRouterServiceCreateSecretPutGrantProcedure is the fully-qualified name of the
+	// SandboxRouterService's CreateSecretPutGrant RPC.
+	SandboxRouterServiceCreateSecretPutGrantProcedure = "/bugnet.router.v1.SandboxRouterService/CreateSecretPutGrant"
+	// SandboxRouterServiceGetSecretSealingKeyProcedure is the fully-qualified name of the
+	// SandboxRouterService's GetSecretSealingKey RPC.
+	SandboxRouterServiceGetSecretSealingKeyProcedure = "/bugnet.router.v1.SandboxRouterService/GetSecretSealingKey"
+	// SandboxRouterServicePutSecretProcedure is the fully-qualified name of the SandboxRouterService's
+	// PutSecret RPC.
+	SandboxRouterServicePutSecretProcedure = "/bugnet.router.v1.SandboxRouterService/PutSecret"
+	// SandboxRouterServiceListSecretsProcedure is the fully-qualified name of the
+	// SandboxRouterService's ListSecrets RPC.
+	SandboxRouterServiceListSecretsProcedure = "/bugnet.router.v1.SandboxRouterService/ListSecrets"
+	// SandboxRouterServiceDeleteSecretProcedure is the fully-qualified name of the
+	// SandboxRouterService's DeleteSecret RPC.
+	SandboxRouterServiceDeleteSecretProcedure = "/bugnet.router.v1.SandboxRouterService/DeleteSecret"
+	// SandboxRouterServiceFetchSourceProcedure is the fully-qualified name of the
+	// SandboxRouterService's FetchSource RPC.
+	SandboxRouterServiceFetchSourceProcedure = "/bugnet.router.v1.SandboxRouterService/FetchSource"
 )
 
 // SandboxRouterServiceClient is a client for the bugnet.router.v1.SandboxRouterService service.
@@ -93,6 +126,19 @@ type SandboxRouterServiceClient interface {
 	ReadFile(context.Context, *connect.Request[v1.ReadFileRequest]) (*connect.Response[v1.ReadFileResponse], error)
 	WriteFile(context.Context, *connect.Request[v1.WriteFileRequest]) (*connect.Response[v1.WriteFileResponse], error)
 	ListFiles(context.Context, *connect.Request[v1.ListFilesRequest]) (*connect.Response[v1.ListFilesResponse], error)
+	CreatePreview(context.Context, *connect.Request[v1.CreatePreviewRequest]) (*connect.Response[v1.CreatePreviewResponse], error)
+	CreateTransfer(context.Context, *connect.Request[v1.CreateTransferRequest]) (*connect.Response[v1.CreateTransferResponse], error)
+	AddSshKey(context.Context, *connect.Request[v1.AddSshKeyRequest]) (*connect.Response[v1.AddSshKeyResponse], error)
+	RemoveSshKey(context.Context, *connect.Request[v1.RemoveSshKeyRequest]) (*connect.Response[v1.RemoveSshKeyResponse], error)
+	CreateSecretLink(context.Context, *connect.Request[v1.CreateSecretLinkRequest]) (*connect.Response[v1.CreateSecretLinkResponse], error)
+	// A 10-minute grant the bridge sends to the secrets route instead of the handle
+	CreateSecretPutGrant(context.Context, *connect.Request[v1.CreateSecretPutGrantRequest]) (*connect.Response[v1.CreateSecretPutGrantResponse], error)
+	GetSecretSealingKey(context.Context, *connect.Request[v1.GetSecretSealingKeyRequest]) (*connect.Response[v1.GetSecretSealingKeyResponse], error)
+	PutSecret(context.Context, *connect.Request[v1.PutSecretRequest]) (*connect.Response[v1.PutSecretResponse], error)
+	ListSecrets(context.Context, *connect.Request[v1.ListSecretsRequest]) (*connect.Response[v1.ListSecretsResponse], error)
+	DeleteSecret(context.Context, *connect.Request[v1.DeleteSecretRequest]) (*connect.Response[v1.DeleteSecretResponse], error)
+	// Puts the placement's GitHub source in the sandbox, safe to call again
+	FetchSource(context.Context, *connect.Request[v1.FetchSourceRequest]) (*connect.Response[v1.FetchSourceResponse], error)
 }
 
 // NewSandboxRouterServiceClient constructs a client for the bugnet.router.v1.SandboxRouterService
@@ -190,6 +236,72 @@ func NewSandboxRouterServiceClient(httpClient connect.HTTPClient, baseURL string
 			connect.WithSchema(sandboxRouterServiceMethods.ByName("ListFiles")),
 			connect.WithClientOptions(opts...),
 		),
+		createPreview: connect.NewClient[v1.CreatePreviewRequest, v1.CreatePreviewResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceCreatePreviewProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("CreatePreview")),
+			connect.WithClientOptions(opts...),
+		),
+		createTransfer: connect.NewClient[v1.CreateTransferRequest, v1.CreateTransferResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceCreateTransferProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("CreateTransfer")),
+			connect.WithClientOptions(opts...),
+		),
+		addSshKey: connect.NewClient[v1.AddSshKeyRequest, v1.AddSshKeyResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceAddSshKeyProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("AddSshKey")),
+			connect.WithClientOptions(opts...),
+		),
+		removeSshKey: connect.NewClient[v1.RemoveSshKeyRequest, v1.RemoveSshKeyResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceRemoveSshKeyProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("RemoveSshKey")),
+			connect.WithClientOptions(opts...),
+		),
+		createSecretLink: connect.NewClient[v1.CreateSecretLinkRequest, v1.CreateSecretLinkResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceCreateSecretLinkProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("CreateSecretLink")),
+			connect.WithClientOptions(opts...),
+		),
+		createSecretPutGrant: connect.NewClient[v1.CreateSecretPutGrantRequest, v1.CreateSecretPutGrantResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceCreateSecretPutGrantProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("CreateSecretPutGrant")),
+			connect.WithClientOptions(opts...),
+		),
+		getSecretSealingKey: connect.NewClient[v1.GetSecretSealingKeyRequest, v1.GetSecretSealingKeyResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceGetSecretSealingKeyProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("GetSecretSealingKey")),
+			connect.WithClientOptions(opts...),
+		),
+		putSecret: connect.NewClient[v1.PutSecretRequest, v1.PutSecretResponse](
+			httpClient,
+			baseURL+SandboxRouterServicePutSecretProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("PutSecret")),
+			connect.WithClientOptions(opts...),
+		),
+		listSecrets: connect.NewClient[v1.ListSecretsRequest, v1.ListSecretsResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceListSecretsProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("ListSecrets")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteSecret: connect.NewClient[v1.DeleteSecretRequest, v1.DeleteSecretResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceDeleteSecretProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("DeleteSecret")),
+			connect.WithClientOptions(opts...),
+		),
+		fetchSource: connect.NewClient[v1.FetchSourceRequest, v1.FetchSourceResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceFetchSourceProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("FetchSource")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -209,6 +321,17 @@ type sandboxRouterServiceClient struct {
 	readFile             *connect.Client[v1.ReadFileRequest, v1.ReadFileResponse]
 	writeFile            *connect.Client[v1.WriteFileRequest, v1.WriteFileResponse]
 	listFiles            *connect.Client[v1.ListFilesRequest, v1.ListFilesResponse]
+	createPreview        *connect.Client[v1.CreatePreviewRequest, v1.CreatePreviewResponse]
+	createTransfer       *connect.Client[v1.CreateTransferRequest, v1.CreateTransferResponse]
+	addSshKey            *connect.Client[v1.AddSshKeyRequest, v1.AddSshKeyResponse]
+	removeSshKey         *connect.Client[v1.RemoveSshKeyRequest, v1.RemoveSshKeyResponse]
+	createSecretLink     *connect.Client[v1.CreateSecretLinkRequest, v1.CreateSecretLinkResponse]
+	createSecretPutGrant *connect.Client[v1.CreateSecretPutGrantRequest, v1.CreateSecretPutGrantResponse]
+	getSecretSealingKey  *connect.Client[v1.GetSecretSealingKeyRequest, v1.GetSecretSealingKeyResponse]
+	putSecret            *connect.Client[v1.PutSecretRequest, v1.PutSecretResponse]
+	listSecrets          *connect.Client[v1.ListSecretsRequest, v1.ListSecretsResponse]
+	deleteSecret         *connect.Client[v1.DeleteSecretRequest, v1.DeleteSecretResponse]
+	fetchSource          *connect.Client[v1.FetchSourceRequest, v1.FetchSourceResponse]
 }
 
 // Estimate calls bugnet.router.v1.SandboxRouterService.Estimate.
@@ -281,6 +404,61 @@ func (c *sandboxRouterServiceClient) ListFiles(ctx context.Context, req *connect
 	return c.listFiles.CallUnary(ctx, req)
 }
 
+// CreatePreview calls bugnet.router.v1.SandboxRouterService.CreatePreview.
+func (c *sandboxRouterServiceClient) CreatePreview(ctx context.Context, req *connect.Request[v1.CreatePreviewRequest]) (*connect.Response[v1.CreatePreviewResponse], error) {
+	return c.createPreview.CallUnary(ctx, req)
+}
+
+// CreateTransfer calls bugnet.router.v1.SandboxRouterService.CreateTransfer.
+func (c *sandboxRouterServiceClient) CreateTransfer(ctx context.Context, req *connect.Request[v1.CreateTransferRequest]) (*connect.Response[v1.CreateTransferResponse], error) {
+	return c.createTransfer.CallUnary(ctx, req)
+}
+
+// AddSshKey calls bugnet.router.v1.SandboxRouterService.AddSshKey.
+func (c *sandboxRouterServiceClient) AddSshKey(ctx context.Context, req *connect.Request[v1.AddSshKeyRequest]) (*connect.Response[v1.AddSshKeyResponse], error) {
+	return c.addSshKey.CallUnary(ctx, req)
+}
+
+// RemoveSshKey calls bugnet.router.v1.SandboxRouterService.RemoveSshKey.
+func (c *sandboxRouterServiceClient) RemoveSshKey(ctx context.Context, req *connect.Request[v1.RemoveSshKeyRequest]) (*connect.Response[v1.RemoveSshKeyResponse], error) {
+	return c.removeSshKey.CallUnary(ctx, req)
+}
+
+// CreateSecretLink calls bugnet.router.v1.SandboxRouterService.CreateSecretLink.
+func (c *sandboxRouterServiceClient) CreateSecretLink(ctx context.Context, req *connect.Request[v1.CreateSecretLinkRequest]) (*connect.Response[v1.CreateSecretLinkResponse], error) {
+	return c.createSecretLink.CallUnary(ctx, req)
+}
+
+// CreateSecretPutGrant calls bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant.
+func (c *sandboxRouterServiceClient) CreateSecretPutGrant(ctx context.Context, req *connect.Request[v1.CreateSecretPutGrantRequest]) (*connect.Response[v1.CreateSecretPutGrantResponse], error) {
+	return c.createSecretPutGrant.CallUnary(ctx, req)
+}
+
+// GetSecretSealingKey calls bugnet.router.v1.SandboxRouterService.GetSecretSealingKey.
+func (c *sandboxRouterServiceClient) GetSecretSealingKey(ctx context.Context, req *connect.Request[v1.GetSecretSealingKeyRequest]) (*connect.Response[v1.GetSecretSealingKeyResponse], error) {
+	return c.getSecretSealingKey.CallUnary(ctx, req)
+}
+
+// PutSecret calls bugnet.router.v1.SandboxRouterService.PutSecret.
+func (c *sandboxRouterServiceClient) PutSecret(ctx context.Context, req *connect.Request[v1.PutSecretRequest]) (*connect.Response[v1.PutSecretResponse], error) {
+	return c.putSecret.CallUnary(ctx, req)
+}
+
+// ListSecrets calls bugnet.router.v1.SandboxRouterService.ListSecrets.
+func (c *sandboxRouterServiceClient) ListSecrets(ctx context.Context, req *connect.Request[v1.ListSecretsRequest]) (*connect.Response[v1.ListSecretsResponse], error) {
+	return c.listSecrets.CallUnary(ctx, req)
+}
+
+// DeleteSecret calls bugnet.router.v1.SandboxRouterService.DeleteSecret.
+func (c *sandboxRouterServiceClient) DeleteSecret(ctx context.Context, req *connect.Request[v1.DeleteSecretRequest]) (*connect.Response[v1.DeleteSecretResponse], error) {
+	return c.deleteSecret.CallUnary(ctx, req)
+}
+
+// FetchSource calls bugnet.router.v1.SandboxRouterService.FetchSource.
+func (c *sandboxRouterServiceClient) FetchSource(ctx context.Context, req *connect.Request[v1.FetchSourceRequest]) (*connect.Response[v1.FetchSourceResponse], error) {
+	return c.fetchSource.CallUnary(ctx, req)
+}
+
 // SandboxRouterServiceHandler is an implementation of the bugnet.router.v1.SandboxRouterService
 // service.
 type SandboxRouterServiceHandler interface {
@@ -298,6 +476,19 @@ type SandboxRouterServiceHandler interface {
 	ReadFile(context.Context, *connect.Request[v1.ReadFileRequest]) (*connect.Response[v1.ReadFileResponse], error)
 	WriteFile(context.Context, *connect.Request[v1.WriteFileRequest]) (*connect.Response[v1.WriteFileResponse], error)
 	ListFiles(context.Context, *connect.Request[v1.ListFilesRequest]) (*connect.Response[v1.ListFilesResponse], error)
+	CreatePreview(context.Context, *connect.Request[v1.CreatePreviewRequest]) (*connect.Response[v1.CreatePreviewResponse], error)
+	CreateTransfer(context.Context, *connect.Request[v1.CreateTransferRequest]) (*connect.Response[v1.CreateTransferResponse], error)
+	AddSshKey(context.Context, *connect.Request[v1.AddSshKeyRequest]) (*connect.Response[v1.AddSshKeyResponse], error)
+	RemoveSshKey(context.Context, *connect.Request[v1.RemoveSshKeyRequest]) (*connect.Response[v1.RemoveSshKeyResponse], error)
+	CreateSecretLink(context.Context, *connect.Request[v1.CreateSecretLinkRequest]) (*connect.Response[v1.CreateSecretLinkResponse], error)
+	// A 10-minute grant the bridge sends to the secrets route instead of the handle
+	CreateSecretPutGrant(context.Context, *connect.Request[v1.CreateSecretPutGrantRequest]) (*connect.Response[v1.CreateSecretPutGrantResponse], error)
+	GetSecretSealingKey(context.Context, *connect.Request[v1.GetSecretSealingKeyRequest]) (*connect.Response[v1.GetSecretSealingKeyResponse], error)
+	PutSecret(context.Context, *connect.Request[v1.PutSecretRequest]) (*connect.Response[v1.PutSecretResponse], error)
+	ListSecrets(context.Context, *connect.Request[v1.ListSecretsRequest]) (*connect.Response[v1.ListSecretsResponse], error)
+	DeleteSecret(context.Context, *connect.Request[v1.DeleteSecretRequest]) (*connect.Response[v1.DeleteSecretResponse], error)
+	// Puts the placement's GitHub source in the sandbox, safe to call again
+	FetchSource(context.Context, *connect.Request[v1.FetchSourceRequest]) (*connect.Response[v1.FetchSourceResponse], error)
 }
 
 // NewSandboxRouterServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -391,6 +582,72 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 		connect.WithSchema(sandboxRouterServiceMethods.ByName("ListFiles")),
 		connect.WithHandlerOptions(opts...),
 	)
+	sandboxRouterServiceCreatePreviewHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceCreatePreviewProcedure,
+		svc.CreatePreview,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("CreatePreview")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceCreateTransferHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceCreateTransferProcedure,
+		svc.CreateTransfer,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("CreateTransfer")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceAddSshKeyHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceAddSshKeyProcedure,
+		svc.AddSshKey,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("AddSshKey")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceRemoveSshKeyHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceRemoveSshKeyProcedure,
+		svc.RemoveSshKey,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("RemoveSshKey")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceCreateSecretLinkHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceCreateSecretLinkProcedure,
+		svc.CreateSecretLink,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("CreateSecretLink")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceCreateSecretPutGrantHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceCreateSecretPutGrantProcedure,
+		svc.CreateSecretPutGrant,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("CreateSecretPutGrant")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceGetSecretSealingKeyHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceGetSecretSealingKeyProcedure,
+		svc.GetSecretSealingKey,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("GetSecretSealingKey")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServicePutSecretHandler := connect.NewUnaryHandler(
+		SandboxRouterServicePutSecretProcedure,
+		svc.PutSecret,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("PutSecret")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceListSecretsHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceListSecretsProcedure,
+		svc.ListSecrets,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("ListSecrets")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceDeleteSecretHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceDeleteSecretProcedure,
+		svc.DeleteSecret,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("DeleteSecret")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceFetchSourceHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceFetchSourceProcedure,
+		svc.FetchSource,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("FetchSource")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/bugnet.router.v1.SandboxRouterService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SandboxRouterServiceEstimateProcedure:
@@ -421,6 +678,28 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 			sandboxRouterServiceWriteFileHandler.ServeHTTP(w, r)
 		case SandboxRouterServiceListFilesProcedure:
 			sandboxRouterServiceListFilesHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceCreatePreviewProcedure:
+			sandboxRouterServiceCreatePreviewHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceCreateTransferProcedure:
+			sandboxRouterServiceCreateTransferHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceAddSshKeyProcedure:
+			sandboxRouterServiceAddSshKeyHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceRemoveSshKeyProcedure:
+			sandboxRouterServiceRemoveSshKeyHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceCreateSecretLinkProcedure:
+			sandboxRouterServiceCreateSecretLinkHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceCreateSecretPutGrantProcedure:
+			sandboxRouterServiceCreateSecretPutGrantHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceGetSecretSealingKeyProcedure:
+			sandboxRouterServiceGetSecretSealingKeyHandler.ServeHTTP(w, r)
+		case SandboxRouterServicePutSecretProcedure:
+			sandboxRouterServicePutSecretHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceListSecretsProcedure:
+			sandboxRouterServiceListSecretsHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceDeleteSecretProcedure:
+			sandboxRouterServiceDeleteSecretHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceFetchSourceProcedure:
+			sandboxRouterServiceFetchSourceHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -484,4 +763,48 @@ func (UnimplementedSandboxRouterServiceHandler) WriteFile(context.Context, *conn
 
 func (UnimplementedSandboxRouterServiceHandler) ListFiles(context.Context, *connect.Request[v1.ListFilesRequest]) (*connect.Response[v1.ListFilesResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.ListFiles is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) CreatePreview(context.Context, *connect.Request[v1.CreatePreviewRequest]) (*connect.Response[v1.CreatePreviewResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.CreatePreview is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) CreateTransfer(context.Context, *connect.Request[v1.CreateTransferRequest]) (*connect.Response[v1.CreateTransferResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.CreateTransfer is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) AddSshKey(context.Context, *connect.Request[v1.AddSshKeyRequest]) (*connect.Response[v1.AddSshKeyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.AddSshKey is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) RemoveSshKey(context.Context, *connect.Request[v1.RemoveSshKeyRequest]) (*connect.Response[v1.RemoveSshKeyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.RemoveSshKey is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) CreateSecretLink(context.Context, *connect.Request[v1.CreateSecretLinkRequest]) (*connect.Response[v1.CreateSecretLinkResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.CreateSecretLink is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) CreateSecretPutGrant(context.Context, *connect.Request[v1.CreateSecretPutGrantRequest]) (*connect.Response[v1.CreateSecretPutGrantResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) GetSecretSealingKey(context.Context, *connect.Request[v1.GetSecretSealingKeyRequest]) (*connect.Response[v1.GetSecretSealingKeyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.GetSecretSealingKey is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) PutSecret(context.Context, *connect.Request[v1.PutSecretRequest]) (*connect.Response[v1.PutSecretResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.PutSecret is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) ListSecrets(context.Context, *connect.Request[v1.ListSecretsRequest]) (*connect.Response[v1.ListSecretsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.ListSecrets is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) DeleteSecret(context.Context, *connect.Request[v1.DeleteSecretRequest]) (*connect.Response[v1.DeleteSecretResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.DeleteSecret is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) FetchSource(context.Context, *connect.Request[v1.FetchSourceRequest]) (*connect.Response[v1.FetchSourceResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.FetchSource is not implemented"))
 }

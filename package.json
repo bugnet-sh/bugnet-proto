@@ -6,6 +6,10 @@
     "./router/v1": {
       "types": "./gen/ts/bugnet/router/v1/router_pb.d.ts",
       "default": "./gen/ts/bugnet/router/v1/router_pb.js"
+    },
+    "./router/v1/payments": {
+      "types": "./gen/ts/bugnet/router/v1/payments_pb.d.ts",
+      "default": "./gen/ts/bugnet/router/v1/payments_pb.js"
     }
   },
   "files": [
