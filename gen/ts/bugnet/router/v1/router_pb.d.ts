@@ -547,7 +547,7 @@ export declare type CreatePlacementRequest = Message<"bugnet.router.v1.CreatePla
   requirements?: Requirements | undefined;
 
   /**
-   * The quote's estimate, which ties the run to its source, always a canonical 36-character UUID
+   * Ties the run to its source, always a canonical 36-character UUID that fits 16 bytes
    *
    * @generated from field: string estimate_id = 3;
    */

@@ -279,7 +279,7 @@ message Placement {
 message CreatePlacementRequest {
   string order_token = 1;
   Requirements requirements = 2;
-  // The quote's estimate, which ties the run to its source, always a canonical 36-character UUID
+  // Ties the run to its source, always a canonical 36-character UUID that fits 16 bytes
   string estimate_id = 3;
 }
 

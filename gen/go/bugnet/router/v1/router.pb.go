@@ -1890,7 +1890,7 @@ type CreatePlacementRequest struct {
 	state        protoimpl.MessageState `protogen:"open.v1"`
 	OrderToken   string                 `protobuf:"bytes,1,opt,name=order_token,json=orderToken,proto3" json:"order_token,omitempty"`
 	Requirements *Requirements          `protobuf:"bytes,2,opt,name=requirements,proto3" json:"requirements,omitempty"`
-	// The quote's estimate, which ties the run to its source, always a canonical 36-character UUID
+	// Ties the run to its source, always a canonical 36-character UUID that fits 16 bytes
 	EstimateId    string `protobuf:"bytes,3,opt,name=estimate_id,json=estimateId,proto3" json:"estimate_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
