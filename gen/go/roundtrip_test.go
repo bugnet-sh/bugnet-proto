@@ -2,8 +2,10 @@ package gen_test
 
 import (
 	"testing"
+	"time"
 
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	routerv1 "github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1"
 )
@@ -46,6 +48,32 @@ func TestWatchJobSkipAndTruncatedListingRoundTrip(t *testing.T) {
 		&routerv1.ListFilesResponse{
 			Entries:   []*routerv1.FileEntry{{Path: "/a", Size: 3}},
 			Truncated: true,
+		},
+	}
+	for _, in := range msgs {
+		raw, err := proto.Marshal(in)
+		if err != nil {
+			t.Fatalf("marshal: %v", err)
+		}
+		out := in.ProtoReflect().New().Interface()
+		if err := proto.Unmarshal(raw, out); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		if !proto.Equal(in, out) {
+			t.Fatalf("round trip mismatch: %v != %v", in, out)
+		}
+	}
+}
+
+func TestCheckExtendPlacementRoundTrip(t *testing.T) {
+	deadline := timestamppb.New(time.Date(2026, 11, 5, 12, 0, 0, 0, time.UTC))
+	msgs := []proto.Message{
+		&routerv1.CheckExtendPlacementRequest{Handle: "h-1", PackageId: "small-10m-more"},
+		&routerv1.CheckExtendPlacementResponse{
+			Placement: &routerv1.Placement{
+				PlacementId: "p-1", State: routerv1.PlacementState_PLACEMENT_STATE_READY,
+			},
+			Deadline: deadline,
 		},
 	}
 	for _, in := range msgs {

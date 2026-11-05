@@ -12,6 +12,7 @@ service SandboxRouterService {
   rpc GetPlacement(GetPlacementRequest) returns (GetPlacementResponse);
   rpc WatchPlacement(WatchPlacementRequest) returns (stream WatchPlacementResponse);
   rpc ExtendPlacement(ExtendPlacementRequest) returns (ExtendPlacementResponse);
+  rpc CheckExtendPlacement(CheckExtendPlacementRequest) returns (CheckExtendPlacementResponse);
   rpc StopPlacement(StopPlacementRequest) returns (StopPlacementResponse);
   rpc Exec(ExecRequest) returns (ExecResponse);
   rpc WatchJob(WatchJobRequest) returns (stream WatchJobResponse);
@@ -108,6 +109,17 @@ message ExtendPlacementRequest {
 
 message ExtendPlacementResponse {
   Placement placement = 1;
+}
+
+message CheckExtendPlacementRequest {
+  string handle = 1;
+  string package_id = 2;
+}
+
+message CheckExtendPlacementResponse {
+  Placement placement = 1;
+  // The deadline the placement would have once extended by the package
+  google.protobuf.Timestamp deadline = 2;
 }
 
 message StopPlacementRequest {
