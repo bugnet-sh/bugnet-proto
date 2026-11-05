@@ -1,7 +1,21 @@
 {
-  "name": "bugnet-proto",
+  "name": "@bugnet/proto",
   "private": true,
+  "type": "module",
+  "exports": {
+    "./router/v1": {
+      "types": "./gen/ts/bugnet/router/v1/router_pb.d.ts",
+      "default": "./gen/ts/bugnet/router/v1/router_pb.js"
+    }
+  },
+  "files": [
+    "gen/ts"
+  ],
+  "peerDependencies": {
+    "@bufbuild/protobuf": "^2.16.0"
+  },
   "devDependencies": {
+    "@bufbuild/protobuf": "2.16.0",
     "@bufbuild/protoc-gen-es": "2.16.0"
   }
 }
