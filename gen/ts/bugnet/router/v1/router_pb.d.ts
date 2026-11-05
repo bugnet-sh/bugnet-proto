@@ -110,6 +110,8 @@ export declare type PackageOption = Message<"bugnet.router.v1.PackageOption"> & 
   available: boolean;
 
   /**
+   * no_candidate, feature_unavailable or internal, in ListExtensions not_ready or exceeds_lifetime
+   *
    * @generated from field: string unavailable_reason = 6;
    */
   unavailableReason: string;
@@ -350,7 +352,7 @@ export declare type EstimateResponse = Message<"bugnet.router.v1.EstimateRespons
   options: PackageOption[];
 
   /**
-   * Pass to CreatePlacement through the gateway's quote
+   * Pass to CreatePlacement via the quote, always a canonical 36-character UUID that fits 16 bytes
    *
    * @generated from field: string estimate_id = 2;
    */
@@ -418,6 +420,45 @@ export declare type EstimateResponse = Message<"bugnet.router.v1.EstimateRespons
  * Use `create(EstimateResponseSchema)` to create a new message.
  */
 export declare const EstimateResponseSchema: GenMessage<EstimateResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.PricePackageRequest
+ */
+export declare type PricePackageRequest = Message<"bugnet.router.v1.PricePackageRequest"> & {
+  /**
+   * @generated from field: string package_id = 1;
+   */
+  packageId: string;
+
+  /**
+   * @generated from field: bugnet.router.v1.Requirements requirements = 2;
+   */
+  requirements?: Requirements | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.PricePackageRequest.
+ * Use `create(PricePackageRequestSchema)` to create a new message.
+ */
+export declare const PricePackageRequestSchema: GenMessage<PricePackageRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.PricePackageResponse
+ */
+export declare type PricePackageResponse = Message<"bugnet.router.v1.PricePackageResponse"> & {
+  /**
+   * The package now, available as a start would find it this moment
+   *
+   * @generated from field: bugnet.router.v1.PackageOption option = 1;
+   */
+  option?: PackageOption | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.PricePackageResponse.
+ * Use `create(PricePackageResponseSchema)` to create a new message.
+ */
+export declare const PricePackageResponseSchema: GenMessage<PricePackageResponse>;
 
 /**
  * @generated from message bugnet.router.v1.Placement
@@ -506,7 +547,7 @@ export declare type CreatePlacementRequest = Message<"bugnet.router.v1.CreatePla
   requirements?: Requirements | undefined;
 
   /**
-   * The estimate behind the quote, which ties the run to its source
+   * The quote's estimate, which ties the run to its source, always a canonical 36-character UUID
    *
    * @generated from field: string estimate_id = 3;
    */
@@ -2651,6 +2692,16 @@ export declare const SandboxRouterService: GenService<{
     methodKind: "unary";
     input: typeof EstimateRequestSchema;
     output: typeof EstimateResponseSchema;
+  },
+  /**
+   * Prices a start package as a start would find it now, spending no quote limit, writing no row
+   *
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.PricePackage
+   */
+  pricePackage: {
+    methodKind: "unary";
+    input: typeof PricePackageRequestSchema;
+    output: typeof PricePackageResponseSchema;
   },
   /**
    * @generated from rpc bugnet.router.v1.SandboxRouterService.CreatePlacement

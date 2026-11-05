@@ -36,6 +36,9 @@ const (
 	// SandboxRouterServiceEstimateProcedure is the fully-qualified name of the SandboxRouterService's
 	// Estimate RPC.
 	SandboxRouterServiceEstimateProcedure = "/bugnet.router.v1.SandboxRouterService/Estimate"
+	// SandboxRouterServicePricePackageProcedure is the fully-qualified name of the
+	// SandboxRouterService's PricePackage RPC.
+	SandboxRouterServicePricePackageProcedure = "/bugnet.router.v1.SandboxRouterService/PricePackage"
 	// SandboxRouterServiceCreatePlacementProcedure is the fully-qualified name of the
 	// SandboxRouterService's CreatePlacement RPC.
 	SandboxRouterServiceCreatePlacementProcedure = "/bugnet.router.v1.SandboxRouterService/CreatePlacement"
@@ -113,6 +116,8 @@ const (
 // SandboxRouterServiceClient is a client for the bugnet.router.v1.SandboxRouterService service.
 type SandboxRouterServiceClient interface {
 	Estimate(context.Context, *connect.Request[v1.EstimateRequest]) (*connect.Response[v1.EstimateResponse], error)
+	// Prices a start package as a start would find it now, spending no quote limit, writing no row
+	PricePackage(context.Context, *connect.Request[v1.PricePackageRequest]) (*connect.Response[v1.PricePackageResponse], error)
 	CreatePlacement(context.Context, *connect.Request[v1.CreatePlacementRequest]) (*connect.Response[v1.CreatePlacementResponse], error)
 	GetPlacement(context.Context, *connect.Request[v1.GetPlacementRequest]) (*connect.Response[v1.GetPlacementResponse], error)
 	WatchPlacement(context.Context, *connect.Request[v1.WatchPlacementRequest]) (*connect.ServerStreamForClient[v1.WatchPlacementResponse], error)
@@ -156,6 +161,12 @@ func NewSandboxRouterServiceClient(httpClient connect.HTTPClient, baseURL string
 			httpClient,
 			baseURL+SandboxRouterServiceEstimateProcedure,
 			connect.WithSchema(sandboxRouterServiceMethods.ByName("Estimate")),
+			connect.WithClientOptions(opts...),
+		),
+		pricePackage: connect.NewClient[v1.PricePackageRequest, v1.PricePackageResponse](
+			httpClient,
+			baseURL+SandboxRouterServicePricePackageProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("PricePackage")),
 			connect.WithClientOptions(opts...),
 		),
 		createPlacement: connect.NewClient[v1.CreatePlacementRequest, v1.CreatePlacementResponse](
@@ -308,6 +319,7 @@ func NewSandboxRouterServiceClient(httpClient connect.HTTPClient, baseURL string
 // sandboxRouterServiceClient implements SandboxRouterServiceClient.
 type sandboxRouterServiceClient struct {
 	estimate             *connect.Client[v1.EstimateRequest, v1.EstimateResponse]
+	pricePackage         *connect.Client[v1.PricePackageRequest, v1.PricePackageResponse]
 	createPlacement      *connect.Client[v1.CreatePlacementRequest, v1.CreatePlacementResponse]
 	getPlacement         *connect.Client[v1.GetPlacementRequest, v1.GetPlacementResponse]
 	watchPlacement       *connect.Client[v1.WatchPlacementRequest, v1.WatchPlacementResponse]
@@ -337,6 +349,11 @@ type sandboxRouterServiceClient struct {
 // Estimate calls bugnet.router.v1.SandboxRouterService.Estimate.
 func (c *sandboxRouterServiceClient) Estimate(ctx context.Context, req *connect.Request[v1.EstimateRequest]) (*connect.Response[v1.EstimateResponse], error) {
 	return c.estimate.CallUnary(ctx, req)
+}
+
+// PricePackage calls bugnet.router.v1.SandboxRouterService.PricePackage.
+func (c *sandboxRouterServiceClient) PricePackage(ctx context.Context, req *connect.Request[v1.PricePackageRequest]) (*connect.Response[v1.PricePackageResponse], error) {
+	return c.pricePackage.CallUnary(ctx, req)
 }
 
 // CreatePlacement calls bugnet.router.v1.SandboxRouterService.CreatePlacement.
@@ -463,6 +480,8 @@ func (c *sandboxRouterServiceClient) FetchSource(ctx context.Context, req *conne
 // service.
 type SandboxRouterServiceHandler interface {
 	Estimate(context.Context, *connect.Request[v1.EstimateRequest]) (*connect.Response[v1.EstimateResponse], error)
+	// Prices a start package as a start would find it now, spending no quote limit, writing no row
+	PricePackage(context.Context, *connect.Request[v1.PricePackageRequest]) (*connect.Response[v1.PricePackageResponse], error)
 	CreatePlacement(context.Context, *connect.Request[v1.CreatePlacementRequest]) (*connect.Response[v1.CreatePlacementResponse], error)
 	GetPlacement(context.Context, *connect.Request[v1.GetPlacementRequest]) (*connect.Response[v1.GetPlacementResponse], error)
 	WatchPlacement(context.Context, *connect.Request[v1.WatchPlacementRequest], *connect.ServerStream[v1.WatchPlacementResponse]) error
@@ -502,6 +521,12 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 		SandboxRouterServiceEstimateProcedure,
 		svc.Estimate,
 		connect.WithSchema(sandboxRouterServiceMethods.ByName("Estimate")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServicePricePackageHandler := connect.NewUnaryHandler(
+		SandboxRouterServicePricePackageProcedure,
+		svc.PricePackage,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("PricePackage")),
 		connect.WithHandlerOptions(opts...),
 	)
 	sandboxRouterServiceCreatePlacementHandler := connect.NewUnaryHandler(
@@ -652,6 +677,8 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 		switch r.URL.Path {
 		case SandboxRouterServiceEstimateProcedure:
 			sandboxRouterServiceEstimateHandler.ServeHTTP(w, r)
+		case SandboxRouterServicePricePackageProcedure:
+			sandboxRouterServicePricePackageHandler.ServeHTTP(w, r)
 		case SandboxRouterServiceCreatePlacementProcedure:
 			sandboxRouterServiceCreatePlacementHandler.ServeHTTP(w, r)
 		case SandboxRouterServiceGetPlacementProcedure:
@@ -711,6 +738,10 @@ type UnimplementedSandboxRouterServiceHandler struct{}
 
 func (UnimplementedSandboxRouterServiceHandler) Estimate(context.Context, *connect.Request[v1.EstimateRequest]) (*connect.Response[v1.EstimateResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.Estimate is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) PricePackage(context.Context, *connect.Request[v1.PricePackageRequest]) (*connect.Response[v1.PricePackageResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.PricePackage is not implemented"))
 }
 
 func (UnimplementedSandboxRouterServiceHandler) CreatePlacement(context.Context, *connect.Request[v1.CreatePlacementRequest]) (*connect.Response[v1.CreatePlacementResponse], error) {

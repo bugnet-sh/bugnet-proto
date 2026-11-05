@@ -123,6 +123,24 @@ func TestExtensionPricingRoundTrip(t *testing.T) {
 	}
 }
 
+func TestPricePackageRoundTrip(t *testing.T) {
+	req := &routerv1.PricePackageRequest{
+		PackageId: "small-10m", Requirements: &routerv1.Requirements{Ssh: true},
+	}
+	eq(t, proto.Equal(roundTrip(t, req), req), true)
+	resp := &routerv1.PricePackageResponse{Option: &routerv1.PackageOption{
+		PackageId: "small-10m", Minutes: 10, PriceMicros: 50000,
+		UnavailableReason: "feature_unavailable",
+	}}
+	eq(t, proto.Equal(roundTrip(t, resp), resp), true)
+}
+
+func TestPricePackageFollowsEstimate(t *testing.T) {
+	methods := service(t, "SandboxRouterService").Methods()
+	eq(t, string(methods.Get(0).Name()), "Estimate")
+	eq(t, string(methods.Get(1).Name()), "PricePackage")
+}
+
 func TestTransferSizePresenceSurvives(t *testing.T) {
 	out := roundTrip(t, &routerv1.CreateTransferRequest{SizeBytes: proto.Uint64(0)})
 	eq(t, out.SizeBytes != nil && *out.SizeBytes == 0, true)
@@ -263,6 +281,8 @@ func TestServiceProcedures(t *testing.T) {
 		"/bugnet.router.v1.PaymentsService/CheckPayer")
 	eq(t, routerv1connect.SandboxRouterServiceFetchSourceProcedure,
 		"/bugnet.router.v1.SandboxRouterService/FetchSource")
+	eq(t, routerv1connect.SandboxRouterServicePricePackageProcedure,
+		"/bugnet.router.v1.SandboxRouterService/PricePackage")
 }
 
 // service finds a service of the package by its short name
@@ -314,6 +334,8 @@ func TestSpecFieldNumbers(t *testing.T) {
 		"ExecResponse.oom_killed":                  8,
 		"CreateTransferRequest.size_bytes":         4,
 		"CreateTransferRequest.idempotency_key":    7,
+		"PricePackageRequest.requirements":         2,
+		"PricePackageResponse.option":              1,
 		"ResolvePreviewResponse.started_at":        9,
 		"OpenTransferResponse.budget":              10,
 		"ResolveTunnelResponse.requests_in_flight": 9,

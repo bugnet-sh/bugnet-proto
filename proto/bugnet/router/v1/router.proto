@@ -8,6 +8,8 @@ option go_package = "github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;rou
 
 service SandboxRouterService {
   rpc Estimate(EstimateRequest) returns (EstimateResponse);
+  // Prices a start package as a start would find it now, spending no quote limit, writing no row
+  rpc PricePackage(PricePackageRequest) returns (PricePackageResponse);
   rpc CreatePlacement(CreatePlacementRequest) returns (CreatePlacementResponse);
   rpc GetPlacement(GetPlacementRequest) returns (GetPlacementResponse);
   rpc WatchPlacement(WatchPlacementRequest) returns (stream WatchPlacementResponse);
@@ -71,6 +73,7 @@ message PackageOption {
   uint32 minutes = 3;
   int64 price_micros = 4;
   bool available = 5;
+  // no_candidate, feature_unavailable or internal, in ListExtensions not_ready or exceeds_lifetime
   string unavailable_reason = 6;
   // The package covers the floor, counting the extensions below
   bool fits = 7;
@@ -218,7 +221,7 @@ message EstimateReason {
 
 message EstimateResponse {
   repeated PackageOption options = 1;
-  // Pass to CreatePlacement through the gateway's quote
+  // Pass to CreatePlacement via the quote, always a canonical 36-character UUID that fits 16 bytes
   string estimate_id = 2;
   string estimator_version = 3;
   // Hex SHA-256 of the canonical inputs
@@ -233,6 +236,16 @@ message EstimateResponse {
   Confidence confidence = 11;
   // Some source data could not be read within the time budget
   bool partial = 12;
+}
+
+message PricePackageRequest {
+  string package_id = 1;
+  Requirements requirements = 2;
+}
+
+message PricePackageResponse {
+  // The package now, available as a start would find it this moment
+  PackageOption option = 1;
 }
 
 /* Placements */
@@ -266,7 +279,7 @@ message Placement {
 message CreatePlacementRequest {
   string order_token = 1;
   Requirements requirements = 2;
-  // The estimate behind the quote, which ties the run to its source
+  // The quote's estimate, which ties the run to its source, always a canonical 36-character UUID
   string estimate_id = 3;
 }
 
