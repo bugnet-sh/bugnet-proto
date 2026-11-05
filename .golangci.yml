@@ -14,7 +14,7 @@ linters:
       tab-width: 4
   exclusions:
     paths:
-      - gen
+      - gen/go/bugnet
 
 formatters:
   enable:
