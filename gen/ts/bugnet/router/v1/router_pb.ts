@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file bugnet/router/v1/router.proto.
  */
 export const file_bugnet_router_v1_router: GenFile = /*@__PURE__*/
-  fileDesc("Ch1idWduZXQvcm91dGVyL3YxL3JvdXRlci5wcm90bxIQYnVnbmV0LnJvdXRlci52MSJqCglSZXNvdXJjZXMSDAoEdmNwdRgBIAEoDRISCgptZW1vcnlfbWliGAIgASgNEhAKCGRpc2tfZ2liGAMgASgNEhEKCWdwdV9jb3VudBgEIAEoDRIWCg5ncHVfbWVtb3J5X2dpYhgFIAEoDSI5CgxSZXF1aXJlbWVudHMSCwoDc3NoGAEgASgIEg8KB3ByZXZpZXcYAiABKAgSCwoDZ3B1GAMgASgIIqkBCg1QYWNrYWdlT3B0aW9uEhIKCnBhY2thZ2VfaWQYASABKAkSLgoJcmVzb3VyY2VzGAIgASgLMhsuYnVnbmV0LnJvdXRlci52MS5SZXNvdXJjZXMSDwoHbWludXRlcxgDIAEoDRIUCgxwcmljZV9taWNyb3MYBCABKAMSEQoJYXZhaWxhYmxlGAUgASgIEhoKEnVuYXZhaWxhYmxlX3JlYXNvbhgGIAEoCSJHCg9Fc3RpbWF0ZVJlcXVlc3QSNAoMcmVxdWlyZW1lbnRzGAEgASgLMh4uYnVnbmV0LnJvdXRlci52MS5SZXF1aXJlbWVudHMiRAoQRXN0aW1hdGVSZXNwb25zZRIwCgdvcHRpb25zGAEgAygLMh8uYnVnbmV0LnJvdXRlci52MS5QYWNrYWdlT3B0aW9uIp4CCglQbGFjZW1lbnQSFAoMcGxhY2VtZW50X2lkGAEgASgJEi8KBXN0YXRlGAIgASgOMiAuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnRTdGF0ZRISCgpwYWNrYWdlX2lkGAMgASgJEiwKCGRlYWRsaW5lGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpjcmVhdGVkX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghyZWFkeV9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASFgoOZmFpbHVyZV9yZWFzb24YByABKAkSEgoKcmVmdW5kYWJsZRgIIAEoCCJjChZDcmVhdGVQbGFjZW1lbnRSZXF1ZXN0EhMKC29yZGVyX3Rva2VuGAEgASgJEjQKDHJlcXVpcmVtZW50cxgCIAEoCzIeLmJ1Z25ldC5yb3V0ZXIudjEuUmVxdWlyZW1lbnRzIlkKF0NyZWF0ZVBsYWNlbWVudFJlc3BvbnNlEi4KCXBsYWNlbWVudBgBIAEoCzIbLmJ1Z25ldC5yb3V0ZXIudjEuUGxhY2VtZW50Eg4KBmhhbmRsZRgCIAEoCSJtChNHZXRQbGFjZW1lbnRSZXF1ZXN0Eg4KBmhhbmRsZRgBIAEoCRIPCgd3YWl0X21zGAIgASgNEjUKC2tub3duX3N0YXRlGAMgASgOMiAuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnRTdGF0ZSJGChRHZXRQbGFjZW1lbnRSZXNwb25zZRIuCglwbGFjZW1lbnQYASABKAsyGy5idWduZXQucm91dGVyLnYxLlBsYWNlbWVudCInChVXYXRjaFBsYWNlbWVudFJlcXVlc3QSDgoGaGFuZGxlGAEgASgJIkgKFldhdGNoUGxhY2VtZW50UmVzcG9uc2USLgoJcGxhY2VtZW50GAEgASgLMhsuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnQiPQoWRXh0ZW5kUGxhY2VtZW50UmVxdWVzdBIOCgZoYW5kbGUYASABKAkSEwoLb3JkZXJfdG9rZW4YAiABKAkiSQoXRXh0ZW5kUGxhY2VtZW50UmVzcG9uc2USLgoJcGxhY2VtZW50GAEgASgLMhsuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnQiQQobQ2hlY2tFeHRlbmRQbGFjZW1lbnRSZXF1ZXN0Eg4KBmhhbmRsZRgBIAEoCRISCgpwYWNrYWdlX2lkGAIgASgJInwKHENoZWNrRXh0ZW5kUGxhY2VtZW50UmVzcG9uc2USLgoJcGxhY2VtZW50GAEgASgLMhsuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnQSLAoIZGVhZGxpbmUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIiYKFFN0b3BQbGFjZW1lbnRSZXF1ZXN0Eg4KBmhhbmRsZRgBIAEoCSJHChVTdG9wUGxhY2VtZW50UmVzcG9uc2USLgoJcGxhY2VtZW50GAEgASgLMhsuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnQiPgoFVW50aWwSDAoEZXhpdBgBIAEoCBIWCg5vdXRwdXRfcGF0dGVybhgCIAEoCRIPCgdpZGxlX21zGAMgASgNIusBCgtFeGVjUmVxdWVzdBIOCgZoYW5kbGUYASABKAkSDAoEYXJndhgCIAMoCRILCgNjd2QYAyABKAkSMwoDZW52GAQgAygLMiYuYnVnbmV0LnJvdXRlci52MS5FeGVjUmVxdWVzdC5FbnZFbnRyeRIXCg9pZGVtcG90ZW5jeV9rZXkYBSABKAkSDwoHd2FpdF9tcxgGIAEoDRImCgV1bnRpbBgHIAEoCzIXLmJ1Z25ldC5yb3V0ZXIudjEuVW50aWwaKgoIRW52RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASK8AQoMRXhlY1Jlc3BvbnNlEg4KBmpvYl9pZBgBIAEoCRIpCgVzdGF0ZRgCIAEoDjIaLmJ1Z25ldC5yb3V0ZXIudjEuSm9iU3RhdGUSFgoJZXhpdF9jb2RlGAMgASgFSACIAQESEwoLc3Rkb3V0X3RhaWwYBCABKAwSEwoLc3RkZXJyX3RhaWwYBSABKAwSDgoGY3Vyc29yGAYgASgJEhEKCXRydW5jYXRlZBgHIAEoCEIMCgpfZXhpdF9jb2RlIlkKCUpvYk91dHB1dBIuCgZzdHJlYW0YASABKA4yHi5idWduZXQucm91dGVyLnYxLk91dHB1dFN0cmVhbRIOCgZvZmZzZXQYAiABKAQSDAoEZGF0YRgDIAEoDCJICgdKb2JFeGl0EhEKCWV4aXRfY29kZRgBIAEoBRIUCgxzdGRvdXRfYnl0ZXMYAiABKAQSFAoMc3RkZXJyX2J5dGVzGAMgASgEIjcKB0pvYlNraXASFQoNc3Rkb3V0X29mZnNldBgBIAEoBBIVCg1zdGRlcnJfb2Zmc2V0GAIgASgEImkKD1dhdGNoSm9iUmVxdWVzdBIOCgZoYW5kbGUYASABKAkSDgoGam9iX2lkGAIgASgJEg4KBmN1cnNvchgDIAEoCRImCgV1bnRpbBgEIAEoCzIXLmJ1Z25ldC5yb3V0ZXIudjEuVW50aWwixQEKEFdhdGNoSm9iUmVzcG9uc2USLQoGb3V0cHV0GAEgASgLMhsuYnVnbmV0LnJvdXRlci52MS5Kb2JPdXRwdXRIABIpCgRleGl0GAIgASgLMhkuYnVnbmV0LnJvdXRlci52MS5Kb2JFeGl0SAASEwoJaGVhcnRiZWF0GAMgASgISAASKQoEc2tpcBgFIAEoCzIZLmJ1Z25ldC5yb3V0ZXIudjEuSm9iU2tpcEgAEg4KBmN1cnNvchgEIAEoCUIHCgVmcmFtZSIyChBDYW5jZWxKb2JSZXF1ZXN0Eg4KBmhhbmRsZRgBIAEoCRIOCgZqb2JfaWQYAiABKAkiPgoRQ2FuY2VsSm9iUmVzcG9uc2USKQoFc3RhdGUYASABKA4yGi5idWduZXQucm91dGVyLnYxLkpvYlN0YXRlIk8KD1JlYWRGaWxlUmVxdWVzdBIOCgZoYW5kbGUYASABKAkSDAoEcGF0aBgCIAEoCRIOCgZvZmZzZXQYAyABKAQSDgoGbGVuZ3RoGAQgASgNIi0KEFJlYWRGaWxlUmVzcG9uc2USDAoEZGF0YRgBIAEoDBILCgNlb2YYAiABKAgiTAoQV3JpdGVGaWxlUmVxdWVzdBIOCgZoYW5kbGUYASABKAkSDAoEcGF0aBgCIAEoCRIMCgRkYXRhGAMgASgMEgwKBG1vZGUYBCABKA0iIQoRV3JpdGVGaWxlUmVzcG9uc2USDAoEc2l6ZRgBIAEoBCJ2CglGaWxlRW50cnkSDAoEcGF0aBgBIAEoCRIMCgRzaXplGAIgASgEEg4KBmlzX2RpchgDIAEoCBIMCgRtb2RlGAQgASgNEi8KC21vZGlmaWVkX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCI/ChBMaXN0RmlsZXNSZXF1ZXN0Eg4KBmhhbmRsZRgBIAEoCRIMCgRwYXRoGAIgASgJEg0KBWRlcHRoGAMgASgNIlQKEUxpc3RGaWxlc1Jlc3BvbnNlEiwKB2VudHJpZXMYASADKAsyGy5idWduZXQucm91dGVyLnYxLkZpbGVFbnRyeRIRCgl0cnVuY2F0ZWQYAiABKAgqxgEKDlBsYWNlbWVudFN0YXRlEh8KG1BMQUNFTUVOVF9TVEFURV9VTlNQRUNJRklFRBAAEhsKF1BMQUNFTUVOVF9TVEFURV9QTEFDSU5HEAESGQoVUExBQ0VNRU5UX1NUQVRFX1JFQURZEAISHwobUExBQ0VNRU5UX1NUQVRFX1RFUk1JTkFUSU5HEAMSHgoaUExBQ0VNRU5UX1NUQVRFX1RFUk1JTkFURUQQBBIaChZQTEFDRU1FTlRfU1RBVEVfRkFJTEVEEAUqfwoISm9iU3RhdGUSGQoVSk9CX1NUQVRFX1VOU1BFQ0lGSUVEEAASFQoRSk9CX1NUQVRFX1JVTk5JTkcQARIUChBKT0JfU1RBVEVfRVhJVEVEEAISFwoTSk9CX1NUQVRFX0NBTkNFTExFRBADEhIKDkpPQl9TVEFURV9MT1NUEAQqYQoMT3V0cHV0U3RyZWFtEh0KGU9VVFBVVF9TVFJFQU1fVU5TUEVDSUZJRUQQABIYChRPVVRQVVRfU1RSRUFNX1NURE9VVBABEhgKFE9VVFBVVF9TVFJFQU1fU1RERVJSEAIyyQkKFFNhbmRib3hSb3V0ZXJTZXJ2aWNlElEKCEVzdGltYXRlEiEuYnVnbmV0LnJvdXRlci52MS5Fc3RpbWF0ZVJlcXVlc3QaIi5idWduZXQucm91dGVyLnYxLkVzdGltYXRlUmVzcG9uc2USZgoPQ3JlYXRlUGxhY2VtZW50EiguYnVnbmV0LnJvdXRlci52MS5DcmVhdGVQbGFjZW1lbnRSZXF1ZXN0GikuYnVnbmV0LnJvdXRlci52MS5DcmVhdGVQbGFjZW1lbnRSZXNwb25zZRJdCgxHZXRQbGFjZW1lbnQSJS5idWduZXQucm91dGVyLnYxLkdldFBsYWNlbWVudFJlcXVlc3QaJi5idWduZXQucm91dGVyLnYxLkdldFBsYWNlbWVudFJlc3BvbnNlEmUKDldhdGNoUGxhY2VtZW50EicuYnVnbmV0LnJvdXRlci52MS5XYXRjaFBsYWNlbWVudFJlcXVlc3QaKC5idWduZXQucm91dGVyLnYxLldhdGNoUGxhY2VtZW50UmVzcG9uc2UwARJmCg9FeHRlbmRQbGFjZW1lbnQSKC5idWduZXQucm91dGVyLnYxLkV4dGVuZFBsYWNlbWVudFJlcXVlc3QaKS5idWduZXQucm91dGVyLnYxLkV4dGVuZFBsYWNlbWVudFJlc3BvbnNlEnUKFENoZWNrRXh0ZW5kUGxhY2VtZW50Ei0uYnVnbmV0LnJvdXRlci52MS5DaGVja0V4dGVuZFBsYWNlbWVudFJlcXVlc3QaLi5idWduZXQucm91dGVyLnYxLkNoZWNrRXh0ZW5kUGxhY2VtZW50UmVzcG9uc2USYAoNU3RvcFBsYWNlbWVudBImLmJ1Z25ldC5yb3V0ZXIudjEuU3RvcFBsYWNlbWVudFJlcXVlc3QaJy5idWduZXQucm91dGVyLnYxLlN0b3BQbGFjZW1lbnRSZXNwb25zZRJFCgRFeGVjEh0uYnVnbmV0LnJvdXRlci52MS5FeGVjUmVxdWVzdBoeLmJ1Z25ldC5yb3V0ZXIudjEuRXhlY1Jlc3BvbnNlElMKCFdhdGNoSm9iEiEuYnVnbmV0LnJvdXRlci52MS5XYXRjaEpvYlJlcXVlc3QaIi5idWduZXQucm91dGVyLnYxLldhdGNoSm9iUmVzcG9uc2UwARJUCglDYW5jZWxKb2ISIi5idWduZXQucm91dGVyLnYxLkNhbmNlbEpvYlJlcXVlc3QaIy5idWduZXQucm91dGVyLnYxLkNhbmNlbEpvYlJlc3BvbnNlElEKCFJlYWRGaWxlEiEuYnVnbmV0LnJvdXRlci52MS5SZWFkRmlsZVJlcXVlc3QaIi5idWduZXQucm91dGVyLnYxLlJlYWRGaWxlUmVzcG9uc2USVAoJV3JpdGVGaWxlEiIuYnVnbmV0LnJvdXRlci52MS5Xcml0ZUZpbGVSZXF1ZXN0GiMuYnVnbmV0LnJvdXRlci52MS5Xcml0ZUZpbGVSZXNwb25zZRJUCglMaXN0RmlsZXMSIi5idWduZXQucm91dGVyLnYxLkxpc3RGaWxlc1JlcXVlc3QaIy5idWduZXQucm91dGVyLnYxLkxpc3RGaWxlc1Jlc3BvbnNlQkJaQGdpdGh1Yi5jb20vb3lub3phbi9idWduZXQtcHJvdG8vZ2VuL2dvL2J1Z25ldC9yb3V0ZXIvdjE7cm91dGVydjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+  fileDesc("Ch1idWduZXQvcm91dGVyL3YxL3JvdXRlci5wcm90bxIQYnVnbmV0LnJvdXRlci52MSJqCglSZXNvdXJjZXMSDAoEdmNwdRgBIAEoDRISCgptZW1vcnlfbWliGAIgASgNEhAKCGRpc2tfZ2liGAMgASgNEhEKCWdwdV9jb3VudBgEIAEoDRIWCg5ncHVfbWVtb3J5X2dpYhgFIAEoDSI5CgxSZXF1aXJlbWVudHMSCwoDc3NoGAEgASgIEg8KB3ByZXZpZXcYAiABKAgSCwoDZ3B1GAMgASgIIqkBCg1QYWNrYWdlT3B0aW9uEhIKCnBhY2thZ2VfaWQYASABKAkSLgoJcmVzb3VyY2VzGAIgASgLMhsuYnVnbmV0LnJvdXRlci52MS5SZXNvdXJjZXMSDwoHbWludXRlcxgDIAEoDRIUCgxwcmljZV9taWNyb3MYBCABKAMSEQoJYXZhaWxhYmxlGAUgASgIEhoKEnVuYXZhaWxhYmxlX3JlYXNvbhgGIAEoCSJHCg9Fc3RpbWF0ZVJlcXVlc3QSNAoMcmVxdWlyZW1lbnRzGAEgASgLMh4uYnVnbmV0LnJvdXRlci52MS5SZXF1aXJlbWVudHMiRAoQRXN0aW1hdGVSZXNwb25zZRIwCgdvcHRpb25zGAEgAygLMh8uYnVnbmV0LnJvdXRlci52MS5QYWNrYWdlT3B0aW9uIp4CCglQbGFjZW1lbnQSFAoMcGxhY2VtZW50X2lkGAEgASgJEi8KBXN0YXRlGAIgASgOMiAuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnRTdGF0ZRISCgpwYWNrYWdlX2lkGAMgASgJEiwKCGRlYWRsaW5lGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpjcmVhdGVkX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIsCghyZWFkeV9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASFgoOZmFpbHVyZV9yZWFzb24YByABKAkSEgoKcmVmdW5kYWJsZRgIIAEoCCJjChZDcmVhdGVQbGFjZW1lbnRSZXF1ZXN0EhMKC29yZGVyX3Rva2VuGAEgASgJEjQKDHJlcXVpcmVtZW50cxgCIAEoCzIeLmJ1Z25ldC5yb3V0ZXIudjEuUmVxdWlyZW1lbnRzIlkKF0NyZWF0ZVBsYWNlbWVudFJlc3BvbnNlEi4KCXBsYWNlbWVudBgBIAEoCzIbLmJ1Z25ldC5yb3V0ZXIudjEuUGxhY2VtZW50Eg4KBmhhbmRsZRgCIAEoCSJtChNHZXRQbGFjZW1lbnRSZXF1ZXN0Eg4KBmhhbmRsZRgBIAEoCRIPCgd3YWl0X21zGAIgASgNEjUKC2tub3duX3N0YXRlGAMgASgOMiAuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnRTdGF0ZSJGChRHZXRQbGFjZW1lbnRSZXNwb25zZRIuCglwbGFjZW1lbnQYASABKAsyGy5idWduZXQucm91dGVyLnYxLlBsYWNlbWVudCInChVXYXRjaFBsYWNlbWVudFJlcXVlc3QSDgoGaGFuZGxlGAEgASgJIkgKFldhdGNoUGxhY2VtZW50UmVzcG9uc2USLgoJcGxhY2VtZW50GAEgASgLMhsuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnQiPQoWRXh0ZW5kUGxhY2VtZW50UmVxdWVzdBIOCgZoYW5kbGUYASABKAkSEwoLb3JkZXJfdG9rZW4YAiABKAkiSQoXRXh0ZW5kUGxhY2VtZW50UmVzcG9uc2USLgoJcGxhY2VtZW50GAEgASgLMhsuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnQiQQobQ2hlY2tFeHRlbmRQbGFjZW1lbnRSZXF1ZXN0Eg4KBmhhbmRsZRgBIAEoCRISCgpwYWNrYWdlX2lkGAIgASgJIq4BChxDaGVja0V4dGVuZFBsYWNlbWVudFJlc3BvbnNlEi4KCXBsYWNlbWVudBgBIAEoCzIbLmJ1Z25ldC5yb3V0ZXIudjEuUGxhY2VtZW50EiwKCGRlYWRsaW5lGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIwCgdwYWNrYWdlGAMgASgLMh8uYnVnbmV0LnJvdXRlci52MS5QYWNrYWdlT3B0aW9uIicKFUxpc3RFeHRlbnNpb25zUmVxdWVzdBIOCgZoYW5kbGUYASABKAkiSgoWTGlzdEV4dGVuc2lvbnNSZXNwb25zZRIwCgdvcHRpb25zGAEgAygLMh8uYnVnbmV0LnJvdXRlci52MS5QYWNrYWdlT3B0aW9uIiYKFFN0b3BQbGFjZW1lbnRSZXF1ZXN0Eg4KBmhhbmRsZRgBIAEoCSJHChVTdG9wUGxhY2VtZW50UmVzcG9uc2USLgoJcGxhY2VtZW50GAEgASgLMhsuYnVnbmV0LnJvdXRlci52MS5QbGFjZW1lbnQiPgoFVW50aWwSDAoEZXhpdBgBIAEoCBIWCg5vdXRwdXRfcGF0dGVybhgCIAEoCRIPCgdpZGxlX21zGAMgASgNIusBCgtFeGVjUmVxdWVzdBIOCgZoYW5kbGUYASABKAkSDAoEYXJndhgCIAMoCRILCgNjd2QYAyABKAkSMwoDZW52GAQgAygLMiYuYnVnbmV0LnJvdXRlci52MS5FeGVjUmVxdWVzdC5FbnZFbnRyeRIXCg9pZGVtcG90ZW5jeV9rZXkYBSABKAkSDwoHd2FpdF9tcxgGIAEoDRImCgV1bnRpbBgHIAEoCzIXLmJ1Z25ldC5yb3V0ZXIudjEuVW50aWwaKgoIRW52RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASK8AQoMRXhlY1Jlc3BvbnNlEg4KBmpvYl9pZBgBIAEoCRIpCgVzdGF0ZRgCIAEoDjIaLmJ1Z25ldC5yb3V0ZXIudjEuSm9iU3RhdGUSFgoJZXhpdF9jb2RlGAMgASgFSACIAQESEwoLc3Rkb3V0X3RhaWwYBCABKAwSEwoLc3RkZXJyX3RhaWwYBSABKAwSDgoGY3Vyc29yGAYgASgJEhEKCXRydW5jYXRlZBgHIAEoCEIMCgpfZXhpdF9jb2RlIlkKCUpvYk91dHB1dBIuCgZzdHJlYW0YASABKA4yHi5idWduZXQucm91dGVyLnYxLk91dHB1dFN0cmVhbRIOCgZvZmZzZXQYAiABKAQSDAoEZGF0YRgDIAEoDCJICgdKb2JFeGl0EhEKCWV4aXRfY29kZRgBIAEoBRIUCgxzdGRvdXRfYnl0ZXMYAiABKAQSFAoMc3RkZXJyX2J5dGVzGAMgASgEIjcKB0pvYlNraXASFQoNc3Rkb3V0X29mZnNldBgBIAEoBBIVCg1zdGRlcnJfb2Zmc2V0GAIgASgEImkKD1dhdGNoSm9iUmVxdWVzdBIOCgZoYW5kbGUYASABKAkSDgoGam9iX2lkGAIgASgJEg4KBmN1cnNvchgDIAEoCRImCgV1bnRpbBgEIAEoCzIXLmJ1Z25ldC5yb3V0ZXIudjEuVW50aWwixQEKEFdhdGNoSm9iUmVzcG9uc2USLQoGb3V0cHV0GAEgASgLMhsuYnVnbmV0LnJvdXRlci52MS5Kb2JPdXRwdXRIABIpCgRleGl0GAIgASgLMhkuYnVnbmV0LnJvdXRlci52MS5Kb2JFeGl0SAASEwoJaGVhcnRiZWF0GAMgASgISAASKQoEc2tpcBgFIAEoCzIZLmJ1Z25ldC5yb3V0ZXIudjEuSm9iU2tpcEgAEg4KBmN1cnNvchgEIAEoCUIHCgVmcmFtZSIyChBDYW5jZWxKb2JSZXF1ZXN0Eg4KBmhhbmRsZRgBIAEoCRIOCgZqb2JfaWQYAiABKAkiPgoRQ2FuY2VsSm9iUmVzcG9uc2USKQoFc3RhdGUYASABKA4yGi5idWduZXQucm91dGVyLnYxLkpvYlN0YXRlIk8KD1JlYWRGaWxlUmVxdWVzdBIOCgZoYW5kbGUYASABKAkSDAoEcGF0aBgCIAEoCRIOCgZvZmZzZXQYAyABKAQSDgoGbGVuZ3RoGAQgASgNIi0KEFJlYWRGaWxlUmVzcG9uc2USDAoEZGF0YRgBIAEoDBILCgNlb2YYAiABKAgiTAoQV3JpdGVGaWxlUmVxdWVzdBIOCgZoYW5kbGUYASABKAkSDAoEcGF0aBgCIAEoCRIMCgRkYXRhGAMgASgMEgwKBG1vZGUYBCABKA0iIQoRV3JpdGVGaWxlUmVzcG9uc2USDAoEc2l6ZRgBIAEoBCJ2CglGaWxlRW50cnkSDAoEcGF0aBgBIAEoCRIMCgRzaXplGAIgASgEEg4KBmlzX2RpchgDIAEoCBIMCgRtb2RlGAQgASgNEi8KC21vZGlmaWVkX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCI/ChBMaXN0RmlsZXNSZXF1ZXN0Eg4KBmhhbmRsZRgBIAEoCRIMCgRwYXRoGAIgASgJEg0KBWRlcHRoGAMgASgNIlQKEUxpc3RGaWxlc1Jlc3BvbnNlEiwKB2VudHJpZXMYASADKAsyGy5idWduZXQucm91dGVyLnYxLkZpbGVFbnRyeRIRCgl0cnVuY2F0ZWQYAiABKAgqxgEKDlBsYWNlbWVudFN0YXRlEh8KG1BMQUNFTUVOVF9TVEFURV9VTlNQRUNJRklFRBAAEhsKF1BMQUNFTUVOVF9TVEFURV9QTEFDSU5HEAESGQoVUExBQ0VNRU5UX1NUQVRFX1JFQURZEAISHwobUExBQ0VNRU5UX1NUQVRFX1RFUk1JTkFUSU5HEAMSHgoaUExBQ0VNRU5UX1NUQVRFX1RFUk1JTkFURUQQBBIaChZQTEFDRU1FTlRfU1RBVEVfRkFJTEVEEAUqfwoISm9iU3RhdGUSGQoVSk9CX1NUQVRFX1VOU1BFQ0lGSUVEEAASFQoRSk9CX1NUQVRFX1JVTk5JTkcQARIUChBKT0JfU1RBVEVfRVhJVEVEEAISFwoTSk9CX1NUQVRFX0NBTkNFTExFRBADEhIKDkpPQl9TVEFURV9MT1NUEAQqYQoMT3V0cHV0U3RyZWFtEh0KGU9VVFBVVF9TVFJFQU1fVU5TUEVDSUZJRUQQABIYChRPVVRQVVRfU1RSRUFNX1NURE9VVBABEhgKFE9VVFBVVF9TVFJFQU1fU1RERVJSEAIyrgoKFFNhbmRib3hSb3V0ZXJTZXJ2aWNlElEKCEVzdGltYXRlEiEuYnVnbmV0LnJvdXRlci52MS5Fc3RpbWF0ZVJlcXVlc3QaIi5idWduZXQucm91dGVyLnYxLkVzdGltYXRlUmVzcG9uc2USZgoPQ3JlYXRlUGxhY2VtZW50EiguYnVnbmV0LnJvdXRlci52MS5DcmVhdGVQbGFjZW1lbnRSZXF1ZXN0GikuYnVnbmV0LnJvdXRlci52MS5DcmVhdGVQbGFjZW1lbnRSZXNwb25zZRJdCgxHZXRQbGFjZW1lbnQSJS5idWduZXQucm91dGVyLnYxLkdldFBsYWNlbWVudFJlcXVlc3QaJi5idWduZXQucm91dGVyLnYxLkdldFBsYWNlbWVudFJlc3BvbnNlEmUKDldhdGNoUGxhY2VtZW50EicuYnVnbmV0LnJvdXRlci52MS5XYXRjaFBsYWNlbWVudFJlcXVlc3QaKC5idWduZXQucm91dGVyLnYxLldhdGNoUGxhY2VtZW50UmVzcG9uc2UwARJmCg9FeHRlbmRQbGFjZW1lbnQSKC5idWduZXQucm91dGVyLnYxLkV4dGVuZFBsYWNlbWVudFJlcXVlc3QaKS5idWduZXQucm91dGVyLnYxLkV4dGVuZFBsYWNlbWVudFJlc3BvbnNlEnUKFENoZWNrRXh0ZW5kUGxhY2VtZW50Ei0uYnVnbmV0LnJvdXRlci52MS5DaGVja0V4dGVuZFBsYWNlbWVudFJlcXVlc3QaLi5idWduZXQucm91dGVyLnYxLkNoZWNrRXh0ZW5kUGxhY2VtZW50UmVzcG9uc2USYwoOTGlzdEV4dGVuc2lvbnMSJy5idWduZXQucm91dGVyLnYxLkxpc3RFeHRlbnNpb25zUmVxdWVzdBooLmJ1Z25ldC5yb3V0ZXIudjEuTGlzdEV4dGVuc2lvbnNSZXNwb25zZRJgCg1TdG9wUGxhY2VtZW50EiYuYnVnbmV0LnJvdXRlci52MS5TdG9wUGxhY2VtZW50UmVxdWVzdBonLmJ1Z25ldC5yb3V0ZXIudjEuU3RvcFBsYWNlbWVudFJlc3BvbnNlEkUKBEV4ZWMSHS5idWduZXQucm91dGVyLnYxLkV4ZWNSZXF1ZXN0Gh4uYnVnbmV0LnJvdXRlci52MS5FeGVjUmVzcG9uc2USUwoIV2F0Y2hKb2ISIS5idWduZXQucm91dGVyLnYxLldhdGNoSm9iUmVxdWVzdBoiLmJ1Z25ldC5yb3V0ZXIudjEuV2F0Y2hKb2JSZXNwb25zZTABElQKCUNhbmNlbEpvYhIiLmJ1Z25ldC5yb3V0ZXIudjEuQ2FuY2VsSm9iUmVxdWVzdBojLmJ1Z25ldC5yb3V0ZXIudjEuQ2FuY2VsSm9iUmVzcG9uc2USUQoIUmVhZEZpbGUSIS5idWduZXQucm91dGVyLnYxLlJlYWRGaWxlUmVxdWVzdBoiLmJ1Z25ldC5yb3V0ZXIudjEuUmVhZEZpbGVSZXNwb25zZRJUCglXcml0ZUZpbGUSIi5idWduZXQucm91dGVyLnYxLldyaXRlRmlsZVJlcXVlc3QaIy5idWduZXQucm91dGVyLnYxLldyaXRlRmlsZVJlc3BvbnNlElQKCUxpc3RGaWxlcxIiLmJ1Z25ldC5yb3V0ZXIudjEuTGlzdEZpbGVzUmVxdWVzdBojLmJ1Z25ldC5yb3V0ZXIudjEuTGlzdEZpbGVzUmVzcG9uc2VCQlpAZ2l0aHViLmNvbS9veW5vemFuL2J1Z25ldC1wcm90by9nZW4vZ28vYnVnbmV0L3JvdXRlci92MTtyb3V0ZXJ2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message bugnet.router.v1.Resources
@@ -406,6 +406,13 @@ export type CheckExtendPlacementResponse = Message<"bugnet.router.v1.CheckExtend
    * @generated from field: google.protobuf.Timestamp deadline = 2;
    */
   deadline?: Timestamp | undefined;
+
+  /**
+   * The checked package, priced from the catalog
+   *
+   * @generated from field: bugnet.router.v1.PackageOption package = 3;
+   */
+  package?: PackageOption | undefined;
 };
 
 /**
@@ -414,6 +421,42 @@ export type CheckExtendPlacementResponse = Message<"bugnet.router.v1.CheckExtend
  */
 export const CheckExtendPlacementResponseSchema: GenMessage<CheckExtendPlacementResponse> = /*@__PURE__*/
   messageDesc(file_bugnet_router_v1_router, 15);
+
+/**
+ * @generated from message bugnet.router.v1.ListExtensionsRequest
+ */
+export type ListExtensionsRequest = Message<"bugnet.router.v1.ListExtensionsRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.ListExtensionsRequest.
+ * Use `create(ListExtensionsRequestSchema)` to create a new message.
+ */
+export const ListExtensionsRequestSchema: GenMessage<ListExtensionsRequest> = /*@__PURE__*/
+  messageDesc(file_bugnet_router_v1_router, 16);
+
+/**
+ * @generated from message bugnet.router.v1.ListExtensionsResponse
+ */
+export type ListExtensionsResponse = Message<"bugnet.router.v1.ListExtensionsResponse"> & {
+  /**
+   * Every package that can extend the placement, available as CheckExtendPlacement would answer
+   *
+   * @generated from field: repeated bugnet.router.v1.PackageOption options = 1;
+   */
+  options: PackageOption[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.ListExtensionsResponse.
+ * Use `create(ListExtensionsResponseSchema)` to create a new message.
+ */
+export const ListExtensionsResponseSchema: GenMessage<ListExtensionsResponse> = /*@__PURE__*/
+  messageDesc(file_bugnet_router_v1_router, 17);
 
 /**
  * @generated from message bugnet.router.v1.StopPlacementRequest
@@ -430,7 +473,7 @@ export type StopPlacementRequest = Message<"bugnet.router.v1.StopPlacementReques
  * Use `create(StopPlacementRequestSchema)` to create a new message.
  */
 export const StopPlacementRequestSchema: GenMessage<StopPlacementRequest> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 16);
+  messageDesc(file_bugnet_router_v1_router, 18);
 
 /**
  * @generated from message bugnet.router.v1.StopPlacementResponse
@@ -447,7 +490,7 @@ export type StopPlacementResponse = Message<"bugnet.router.v1.StopPlacementRespo
  * Use `create(StopPlacementResponseSchema)` to create a new message.
  */
 export const StopPlacementResponseSchema: GenMessage<StopPlacementResponse> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 17);
+  messageDesc(file_bugnet_router_v1_router, 19);
 
 /**
  * @generated from message bugnet.router.v1.Until
@@ -474,7 +517,7 @@ export type Until = Message<"bugnet.router.v1.Until"> & {
  * Use `create(UntilSchema)` to create a new message.
  */
 export const UntilSchema: GenMessage<Until> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 18);
+  messageDesc(file_bugnet_router_v1_router, 20);
 
 /**
  * @generated from message bugnet.router.v1.ExecRequest
@@ -521,7 +564,7 @@ export type ExecRequest = Message<"bugnet.router.v1.ExecRequest"> & {
  * Use `create(ExecRequestSchema)` to create a new message.
  */
 export const ExecRequestSchema: GenMessage<ExecRequest> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 19);
+  messageDesc(file_bugnet_router_v1_router, 21);
 
 /**
  * @generated from message bugnet.router.v1.ExecResponse
@@ -568,7 +611,7 @@ export type ExecResponse = Message<"bugnet.router.v1.ExecResponse"> & {
  * Use `create(ExecResponseSchema)` to create a new message.
  */
 export const ExecResponseSchema: GenMessage<ExecResponse> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 20);
+  messageDesc(file_bugnet_router_v1_router, 22);
 
 /**
  * @generated from message bugnet.router.v1.JobOutput
@@ -595,7 +638,7 @@ export type JobOutput = Message<"bugnet.router.v1.JobOutput"> & {
  * Use `create(JobOutputSchema)` to create a new message.
  */
 export const JobOutputSchema: GenMessage<JobOutput> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 21);
+  messageDesc(file_bugnet_router_v1_router, 23);
 
 /**
  * @generated from message bugnet.router.v1.JobExit
@@ -622,7 +665,7 @@ export type JobExit = Message<"bugnet.router.v1.JobExit"> & {
  * Use `create(JobExitSchema)` to create a new message.
  */
 export const JobExitSchema: GenMessage<JobExit> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 22);
+  messageDesc(file_bugnet_router_v1_router, 24);
 
 /**
  * Output resumes at these offsets, the bytes skipped before them stay in the sandbox's job files
@@ -646,7 +689,7 @@ export type JobSkip = Message<"bugnet.router.v1.JobSkip"> & {
  * Use `create(JobSkipSchema)` to create a new message.
  */
 export const JobSkipSchema: GenMessage<JobSkip> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 23);
+  messageDesc(file_bugnet_router_v1_router, 25);
 
 /**
  * @generated from message bugnet.router.v1.WatchJobRequest
@@ -678,7 +721,7 @@ export type WatchJobRequest = Message<"bugnet.router.v1.WatchJobRequest"> & {
  * Use `create(WatchJobRequestSchema)` to create a new message.
  */
 export const WatchJobRequestSchema: GenMessage<WatchJobRequest> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 24);
+  messageDesc(file_bugnet_router_v1_router, 26);
 
 /**
  * @generated from message bugnet.router.v1.WatchJobResponse
@@ -724,7 +767,7 @@ export type WatchJobResponse = Message<"bugnet.router.v1.WatchJobResponse"> & {
  * Use `create(WatchJobResponseSchema)` to create a new message.
  */
 export const WatchJobResponseSchema: GenMessage<WatchJobResponse> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 25);
+  messageDesc(file_bugnet_router_v1_router, 27);
 
 /**
  * @generated from message bugnet.router.v1.CancelJobRequest
@@ -746,7 +789,7 @@ export type CancelJobRequest = Message<"bugnet.router.v1.CancelJobRequest"> & {
  * Use `create(CancelJobRequestSchema)` to create a new message.
  */
 export const CancelJobRequestSchema: GenMessage<CancelJobRequest> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 26);
+  messageDesc(file_bugnet_router_v1_router, 28);
 
 /**
  * @generated from message bugnet.router.v1.CancelJobResponse
@@ -763,7 +806,7 @@ export type CancelJobResponse = Message<"bugnet.router.v1.CancelJobResponse"> & 
  * Use `create(CancelJobResponseSchema)` to create a new message.
  */
 export const CancelJobResponseSchema: GenMessage<CancelJobResponse> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 27);
+  messageDesc(file_bugnet_router_v1_router, 29);
 
 /**
  * @generated from message bugnet.router.v1.ReadFileRequest
@@ -795,7 +838,7 @@ export type ReadFileRequest = Message<"bugnet.router.v1.ReadFileRequest"> & {
  * Use `create(ReadFileRequestSchema)` to create a new message.
  */
 export const ReadFileRequestSchema: GenMessage<ReadFileRequest> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 28);
+  messageDesc(file_bugnet_router_v1_router, 30);
 
 /**
  * @generated from message bugnet.router.v1.ReadFileResponse
@@ -817,7 +860,7 @@ export type ReadFileResponse = Message<"bugnet.router.v1.ReadFileResponse"> & {
  * Use `create(ReadFileResponseSchema)` to create a new message.
  */
 export const ReadFileResponseSchema: GenMessage<ReadFileResponse> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 29);
+  messageDesc(file_bugnet_router_v1_router, 31);
 
 /**
  * @generated from message bugnet.router.v1.WriteFileRequest
@@ -849,7 +892,7 @@ export type WriteFileRequest = Message<"bugnet.router.v1.WriteFileRequest"> & {
  * Use `create(WriteFileRequestSchema)` to create a new message.
  */
 export const WriteFileRequestSchema: GenMessage<WriteFileRequest> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 30);
+  messageDesc(file_bugnet_router_v1_router, 32);
 
 /**
  * @generated from message bugnet.router.v1.WriteFileResponse
@@ -866,7 +909,7 @@ export type WriteFileResponse = Message<"bugnet.router.v1.WriteFileResponse"> & 
  * Use `create(WriteFileResponseSchema)` to create a new message.
  */
 export const WriteFileResponseSchema: GenMessage<WriteFileResponse> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 31);
+  messageDesc(file_bugnet_router_v1_router, 33);
 
 /**
  * @generated from message bugnet.router.v1.FileEntry
@@ -903,7 +946,7 @@ export type FileEntry = Message<"bugnet.router.v1.FileEntry"> & {
  * Use `create(FileEntrySchema)` to create a new message.
  */
 export const FileEntrySchema: GenMessage<FileEntry> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 32);
+  messageDesc(file_bugnet_router_v1_router, 34);
 
 /**
  * @generated from message bugnet.router.v1.ListFilesRequest
@@ -930,7 +973,7 @@ export type ListFilesRequest = Message<"bugnet.router.v1.ListFilesRequest"> & {
  * Use `create(ListFilesRequestSchema)` to create a new message.
  */
 export const ListFilesRequestSchema: GenMessage<ListFilesRequest> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 33);
+  messageDesc(file_bugnet_router_v1_router, 35);
 
 /**
  * @generated from message bugnet.router.v1.ListFilesResponse
@@ -954,7 +997,7 @@ export type ListFilesResponse = Message<"bugnet.router.v1.ListFilesResponse"> & 
  * Use `create(ListFilesResponseSchema)` to create a new message.
  */
 export const ListFilesResponseSchema: GenMessage<ListFilesResponse> = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_router, 34);
+  messageDesc(file_bugnet_router_v1_router, 36);
 
 /**
  * @generated from enum bugnet.router.v1.PlacementState
@@ -1110,6 +1153,14 @@ export const SandboxRouterService: GenService<{
     methodKind: "unary";
     input: typeof CheckExtendPlacementRequestSchema;
     output: typeof CheckExtendPlacementResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.ListExtensions
+   */
+  listExtensions: {
+    methodKind: "unary";
+    input: typeof ListExtensionsRequestSchema;
+    output: typeof ListExtensionsResponseSchema;
   },
   /**
    * @generated from rpc bugnet.router.v1.SandboxRouterService.StopPlacement

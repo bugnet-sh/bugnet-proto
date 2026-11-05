@@ -1041,7 +1041,9 @@ type CheckExtendPlacementResponse struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	Placement *Placement             `protobuf:"bytes,1,opt,name=placement,proto3" json:"placement,omitempty"`
 	// The deadline the placement would have once extended by the package
-	Deadline      *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=deadline,proto3" json:"deadline,omitempty"`
+	Deadline *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=deadline,proto3" json:"deadline,omitempty"`
+	// The checked package, priced from the catalog
+	Package       *PackageOption `protobuf:"bytes,3,opt,name=package,proto3" json:"package,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1090,6 +1092,102 @@ func (x *CheckExtendPlacementResponse) GetDeadline() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *CheckExtendPlacementResponse) GetPackage() *PackageOption {
+	if x != nil {
+		return x.Package
+	}
+	return nil
+}
+
+type ListExtensionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Handle        string                 `protobuf:"bytes,1,opt,name=handle,proto3" json:"handle,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListExtensionsRequest) Reset() {
+	*x = ListExtensionsRequest{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListExtensionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListExtensionsRequest) ProtoMessage() {}
+
+func (x *ListExtensionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListExtensionsRequest.ProtoReflect.Descriptor instead.
+func (*ListExtensionsRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ListExtensionsRequest) GetHandle() string {
+	if x != nil {
+		return x.Handle
+	}
+	return ""
+}
+
+type ListExtensionsResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Every package that can extend the placement, available as CheckExtendPlacement would answer
+	Options       []*PackageOption `protobuf:"bytes,1,rep,name=options,proto3" json:"options,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListExtensionsResponse) Reset() {
+	*x = ListExtensionsResponse{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListExtensionsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListExtensionsResponse) ProtoMessage() {}
+
+func (x *ListExtensionsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListExtensionsResponse.ProtoReflect.Descriptor instead.
+func (*ListExtensionsResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ListExtensionsResponse) GetOptions() []*PackageOption {
+	if x != nil {
+		return x.Options
+	}
+	return nil
+}
+
 type StopPlacementRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Handle        string                 `protobuf:"bytes,1,opt,name=handle,proto3" json:"handle,omitempty"`
@@ -1099,7 +1197,7 @@ type StopPlacementRequest struct {
 
 func (x *StopPlacementRequest) Reset() {
 	*x = StopPlacementRequest{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[16]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1111,7 +1209,7 @@ func (x *StopPlacementRequest) String() string {
 func (*StopPlacementRequest) ProtoMessage() {}
 
 func (x *StopPlacementRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[16]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1124,7 +1222,7 @@ func (x *StopPlacementRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StopPlacementRequest.ProtoReflect.Descriptor instead.
 func (*StopPlacementRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{16}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *StopPlacementRequest) GetHandle() string {
@@ -1143,7 +1241,7 @@ type StopPlacementResponse struct {
 
 func (x *StopPlacementResponse) Reset() {
 	*x = StopPlacementResponse{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[17]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1155,7 +1253,7 @@ func (x *StopPlacementResponse) String() string {
 func (*StopPlacementResponse) ProtoMessage() {}
 
 func (x *StopPlacementResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[17]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1168,7 +1266,7 @@ func (x *StopPlacementResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StopPlacementResponse.ProtoReflect.Descriptor instead.
 func (*StopPlacementResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{17}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *StopPlacementResponse) GetPlacement() *Placement {
@@ -1189,7 +1287,7 @@ type Until struct {
 
 func (x *Until) Reset() {
 	*x = Until{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[18]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1201,7 +1299,7 @@ func (x *Until) String() string {
 func (*Until) ProtoMessage() {}
 
 func (x *Until) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[18]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1214,7 +1312,7 @@ func (x *Until) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Until.ProtoReflect.Descriptor instead.
 func (*Until) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{18}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *Until) GetExit() bool {
@@ -1253,7 +1351,7 @@ type ExecRequest struct {
 
 func (x *ExecRequest) Reset() {
 	*x = ExecRequest{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[19]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1265,7 +1363,7 @@ func (x *ExecRequest) String() string {
 func (*ExecRequest) ProtoMessage() {}
 
 func (x *ExecRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[19]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1278,7 +1376,7 @@ func (x *ExecRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExecRequest.ProtoReflect.Descriptor instead.
 func (*ExecRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{19}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ExecRequest) GetHandle() string {
@@ -1345,7 +1443,7 @@ type ExecResponse struct {
 
 func (x *ExecResponse) Reset() {
 	*x = ExecResponse{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[20]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1357,7 +1455,7 @@ func (x *ExecResponse) String() string {
 func (*ExecResponse) ProtoMessage() {}
 
 func (x *ExecResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[20]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1370,7 +1468,7 @@ func (x *ExecResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExecResponse.ProtoReflect.Descriptor instead.
 func (*ExecResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{20}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ExecResponse) GetJobId() string {
@@ -1433,7 +1531,7 @@ type JobOutput struct {
 
 func (x *JobOutput) Reset() {
 	*x = JobOutput{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[21]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1445,7 +1543,7 @@ func (x *JobOutput) String() string {
 func (*JobOutput) ProtoMessage() {}
 
 func (x *JobOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[21]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1458,7 +1556,7 @@ func (x *JobOutput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JobOutput.ProtoReflect.Descriptor instead.
 func (*JobOutput) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{21}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *JobOutput) GetStream() OutputStream {
@@ -1493,7 +1591,7 @@ type JobExit struct {
 
 func (x *JobExit) Reset() {
 	*x = JobExit{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[22]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1505,7 +1603,7 @@ func (x *JobExit) String() string {
 func (*JobExit) ProtoMessage() {}
 
 func (x *JobExit) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[22]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1518,7 +1616,7 @@ func (x *JobExit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JobExit.ProtoReflect.Descriptor instead.
 func (*JobExit) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{22}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *JobExit) GetExitCode() int32 {
@@ -1553,7 +1651,7 @@ type JobSkip struct {
 
 func (x *JobSkip) Reset() {
 	*x = JobSkip{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[23]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1565,7 +1663,7 @@ func (x *JobSkip) String() string {
 func (*JobSkip) ProtoMessage() {}
 
 func (x *JobSkip) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[23]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1578,7 +1676,7 @@ func (x *JobSkip) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JobSkip.ProtoReflect.Descriptor instead.
 func (*JobSkip) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{23}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *JobSkip) GetStdoutOffset() uint64 {
@@ -1607,7 +1705,7 @@ type WatchJobRequest struct {
 
 func (x *WatchJobRequest) Reset() {
 	*x = WatchJobRequest{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[24]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1619,7 +1717,7 @@ func (x *WatchJobRequest) String() string {
 func (*WatchJobRequest) ProtoMessage() {}
 
 func (x *WatchJobRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[24]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1632,7 +1730,7 @@ func (x *WatchJobRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchJobRequest.ProtoReflect.Descriptor instead.
 func (*WatchJobRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{24}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *WatchJobRequest) GetHandle() string {
@@ -1679,7 +1777,7 @@ type WatchJobResponse struct {
 
 func (x *WatchJobResponse) Reset() {
 	*x = WatchJobResponse{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[25]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1691,7 +1789,7 @@ func (x *WatchJobResponse) String() string {
 func (*WatchJobResponse) ProtoMessage() {}
 
 func (x *WatchJobResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[25]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1704,7 +1802,7 @@ func (x *WatchJobResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchJobResponse.ProtoReflect.Descriptor instead.
 func (*WatchJobResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{25}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *WatchJobResponse) GetFrame() isWatchJobResponse_Frame {
@@ -1795,7 +1893,7 @@ type CancelJobRequest struct {
 
 func (x *CancelJobRequest) Reset() {
 	*x = CancelJobRequest{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[26]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1807,7 +1905,7 @@ func (x *CancelJobRequest) String() string {
 func (*CancelJobRequest) ProtoMessage() {}
 
 func (x *CancelJobRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[26]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1820,7 +1918,7 @@ func (x *CancelJobRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelJobRequest.ProtoReflect.Descriptor instead.
 func (*CancelJobRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{26}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *CancelJobRequest) GetHandle() string {
@@ -1846,7 +1944,7 @@ type CancelJobResponse struct {
 
 func (x *CancelJobResponse) Reset() {
 	*x = CancelJobResponse{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[27]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1858,7 +1956,7 @@ func (x *CancelJobResponse) String() string {
 func (*CancelJobResponse) ProtoMessage() {}
 
 func (x *CancelJobResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[27]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1871,7 +1969,7 @@ func (x *CancelJobResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelJobResponse.ProtoReflect.Descriptor instead.
 func (*CancelJobResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{27}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *CancelJobResponse) GetState() JobState {
@@ -1893,7 +1991,7 @@ type ReadFileRequest struct {
 
 func (x *ReadFileRequest) Reset() {
 	*x = ReadFileRequest{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[28]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1905,7 +2003,7 @@ func (x *ReadFileRequest) String() string {
 func (*ReadFileRequest) ProtoMessage() {}
 
 func (x *ReadFileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[28]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1918,7 +2016,7 @@ func (x *ReadFileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReadFileRequest.ProtoReflect.Descriptor instead.
 func (*ReadFileRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{28}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *ReadFileRequest) GetHandle() string {
@@ -1959,7 +2057,7 @@ type ReadFileResponse struct {
 
 func (x *ReadFileResponse) Reset() {
 	*x = ReadFileResponse{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[29]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1971,7 +2069,7 @@ func (x *ReadFileResponse) String() string {
 func (*ReadFileResponse) ProtoMessage() {}
 
 func (x *ReadFileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[29]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1984,7 +2082,7 @@ func (x *ReadFileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReadFileResponse.ProtoReflect.Descriptor instead.
 func (*ReadFileResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{29}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ReadFileResponse) GetData() []byte {
@@ -2013,7 +2111,7 @@ type WriteFileRequest struct {
 
 func (x *WriteFileRequest) Reset() {
 	*x = WriteFileRequest{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[30]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2025,7 +2123,7 @@ func (x *WriteFileRequest) String() string {
 func (*WriteFileRequest) ProtoMessage() {}
 
 func (x *WriteFileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[30]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2038,7 +2136,7 @@ func (x *WriteFileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WriteFileRequest.ProtoReflect.Descriptor instead.
 func (*WriteFileRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{30}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *WriteFileRequest) GetHandle() string {
@@ -2078,7 +2176,7 @@ type WriteFileResponse struct {
 
 func (x *WriteFileResponse) Reset() {
 	*x = WriteFileResponse{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[31]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2090,7 +2188,7 @@ func (x *WriteFileResponse) String() string {
 func (*WriteFileResponse) ProtoMessage() {}
 
 func (x *WriteFileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[31]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2103,7 +2201,7 @@ func (x *WriteFileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WriteFileResponse.ProtoReflect.Descriptor instead.
 func (*WriteFileResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{31}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *WriteFileResponse) GetSize() uint64 {
@@ -2126,7 +2224,7 @@ type FileEntry struct {
 
 func (x *FileEntry) Reset() {
 	*x = FileEntry{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[32]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2138,7 +2236,7 @@ func (x *FileEntry) String() string {
 func (*FileEntry) ProtoMessage() {}
 
 func (x *FileEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[32]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2151,7 +2249,7 @@ func (x *FileEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileEntry.ProtoReflect.Descriptor instead.
 func (*FileEntry) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{32}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *FileEntry) GetPath() string {
@@ -2200,7 +2298,7 @@ type ListFilesRequest struct {
 
 func (x *ListFilesRequest) Reset() {
 	*x = ListFilesRequest{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[33]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2212,7 +2310,7 @@ func (x *ListFilesRequest) String() string {
 func (*ListFilesRequest) ProtoMessage() {}
 
 func (x *ListFilesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[33]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2225,7 +2323,7 @@ func (x *ListFilesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFilesRequest.ProtoReflect.Descriptor instead.
 func (*ListFilesRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{33}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *ListFilesRequest) GetHandle() string {
@@ -2260,7 +2358,7 @@ type ListFilesResponse struct {
 
 func (x *ListFilesResponse) Reset() {
 	*x = ListFilesResponse{}
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[34]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2272,7 +2370,7 @@ func (x *ListFilesResponse) String() string {
 func (*ListFilesResponse) ProtoMessage() {}
 
 func (x *ListFilesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_router_proto_msgTypes[34]
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2285,7 +2383,7 @@ func (x *ListFilesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFilesResponse.ProtoReflect.Descriptor instead.
 func (*ListFilesResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{34}
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *ListFilesResponse) GetEntries() []*FileEntry {
@@ -2370,10 +2468,15 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"\x1bCheckExtendPlacementRequest\x12\x16\n" +
 	"\x06handle\x18\x01 \x01(\tR\x06handle\x12\x1d\n" +
 	"\n" +
-	"package_id\x18\x02 \x01(\tR\tpackageId\"\x91\x01\n" +
+	"package_id\x18\x02 \x01(\tR\tpackageId\"\xcc\x01\n" +
 	"\x1cCheckExtendPlacementResponse\x129\n" +
 	"\tplacement\x18\x01 \x01(\v2\x1b.bugnet.router.v1.PlacementR\tplacement\x126\n" +
-	"\bdeadline\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bdeadline\".\n" +
+	"\bdeadline\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bdeadline\x129\n" +
+	"\apackage\x18\x03 \x01(\v2\x1f.bugnet.router.v1.PackageOptionR\apackage\"/\n" +
+	"\x15ListExtensionsRequest\x12\x16\n" +
+	"\x06handle\x18\x01 \x01(\tR\x06handle\"S\n" +
+	"\x16ListExtensionsResponse\x129\n" +
+	"\aoptions\x18\x01 \x03(\v2\x1f.bugnet.router.v1.PackageOptionR\aoptions\".\n" +
 	"\x14StopPlacementRequest\x12\x16\n" +
 	"\x06handle\x18\x01 \x01(\tR\x06handle\"R\n" +
 	"\x15StopPlacementResponse\x129\n" +
@@ -2478,14 +2581,16 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"\fOutputStream\x12\x1d\n" +
 	"\x19OUTPUT_STREAM_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14OUTPUT_STREAM_STDOUT\x10\x01\x12\x18\n" +
-	"\x14OUTPUT_STREAM_STDERR\x10\x022\xc9\t\n" +
+	"\x14OUTPUT_STREAM_STDERR\x10\x022\xae\n" +
+	"\n" +
 	"\x14SandboxRouterService\x12Q\n" +
 	"\bEstimate\x12!.bugnet.router.v1.EstimateRequest\x1a\".bugnet.router.v1.EstimateResponse\x12f\n" +
 	"\x0fCreatePlacement\x12(.bugnet.router.v1.CreatePlacementRequest\x1a).bugnet.router.v1.CreatePlacementResponse\x12]\n" +
 	"\fGetPlacement\x12%.bugnet.router.v1.GetPlacementRequest\x1a&.bugnet.router.v1.GetPlacementResponse\x12e\n" +
 	"\x0eWatchPlacement\x12'.bugnet.router.v1.WatchPlacementRequest\x1a(.bugnet.router.v1.WatchPlacementResponse0\x01\x12f\n" +
 	"\x0fExtendPlacement\x12(.bugnet.router.v1.ExtendPlacementRequest\x1a).bugnet.router.v1.ExtendPlacementResponse\x12u\n" +
-	"\x14CheckExtendPlacement\x12-.bugnet.router.v1.CheckExtendPlacementRequest\x1a..bugnet.router.v1.CheckExtendPlacementResponse\x12`\n" +
+	"\x14CheckExtendPlacement\x12-.bugnet.router.v1.CheckExtendPlacementRequest\x1a..bugnet.router.v1.CheckExtendPlacementResponse\x12c\n" +
+	"\x0eListExtensions\x12'.bugnet.router.v1.ListExtensionsRequest\x1a(.bugnet.router.v1.ListExtensionsResponse\x12`\n" +
 	"\rStopPlacement\x12&.bugnet.router.v1.StopPlacementRequest\x1a'.bugnet.router.v1.StopPlacementResponse\x12E\n" +
 	"\x04Exec\x12\x1d.bugnet.router.v1.ExecRequest\x1a\x1e.bugnet.router.v1.ExecResponse\x12S\n" +
 	"\bWatchJob\x12!.bugnet.router.v1.WatchJobRequest\x1a\".bugnet.router.v1.WatchJobResponse0\x01\x12T\n" +
@@ -2507,7 +2612,7 @@ func file_bugnet_router_v1_router_proto_rawDescGZIP() []byte {
 }
 
 var file_bugnet_router_v1_router_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_bugnet_router_v1_router_proto_msgTypes = make([]protoimpl.MessageInfo, 36)
+var file_bugnet_router_v1_router_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_bugnet_router_v1_router_proto_goTypes = []any{
 	(PlacementState)(0),                  // 0: bugnet.router.v1.PlacementState
 	(JobState)(0),                        // 1: bugnet.router.v1.JobState
@@ -2528,36 +2633,38 @@ var file_bugnet_router_v1_router_proto_goTypes = []any{
 	(*ExtendPlacementResponse)(nil),      // 16: bugnet.router.v1.ExtendPlacementResponse
 	(*CheckExtendPlacementRequest)(nil),  // 17: bugnet.router.v1.CheckExtendPlacementRequest
 	(*CheckExtendPlacementResponse)(nil), // 18: bugnet.router.v1.CheckExtendPlacementResponse
-	(*StopPlacementRequest)(nil),         // 19: bugnet.router.v1.StopPlacementRequest
-	(*StopPlacementResponse)(nil),        // 20: bugnet.router.v1.StopPlacementResponse
-	(*Until)(nil),                        // 21: bugnet.router.v1.Until
-	(*ExecRequest)(nil),                  // 22: bugnet.router.v1.ExecRequest
-	(*ExecResponse)(nil),                 // 23: bugnet.router.v1.ExecResponse
-	(*JobOutput)(nil),                    // 24: bugnet.router.v1.JobOutput
-	(*JobExit)(nil),                      // 25: bugnet.router.v1.JobExit
-	(*JobSkip)(nil),                      // 26: bugnet.router.v1.JobSkip
-	(*WatchJobRequest)(nil),              // 27: bugnet.router.v1.WatchJobRequest
-	(*WatchJobResponse)(nil),             // 28: bugnet.router.v1.WatchJobResponse
-	(*CancelJobRequest)(nil),             // 29: bugnet.router.v1.CancelJobRequest
-	(*CancelJobResponse)(nil),            // 30: bugnet.router.v1.CancelJobResponse
-	(*ReadFileRequest)(nil),              // 31: bugnet.router.v1.ReadFileRequest
-	(*ReadFileResponse)(nil),             // 32: bugnet.router.v1.ReadFileResponse
-	(*WriteFileRequest)(nil),             // 33: bugnet.router.v1.WriteFileRequest
-	(*WriteFileResponse)(nil),            // 34: bugnet.router.v1.WriteFileResponse
-	(*FileEntry)(nil),                    // 35: bugnet.router.v1.FileEntry
-	(*ListFilesRequest)(nil),             // 36: bugnet.router.v1.ListFilesRequest
-	(*ListFilesResponse)(nil),            // 37: bugnet.router.v1.ListFilesResponse
-	nil,                                  // 38: bugnet.router.v1.ExecRequest.EnvEntry
-	(*timestamppb.Timestamp)(nil),        // 39: google.protobuf.Timestamp
+	(*ListExtensionsRequest)(nil),        // 19: bugnet.router.v1.ListExtensionsRequest
+	(*ListExtensionsResponse)(nil),       // 20: bugnet.router.v1.ListExtensionsResponse
+	(*StopPlacementRequest)(nil),         // 21: bugnet.router.v1.StopPlacementRequest
+	(*StopPlacementResponse)(nil),        // 22: bugnet.router.v1.StopPlacementResponse
+	(*Until)(nil),                        // 23: bugnet.router.v1.Until
+	(*ExecRequest)(nil),                  // 24: bugnet.router.v1.ExecRequest
+	(*ExecResponse)(nil),                 // 25: bugnet.router.v1.ExecResponse
+	(*JobOutput)(nil),                    // 26: bugnet.router.v1.JobOutput
+	(*JobExit)(nil),                      // 27: bugnet.router.v1.JobExit
+	(*JobSkip)(nil),                      // 28: bugnet.router.v1.JobSkip
+	(*WatchJobRequest)(nil),              // 29: bugnet.router.v1.WatchJobRequest
+	(*WatchJobResponse)(nil),             // 30: bugnet.router.v1.WatchJobResponse
+	(*CancelJobRequest)(nil),             // 31: bugnet.router.v1.CancelJobRequest
+	(*CancelJobResponse)(nil),            // 32: bugnet.router.v1.CancelJobResponse
+	(*ReadFileRequest)(nil),              // 33: bugnet.router.v1.ReadFileRequest
+	(*ReadFileResponse)(nil),             // 34: bugnet.router.v1.ReadFileResponse
+	(*WriteFileRequest)(nil),             // 35: bugnet.router.v1.WriteFileRequest
+	(*WriteFileResponse)(nil),            // 36: bugnet.router.v1.WriteFileResponse
+	(*FileEntry)(nil),                    // 37: bugnet.router.v1.FileEntry
+	(*ListFilesRequest)(nil),             // 38: bugnet.router.v1.ListFilesRequest
+	(*ListFilesResponse)(nil),            // 39: bugnet.router.v1.ListFilesResponse
+	nil,                                  // 40: bugnet.router.v1.ExecRequest.EnvEntry
+	(*timestamppb.Timestamp)(nil),        // 41: google.protobuf.Timestamp
 }
 var file_bugnet_router_v1_router_proto_depIdxs = []int32{
 	3,  // 0: bugnet.router.v1.PackageOption.resources:type_name -> bugnet.router.v1.Resources
 	4,  // 1: bugnet.router.v1.EstimateRequest.requirements:type_name -> bugnet.router.v1.Requirements
 	5,  // 2: bugnet.router.v1.EstimateResponse.options:type_name -> bugnet.router.v1.PackageOption
 	0,  // 3: bugnet.router.v1.Placement.state:type_name -> bugnet.router.v1.PlacementState
-	39, // 4: bugnet.router.v1.Placement.deadline:type_name -> google.protobuf.Timestamp
-	39, // 5: bugnet.router.v1.Placement.created_at:type_name -> google.protobuf.Timestamp
-	39, // 6: bugnet.router.v1.Placement.ready_at:type_name -> google.protobuf.Timestamp
+	41, // 4: bugnet.router.v1.Placement.deadline:type_name -> google.protobuf.Timestamp
+	41, // 5: bugnet.router.v1.Placement.created_at:type_name -> google.protobuf.Timestamp
+	41, // 6: bugnet.router.v1.Placement.ready_at:type_name -> google.protobuf.Timestamp
 	4,  // 7: bugnet.router.v1.CreatePlacementRequest.requirements:type_name -> bugnet.router.v1.Requirements
 	8,  // 8: bugnet.router.v1.CreatePlacementResponse.placement:type_name -> bugnet.router.v1.Placement
 	0,  // 9: bugnet.router.v1.GetPlacementRequest.known_state:type_name -> bugnet.router.v1.PlacementState
@@ -2565,50 +2672,54 @@ var file_bugnet_router_v1_router_proto_depIdxs = []int32{
 	8,  // 11: bugnet.router.v1.WatchPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
 	8,  // 12: bugnet.router.v1.ExtendPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
 	8,  // 13: bugnet.router.v1.CheckExtendPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	39, // 14: bugnet.router.v1.CheckExtendPlacementResponse.deadline:type_name -> google.protobuf.Timestamp
-	8,  // 15: bugnet.router.v1.StopPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	38, // 16: bugnet.router.v1.ExecRequest.env:type_name -> bugnet.router.v1.ExecRequest.EnvEntry
-	21, // 17: bugnet.router.v1.ExecRequest.until:type_name -> bugnet.router.v1.Until
-	1,  // 18: bugnet.router.v1.ExecResponse.state:type_name -> bugnet.router.v1.JobState
-	2,  // 19: bugnet.router.v1.JobOutput.stream:type_name -> bugnet.router.v1.OutputStream
-	21, // 20: bugnet.router.v1.WatchJobRequest.until:type_name -> bugnet.router.v1.Until
-	24, // 21: bugnet.router.v1.WatchJobResponse.output:type_name -> bugnet.router.v1.JobOutput
-	25, // 22: bugnet.router.v1.WatchJobResponse.exit:type_name -> bugnet.router.v1.JobExit
-	26, // 23: bugnet.router.v1.WatchJobResponse.skip:type_name -> bugnet.router.v1.JobSkip
-	1,  // 24: bugnet.router.v1.CancelJobResponse.state:type_name -> bugnet.router.v1.JobState
-	39, // 25: bugnet.router.v1.FileEntry.modified_at:type_name -> google.protobuf.Timestamp
-	35, // 26: bugnet.router.v1.ListFilesResponse.entries:type_name -> bugnet.router.v1.FileEntry
-	6,  // 27: bugnet.router.v1.SandboxRouterService.Estimate:input_type -> bugnet.router.v1.EstimateRequest
-	9,  // 28: bugnet.router.v1.SandboxRouterService.CreatePlacement:input_type -> bugnet.router.v1.CreatePlacementRequest
-	11, // 29: bugnet.router.v1.SandboxRouterService.GetPlacement:input_type -> bugnet.router.v1.GetPlacementRequest
-	13, // 30: bugnet.router.v1.SandboxRouterService.WatchPlacement:input_type -> bugnet.router.v1.WatchPlacementRequest
-	15, // 31: bugnet.router.v1.SandboxRouterService.ExtendPlacement:input_type -> bugnet.router.v1.ExtendPlacementRequest
-	17, // 32: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:input_type -> bugnet.router.v1.CheckExtendPlacementRequest
-	19, // 33: bugnet.router.v1.SandboxRouterService.StopPlacement:input_type -> bugnet.router.v1.StopPlacementRequest
-	22, // 34: bugnet.router.v1.SandboxRouterService.Exec:input_type -> bugnet.router.v1.ExecRequest
-	27, // 35: bugnet.router.v1.SandboxRouterService.WatchJob:input_type -> bugnet.router.v1.WatchJobRequest
-	29, // 36: bugnet.router.v1.SandboxRouterService.CancelJob:input_type -> bugnet.router.v1.CancelJobRequest
-	31, // 37: bugnet.router.v1.SandboxRouterService.ReadFile:input_type -> bugnet.router.v1.ReadFileRequest
-	33, // 38: bugnet.router.v1.SandboxRouterService.WriteFile:input_type -> bugnet.router.v1.WriteFileRequest
-	36, // 39: bugnet.router.v1.SandboxRouterService.ListFiles:input_type -> bugnet.router.v1.ListFilesRequest
-	7,  // 40: bugnet.router.v1.SandboxRouterService.Estimate:output_type -> bugnet.router.v1.EstimateResponse
-	10, // 41: bugnet.router.v1.SandboxRouterService.CreatePlacement:output_type -> bugnet.router.v1.CreatePlacementResponse
-	12, // 42: bugnet.router.v1.SandboxRouterService.GetPlacement:output_type -> bugnet.router.v1.GetPlacementResponse
-	14, // 43: bugnet.router.v1.SandboxRouterService.WatchPlacement:output_type -> bugnet.router.v1.WatchPlacementResponse
-	16, // 44: bugnet.router.v1.SandboxRouterService.ExtendPlacement:output_type -> bugnet.router.v1.ExtendPlacementResponse
-	18, // 45: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:output_type -> bugnet.router.v1.CheckExtendPlacementResponse
-	20, // 46: bugnet.router.v1.SandboxRouterService.StopPlacement:output_type -> bugnet.router.v1.StopPlacementResponse
-	23, // 47: bugnet.router.v1.SandboxRouterService.Exec:output_type -> bugnet.router.v1.ExecResponse
-	28, // 48: bugnet.router.v1.SandboxRouterService.WatchJob:output_type -> bugnet.router.v1.WatchJobResponse
-	30, // 49: bugnet.router.v1.SandboxRouterService.CancelJob:output_type -> bugnet.router.v1.CancelJobResponse
-	32, // 50: bugnet.router.v1.SandboxRouterService.ReadFile:output_type -> bugnet.router.v1.ReadFileResponse
-	34, // 51: bugnet.router.v1.SandboxRouterService.WriteFile:output_type -> bugnet.router.v1.WriteFileResponse
-	37, // 52: bugnet.router.v1.SandboxRouterService.ListFiles:output_type -> bugnet.router.v1.ListFilesResponse
-	40, // [40:53] is the sub-list for method output_type
-	27, // [27:40] is the sub-list for method input_type
-	27, // [27:27] is the sub-list for extension type_name
-	27, // [27:27] is the sub-list for extension extendee
-	0,  // [0:27] is the sub-list for field type_name
+	41, // 14: bugnet.router.v1.CheckExtendPlacementResponse.deadline:type_name -> google.protobuf.Timestamp
+	5,  // 15: bugnet.router.v1.CheckExtendPlacementResponse.package:type_name -> bugnet.router.v1.PackageOption
+	5,  // 16: bugnet.router.v1.ListExtensionsResponse.options:type_name -> bugnet.router.v1.PackageOption
+	8,  // 17: bugnet.router.v1.StopPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	40, // 18: bugnet.router.v1.ExecRequest.env:type_name -> bugnet.router.v1.ExecRequest.EnvEntry
+	23, // 19: bugnet.router.v1.ExecRequest.until:type_name -> bugnet.router.v1.Until
+	1,  // 20: bugnet.router.v1.ExecResponse.state:type_name -> bugnet.router.v1.JobState
+	2,  // 21: bugnet.router.v1.JobOutput.stream:type_name -> bugnet.router.v1.OutputStream
+	23, // 22: bugnet.router.v1.WatchJobRequest.until:type_name -> bugnet.router.v1.Until
+	26, // 23: bugnet.router.v1.WatchJobResponse.output:type_name -> bugnet.router.v1.JobOutput
+	27, // 24: bugnet.router.v1.WatchJobResponse.exit:type_name -> bugnet.router.v1.JobExit
+	28, // 25: bugnet.router.v1.WatchJobResponse.skip:type_name -> bugnet.router.v1.JobSkip
+	1,  // 26: bugnet.router.v1.CancelJobResponse.state:type_name -> bugnet.router.v1.JobState
+	41, // 27: bugnet.router.v1.FileEntry.modified_at:type_name -> google.protobuf.Timestamp
+	37, // 28: bugnet.router.v1.ListFilesResponse.entries:type_name -> bugnet.router.v1.FileEntry
+	6,  // 29: bugnet.router.v1.SandboxRouterService.Estimate:input_type -> bugnet.router.v1.EstimateRequest
+	9,  // 30: bugnet.router.v1.SandboxRouterService.CreatePlacement:input_type -> bugnet.router.v1.CreatePlacementRequest
+	11, // 31: bugnet.router.v1.SandboxRouterService.GetPlacement:input_type -> bugnet.router.v1.GetPlacementRequest
+	13, // 32: bugnet.router.v1.SandboxRouterService.WatchPlacement:input_type -> bugnet.router.v1.WatchPlacementRequest
+	15, // 33: bugnet.router.v1.SandboxRouterService.ExtendPlacement:input_type -> bugnet.router.v1.ExtendPlacementRequest
+	17, // 34: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:input_type -> bugnet.router.v1.CheckExtendPlacementRequest
+	19, // 35: bugnet.router.v1.SandboxRouterService.ListExtensions:input_type -> bugnet.router.v1.ListExtensionsRequest
+	21, // 36: bugnet.router.v1.SandboxRouterService.StopPlacement:input_type -> bugnet.router.v1.StopPlacementRequest
+	24, // 37: bugnet.router.v1.SandboxRouterService.Exec:input_type -> bugnet.router.v1.ExecRequest
+	29, // 38: bugnet.router.v1.SandboxRouterService.WatchJob:input_type -> bugnet.router.v1.WatchJobRequest
+	31, // 39: bugnet.router.v1.SandboxRouterService.CancelJob:input_type -> bugnet.router.v1.CancelJobRequest
+	33, // 40: bugnet.router.v1.SandboxRouterService.ReadFile:input_type -> bugnet.router.v1.ReadFileRequest
+	35, // 41: bugnet.router.v1.SandboxRouterService.WriteFile:input_type -> bugnet.router.v1.WriteFileRequest
+	38, // 42: bugnet.router.v1.SandboxRouterService.ListFiles:input_type -> bugnet.router.v1.ListFilesRequest
+	7,  // 43: bugnet.router.v1.SandboxRouterService.Estimate:output_type -> bugnet.router.v1.EstimateResponse
+	10, // 44: bugnet.router.v1.SandboxRouterService.CreatePlacement:output_type -> bugnet.router.v1.CreatePlacementResponse
+	12, // 45: bugnet.router.v1.SandboxRouterService.GetPlacement:output_type -> bugnet.router.v1.GetPlacementResponse
+	14, // 46: bugnet.router.v1.SandboxRouterService.WatchPlacement:output_type -> bugnet.router.v1.WatchPlacementResponse
+	16, // 47: bugnet.router.v1.SandboxRouterService.ExtendPlacement:output_type -> bugnet.router.v1.ExtendPlacementResponse
+	18, // 48: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:output_type -> bugnet.router.v1.CheckExtendPlacementResponse
+	20, // 49: bugnet.router.v1.SandboxRouterService.ListExtensions:output_type -> bugnet.router.v1.ListExtensionsResponse
+	22, // 50: bugnet.router.v1.SandboxRouterService.StopPlacement:output_type -> bugnet.router.v1.StopPlacementResponse
+	25, // 51: bugnet.router.v1.SandboxRouterService.Exec:output_type -> bugnet.router.v1.ExecResponse
+	30, // 52: bugnet.router.v1.SandboxRouterService.WatchJob:output_type -> bugnet.router.v1.WatchJobResponse
+	32, // 53: bugnet.router.v1.SandboxRouterService.CancelJob:output_type -> bugnet.router.v1.CancelJobResponse
+	34, // 54: bugnet.router.v1.SandboxRouterService.ReadFile:output_type -> bugnet.router.v1.ReadFileResponse
+	36, // 55: bugnet.router.v1.SandboxRouterService.WriteFile:output_type -> bugnet.router.v1.WriteFileResponse
+	39, // 56: bugnet.router.v1.SandboxRouterService.ListFiles:output_type -> bugnet.router.v1.ListFilesResponse
+	43, // [43:57] is the sub-list for method output_type
+	29, // [29:43] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_bugnet_router_v1_router_proto_init() }
@@ -2616,8 +2727,8 @@ func file_bugnet_router_v1_router_proto_init() {
 	if File_bugnet_router_v1_router_proto != nil {
 		return
 	}
-	file_bugnet_router_v1_router_proto_msgTypes[20].OneofWrappers = []any{}
-	file_bugnet_router_v1_router_proto_msgTypes[25].OneofWrappers = []any{
+	file_bugnet_router_v1_router_proto_msgTypes[22].OneofWrappers = []any{}
+	file_bugnet_router_v1_router_proto_msgTypes[27].OneofWrappers = []any{
 		(*WatchJobResponse_Output)(nil),
 		(*WatchJobResponse_Exit)(nil),
 		(*WatchJobResponse_Heartbeat)(nil),
@@ -2629,7 +2740,7 @@ func file_bugnet_router_v1_router_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bugnet_router_v1_router_proto_rawDesc), len(file_bugnet_router_v1_router_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   36,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

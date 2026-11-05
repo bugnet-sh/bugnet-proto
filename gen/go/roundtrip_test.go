@@ -90,3 +90,32 @@ func TestCheckExtendPlacementRoundTrip(t *testing.T) {
 		}
 	}
 }
+
+func TestExtensionPricingRoundTrip(t *testing.T) {
+	more := &routerv1.PackageOption{
+		PackageId: "small-10m-more", Resources: &routerv1.Resources{Vcpu: 2, MemoryMib: 2048},
+		Minutes: 10, PriceMicros: 45000, Available: true,
+	}
+	msgs := []proto.Message{
+		&routerv1.CheckExtendPlacementResponse{
+			Placement: &routerv1.Placement{PlacementId: "p-1"}, Package: more,
+		},
+		&routerv1.ListExtensionsRequest{Handle: "h-1"},
+		&routerv1.ListExtensionsResponse{Options: []*routerv1.PackageOption{
+			more, {PackageId: "small-10m", Minutes: 10, UnavailableReason: "exceeds_lifetime"},
+		}},
+	}
+	for _, in := range msgs {
+		raw, err := proto.Marshal(in)
+		if err != nil {
+			t.Fatalf("marshal: %v", err)
+		}
+		out := in.ProtoReflect().New().Interface()
+		if err := proto.Unmarshal(raw, out); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		if !proto.Equal(in, out) {
+			t.Fatalf("round trip mismatch: %v != %v", in, out)
+		}
+	}
+}

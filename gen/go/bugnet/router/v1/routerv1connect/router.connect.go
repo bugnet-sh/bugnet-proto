@@ -51,6 +51,9 @@ const (
 	// SandboxRouterServiceCheckExtendPlacementProcedure is the fully-qualified name of the
 	// SandboxRouterService's CheckExtendPlacement RPC.
 	SandboxRouterServiceCheckExtendPlacementProcedure = "/bugnet.router.v1.SandboxRouterService/CheckExtendPlacement"
+	// SandboxRouterServiceListExtensionsProcedure is the fully-qualified name of the
+	// SandboxRouterService's ListExtensions RPC.
+	SandboxRouterServiceListExtensionsProcedure = "/bugnet.router.v1.SandboxRouterService/ListExtensions"
 	// SandboxRouterServiceStopPlacementProcedure is the fully-qualified name of the
 	// SandboxRouterService's StopPlacement RPC.
 	SandboxRouterServiceStopPlacementProcedure = "/bugnet.router.v1.SandboxRouterService/StopPlacement"
@@ -82,6 +85,7 @@ type SandboxRouterServiceClient interface {
 	WatchPlacement(context.Context, *connect.Request[v1.WatchPlacementRequest]) (*connect.ServerStreamForClient[v1.WatchPlacementResponse], error)
 	ExtendPlacement(context.Context, *connect.Request[v1.ExtendPlacementRequest]) (*connect.Response[v1.ExtendPlacementResponse], error)
 	CheckExtendPlacement(context.Context, *connect.Request[v1.CheckExtendPlacementRequest]) (*connect.Response[v1.CheckExtendPlacementResponse], error)
+	ListExtensions(context.Context, *connect.Request[v1.ListExtensionsRequest]) (*connect.Response[v1.ListExtensionsResponse], error)
 	StopPlacement(context.Context, *connect.Request[v1.StopPlacementRequest]) (*connect.Response[v1.StopPlacementResponse], error)
 	Exec(context.Context, *connect.Request[v1.ExecRequest]) (*connect.Response[v1.ExecResponse], error)
 	WatchJob(context.Context, *connect.Request[v1.WatchJobRequest]) (*connect.ServerStreamForClient[v1.WatchJobResponse], error)
@@ -138,6 +142,12 @@ func NewSandboxRouterServiceClient(httpClient connect.HTTPClient, baseURL string
 			connect.WithSchema(sandboxRouterServiceMethods.ByName("CheckExtendPlacement")),
 			connect.WithClientOptions(opts...),
 		),
+		listExtensions: connect.NewClient[v1.ListExtensionsRequest, v1.ListExtensionsResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceListExtensionsProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("ListExtensions")),
+			connect.WithClientOptions(opts...),
+		),
 		stopPlacement: connect.NewClient[v1.StopPlacementRequest, v1.StopPlacementResponse](
 			httpClient,
 			baseURL+SandboxRouterServiceStopPlacementProcedure,
@@ -191,6 +201,7 @@ type sandboxRouterServiceClient struct {
 	watchPlacement       *connect.Client[v1.WatchPlacementRequest, v1.WatchPlacementResponse]
 	extendPlacement      *connect.Client[v1.ExtendPlacementRequest, v1.ExtendPlacementResponse]
 	checkExtendPlacement *connect.Client[v1.CheckExtendPlacementRequest, v1.CheckExtendPlacementResponse]
+	listExtensions       *connect.Client[v1.ListExtensionsRequest, v1.ListExtensionsResponse]
 	stopPlacement        *connect.Client[v1.StopPlacementRequest, v1.StopPlacementResponse]
 	exec                 *connect.Client[v1.ExecRequest, v1.ExecResponse]
 	watchJob             *connect.Client[v1.WatchJobRequest, v1.WatchJobResponse]
@@ -228,6 +239,11 @@ func (c *sandboxRouterServiceClient) ExtendPlacement(ctx context.Context, req *c
 // CheckExtendPlacement calls bugnet.router.v1.SandboxRouterService.CheckExtendPlacement.
 func (c *sandboxRouterServiceClient) CheckExtendPlacement(ctx context.Context, req *connect.Request[v1.CheckExtendPlacementRequest]) (*connect.Response[v1.CheckExtendPlacementResponse], error) {
 	return c.checkExtendPlacement.CallUnary(ctx, req)
+}
+
+// ListExtensions calls bugnet.router.v1.SandboxRouterService.ListExtensions.
+func (c *sandboxRouterServiceClient) ListExtensions(ctx context.Context, req *connect.Request[v1.ListExtensionsRequest]) (*connect.Response[v1.ListExtensionsResponse], error) {
+	return c.listExtensions.CallUnary(ctx, req)
 }
 
 // StopPlacement calls bugnet.router.v1.SandboxRouterService.StopPlacement.
@@ -274,6 +290,7 @@ type SandboxRouterServiceHandler interface {
 	WatchPlacement(context.Context, *connect.Request[v1.WatchPlacementRequest], *connect.ServerStream[v1.WatchPlacementResponse]) error
 	ExtendPlacement(context.Context, *connect.Request[v1.ExtendPlacementRequest]) (*connect.Response[v1.ExtendPlacementResponse], error)
 	CheckExtendPlacement(context.Context, *connect.Request[v1.CheckExtendPlacementRequest]) (*connect.Response[v1.CheckExtendPlacementResponse], error)
+	ListExtensions(context.Context, *connect.Request[v1.ListExtensionsRequest]) (*connect.Response[v1.ListExtensionsResponse], error)
 	StopPlacement(context.Context, *connect.Request[v1.StopPlacementRequest]) (*connect.Response[v1.StopPlacementResponse], error)
 	Exec(context.Context, *connect.Request[v1.ExecRequest]) (*connect.Response[v1.ExecResponse], error)
 	WatchJob(context.Context, *connect.Request[v1.WatchJobRequest], *connect.ServerStream[v1.WatchJobResponse]) error
@@ -324,6 +341,12 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 		SandboxRouterServiceCheckExtendPlacementProcedure,
 		svc.CheckExtendPlacement,
 		connect.WithSchema(sandboxRouterServiceMethods.ByName("CheckExtendPlacement")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceListExtensionsHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceListExtensionsProcedure,
+		svc.ListExtensions,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("ListExtensions")),
 		connect.WithHandlerOptions(opts...),
 	)
 	sandboxRouterServiceStopPlacementHandler := connect.NewUnaryHandler(
@@ -382,6 +405,8 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 			sandboxRouterServiceExtendPlacementHandler.ServeHTTP(w, r)
 		case SandboxRouterServiceCheckExtendPlacementProcedure:
 			sandboxRouterServiceCheckExtendPlacementHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceListExtensionsProcedure:
+			sandboxRouterServiceListExtensionsHandler.ServeHTTP(w, r)
 		case SandboxRouterServiceStopPlacementProcedure:
 			sandboxRouterServiceStopPlacementHandler.ServeHTTP(w, r)
 		case SandboxRouterServiceExecProcedure:
@@ -427,6 +452,10 @@ func (UnimplementedSandboxRouterServiceHandler) ExtendPlacement(context.Context,
 
 func (UnimplementedSandboxRouterServiceHandler) CheckExtendPlacement(context.Context, *connect.Request[v1.CheckExtendPlacementRequest]) (*connect.Response[v1.CheckExtendPlacementResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.CheckExtendPlacement is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) ListExtensions(context.Context, *connect.Request[v1.ListExtensionsRequest]) (*connect.Response[v1.ListExtensionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.ListExtensions is not implemented"))
 }
 
 func (UnimplementedSandboxRouterServiceHandler) StopPlacement(context.Context, *connect.Request[v1.StopPlacementRequest]) (*connect.Response[v1.StopPlacementResponse], error) {
