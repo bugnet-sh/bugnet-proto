@@ -2696,7 +2696,8 @@ export enum BootstrapState {
 export declare const BootstrapStateSchema: GenEnum<BootstrapState>;
 
 /**
- * ErrorInfo reasons include HANDLE_UNKNOWN, JOB_UNKNOWN, PACKAGE_UNKNOWN and NOT_START_PACKAGE
+ * ErrorInfo reasons include HANDLE_UNKNOWN, JOB_UNKNOWN, FILE_NOT_FOUND, PACKAGE_UNKNOWN and
+ * NOT_START_PACKAGE
  *
  * @generated from service bugnet.router.v1.SandboxRouterService
  */
