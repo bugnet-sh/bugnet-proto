@@ -297,6 +297,8 @@ func TestServiceProcedures(t *testing.T) {
 		"/bugnet.router.v1.OperatorService/RevokePreview")
 	eq(t, routerv1connect.PaymentsServiceCheckPayerProcedure,
 		"/bugnet.router.v1.PaymentsService/CheckPayer")
+	eq(t, routerv1connect.PaymentsServiceGetOrderProcedure,
+		"/bugnet.router.v1.PaymentsService/GetOrder")
 	eq(t, routerv1connect.SandboxRouterServiceFetchSourceProcedure,
 		"/bugnet.router.v1.SandboxRouterService/FetchSource")
 	eq(t, routerv1connect.SandboxRouterServicePricePackageProcedure,
@@ -363,6 +365,9 @@ func TestSpecFieldNumbers(t *testing.T) {
 		"GetEstimateResponse.catalog":              7,
 		"ProviderStatus.foreign_sandboxes":         13,
 		"CheckPayerRequest.kind":                   4,
+		"GetOrderRequest.order_id":                 1,
+		"GetOrderResponse.placement_state":         3,
+		"GetOrderResponse.ended_at":                7,
 		"OpenSshUpstreamResponse.deadline":         5,
 		"EdgeEvent.resync":                         7,
 		"StartReport.errors":                       18,

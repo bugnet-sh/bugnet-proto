@@ -7,10 +7,30 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
 
-// Called by Payments with BUGNET_PAYMENTS_TOKEN, never by the gateway or the edges
+// Called by Payments with BUGNET_PAYMENTS_ROUTER_TOKEN, never by the gateway or the edges
 service PaymentsService {
   // Says whether the router would refuse this payer's order now, and changes nothing
   rpc CheckPayer(CheckPayerRequest) returns (CheckPayerResponse);
+  // Says what became of an order, so Payments can refund when no event reached it
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message GetOrderResponse {
+  // False when the router never took the order, Payments refunds it in full
+  bool redeemed = 1;
+  // start or extend
+  string kind = 2;
+  // The placement's state now, placing, ready, terminating, terminated or failed
+  string placement_state = 3;
+  bool refundable = 4;
+  // The stable code, as on Placement
+  string failure_reason = 5;
+  string termination_reason = 6;
+  google.protobuf.Timestamp ended_at = 7;
 }
 
 enum PayerVerdict {

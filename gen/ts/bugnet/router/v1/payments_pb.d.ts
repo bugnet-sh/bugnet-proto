@@ -12,6 +12,76 @@ import type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
 export declare const file_bugnet_router_v1_payments: GenFile;
 
 /**
+ * @generated from message bugnet.router.v1.GetOrderRequest
+ */
+export declare type GetOrderRequest = Message<"bugnet.router.v1.GetOrderRequest"> & {
+  /**
+   * @generated from field: string order_id = 1;
+   */
+  orderId: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.GetOrderRequest.
+ * Use `create(GetOrderRequestSchema)` to create a new message.
+ */
+export declare const GetOrderRequestSchema: GenMessage<GetOrderRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.GetOrderResponse
+ */
+export declare type GetOrderResponse = Message<"bugnet.router.v1.GetOrderResponse"> & {
+  /**
+   * False when the router never took the order, Payments refunds it in full
+   *
+   * @generated from field: bool redeemed = 1;
+   */
+  redeemed: boolean;
+
+  /**
+   * start or extend
+   *
+   * @generated from field: string kind = 2;
+   */
+  kind: string;
+
+  /**
+   * The placement's state now, placing, ready, terminating, terminated or failed
+   *
+   * @generated from field: string placement_state = 3;
+   */
+  placementState: string;
+
+  /**
+   * @generated from field: bool refundable = 4;
+   */
+  refundable: boolean;
+
+  /**
+   * The stable code, as on Placement
+   *
+   * @generated from field: string failure_reason = 5;
+   */
+  failureReason: string;
+
+  /**
+   * @generated from field: string termination_reason = 6;
+   */
+  terminationReason: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp ended_at = 7;
+   */
+  endedAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.GetOrderResponse.
+ * Use `create(GetOrderResponseSchema)` to create a new message.
+ */
+export declare const GetOrderResponseSchema: GenMessage<GetOrderResponse>;
+
+/**
  * @generated from message bugnet.router.v1.CheckPayerRequest
  */
 export declare type CheckPayerRequest = Message<"bugnet.router.v1.CheckPayerRequest"> & {
@@ -120,7 +190,7 @@ export enum PayerVerdict {
 export declare const PayerVerdictSchema: GenEnum<PayerVerdict>;
 
 /**
- * Called by Payments with BUGNET_PAYMENTS_TOKEN, never by the gateway or the edges
+ * Called by Payments with BUGNET_PAYMENTS_ROUTER_TOKEN, never by the gateway or the edges
  *
  * @generated from service bugnet.router.v1.PaymentsService
  */
@@ -134,6 +204,16 @@ export declare const PaymentsService: GenService<{
     methodKind: "unary";
     input: typeof CheckPayerRequestSchema;
     output: typeof CheckPayerResponseSchema;
+  },
+  /**
+   * Says what became of an order, so Payments can refund when no event reached it
+   *
+   * @generated from rpc bugnet.router.v1.PaymentsService.GetOrder
+   */
+  getOrder: {
+    methodKind: "unary";
+    input: typeof GetOrderRequestSchema;
+    output: typeof GetOrderResponseSchema;
   },
 }>;
 

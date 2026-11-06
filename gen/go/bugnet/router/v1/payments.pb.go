@@ -81,6 +81,146 @@ func (PayerVerdict) EnumDescriptor() ([]byte, []int) {
 	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{0}
 }
 
+type GetOrderRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrderRequest) Reset() {
+	*x = GetOrderRequest{}
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrderRequest) ProtoMessage() {}
+
+func (x *GetOrderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrderRequest.ProtoReflect.Descriptor instead.
+func (*GetOrderRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetOrderRequest) GetOrderId() string {
+	if x != nil {
+		return x.OrderId
+	}
+	return ""
+}
+
+type GetOrderResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// False when the router never took the order, Payments refunds it in full
+	Redeemed bool `protobuf:"varint,1,opt,name=redeemed,proto3" json:"redeemed,omitempty"`
+	// start or extend
+	Kind string `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"`
+	// The placement's state now, placing, ready, terminating, terminated or failed
+	PlacementState string `protobuf:"bytes,3,opt,name=placement_state,json=placementState,proto3" json:"placement_state,omitempty"`
+	Refundable     bool   `protobuf:"varint,4,opt,name=refundable,proto3" json:"refundable,omitempty"`
+	// The stable code, as on Placement
+	FailureReason     string                 `protobuf:"bytes,5,opt,name=failure_reason,json=failureReason,proto3" json:"failure_reason,omitempty"`
+	TerminationReason string                 `protobuf:"bytes,6,opt,name=termination_reason,json=terminationReason,proto3" json:"termination_reason,omitempty"`
+	EndedAt           *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *GetOrderResponse) Reset() {
+	*x = GetOrderResponse{}
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrderResponse) ProtoMessage() {}
+
+func (x *GetOrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrderResponse.ProtoReflect.Descriptor instead.
+func (*GetOrderResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetOrderResponse) GetRedeemed() bool {
+	if x != nil {
+		return x.Redeemed
+	}
+	return false
+}
+
+func (x *GetOrderResponse) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *GetOrderResponse) GetPlacementState() string {
+	if x != nil {
+		return x.PlacementState
+	}
+	return ""
+}
+
+func (x *GetOrderResponse) GetRefundable() bool {
+	if x != nil {
+		return x.Refundable
+	}
+	return false
+}
+
+func (x *GetOrderResponse) GetFailureReason() string {
+	if x != nil {
+		return x.FailureReason
+	}
+	return ""
+}
+
+func (x *GetOrderResponse) GetTerminationReason() string {
+	if x != nil {
+		return x.TerminationReason
+	}
+	return ""
+}
+
+func (x *GetOrderResponse) GetEndedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndedAt
+	}
+	return nil
+}
+
 type CheckPayerRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Canonical base58, as the order token will carry it
@@ -96,7 +236,7 @@ type CheckPayerRequest struct {
 
 func (x *CheckPayerRequest) Reset() {
 	*x = CheckPayerRequest{}
-	mi := &file_bugnet_router_v1_payments_proto_msgTypes[0]
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -108,7 +248,7 @@ func (x *CheckPayerRequest) String() string {
 func (*CheckPayerRequest) ProtoMessage() {}
 
 func (x *CheckPayerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_payments_proto_msgTypes[0]
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -121,7 +261,7 @@ func (x *CheckPayerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckPayerRequest.ProtoReflect.Descriptor instead.
 func (*CheckPayerRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{0}
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CheckPayerRequest) GetPayer() string {
@@ -165,7 +305,7 @@ type CheckPayerResponse struct {
 
 func (x *CheckPayerResponse) Reset() {
 	*x = CheckPayerResponse{}
-	mi := &file_bugnet_router_v1_payments_proto_msgTypes[1]
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -177,7 +317,7 @@ func (x *CheckPayerResponse) String() string {
 func (*CheckPayerResponse) ProtoMessage() {}
 
 func (x *CheckPayerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_payments_proto_msgTypes[1]
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -190,7 +330,7 @@ func (x *CheckPayerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckPayerResponse.ProtoReflect.Descriptor instead.
 func (*CheckPayerResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{1}
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CheckPayerResponse) GetVerdict() PayerVerdict {
@@ -218,7 +358,19 @@ var File_bugnet_router_v1_payments_proto protoreflect.FileDescriptor
 
 const file_bugnet_router_v1_payments_proto_rawDesc = "" +
 	"\n" +
-	"\x1fbugnet/router/v1/payments.proto\x12\x10bugnet.router.v1\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"y\n" +
+	"\x1fbugnet/router/v1/payments.proto\x12\x10bugnet.router.v1\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\",\n" +
+	"\x0fGetOrderRequest\x12\x19\n" +
+	"\border_id\x18\x01 \x01(\tR\aorderId\"\x98\x02\n" +
+	"\x10GetOrderResponse\x12\x1a\n" +
+	"\bredeemed\x18\x01 \x01(\bR\bredeemed\x12\x12\n" +
+	"\x04kind\x18\x02 \x01(\tR\x04kind\x12'\n" +
+	"\x0fplacement_state\x18\x03 \x01(\tR\x0eplacementState\x12\x1e\n" +
+	"\n" +
+	"refundable\x18\x04 \x01(\bR\n" +
+	"refundable\x12%\n" +
+	"\x0efailure_reason\x18\x05 \x01(\tR\rfailureReason\x12-\n" +
+	"\x12termination_reason\x18\x06 \x01(\tR\x11terminationReason\x125\n" +
+	"\bended_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"y\n" +
 	"\x11CheckPayerRequest\x12\x14\n" +
 	"\x05payer\x18\x01 \x01(\tR\x05payer\x12\x1b\n" +
 	"\tfee_payer\x18\x02 \x01(\tR\bfeePayer\x12\x1d\n" +
@@ -235,10 +387,11 @@ const file_bugnet_router_v1_payments_proto_rawDesc = "" +
 	"\x10PAYER_VERDICT_OK\x10\x01\x12\x19\n" +
 	"\x15PAYER_VERDICT_BLOCKED\x10\x02\x12\x16\n" +
 	"\x12PAYER_VERDICT_BUSY\x10\x03\x12\x1e\n" +
-	"\x1aPAYER_VERDICT_RATE_LIMITED\x10\x042j\n" +
+	"\x1aPAYER_VERDICT_RATE_LIMITED\x10\x042\xbd\x01\n" +
 	"\x0fPaymentsService\x12W\n" +
 	"\n" +
-	"CheckPayer\x12#.bugnet.router.v1.CheckPayerRequest\x1a$.bugnet.router.v1.CheckPayerResponseBBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"CheckPayer\x12#.bugnet.router.v1.CheckPayerRequest\x1a$.bugnet.router.v1.CheckPayerResponse\x12Q\n" +
+	"\bGetOrder\x12!.bugnet.router.v1.GetOrderRequest\x1a\".bugnet.router.v1.GetOrderResponseBBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_payments_proto_rawDescOnce sync.Once
@@ -253,25 +406,30 @@ func file_bugnet_router_v1_payments_proto_rawDescGZIP() []byte {
 }
 
 var file_bugnet_router_v1_payments_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_bugnet_router_v1_payments_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_bugnet_router_v1_payments_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_bugnet_router_v1_payments_proto_goTypes = []any{
 	(PayerVerdict)(0),             // 0: bugnet.router.v1.PayerVerdict
-	(*CheckPayerRequest)(nil),     // 1: bugnet.router.v1.CheckPayerRequest
-	(*CheckPayerResponse)(nil),    // 2: bugnet.router.v1.CheckPayerResponse
-	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),   // 4: google.protobuf.Duration
+	(*GetOrderRequest)(nil),       // 1: bugnet.router.v1.GetOrderRequest
+	(*GetOrderResponse)(nil),      // 2: bugnet.router.v1.GetOrderResponse
+	(*CheckPayerRequest)(nil),     // 3: bugnet.router.v1.CheckPayerRequest
+	(*CheckPayerResponse)(nil),    // 4: bugnet.router.v1.CheckPayerResponse
+	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),   // 6: google.protobuf.Duration
 }
 var file_bugnet_router_v1_payments_proto_depIdxs = []int32{
-	0, // 0: bugnet.router.v1.CheckPayerResponse.verdict:type_name -> bugnet.router.v1.PayerVerdict
-	3, // 1: bugnet.router.v1.CheckPayerResponse.blocked_until:type_name -> google.protobuf.Timestamp
-	4, // 2: bugnet.router.v1.CheckPayerResponse.retry_after:type_name -> google.protobuf.Duration
-	1, // 3: bugnet.router.v1.PaymentsService.CheckPayer:input_type -> bugnet.router.v1.CheckPayerRequest
-	2, // 4: bugnet.router.v1.PaymentsService.CheckPayer:output_type -> bugnet.router.v1.CheckPayerResponse
-	4, // [4:5] is the sub-list for method output_type
-	3, // [3:4] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	5, // 0: bugnet.router.v1.GetOrderResponse.ended_at:type_name -> google.protobuf.Timestamp
+	0, // 1: bugnet.router.v1.CheckPayerResponse.verdict:type_name -> bugnet.router.v1.PayerVerdict
+	5, // 2: bugnet.router.v1.CheckPayerResponse.blocked_until:type_name -> google.protobuf.Timestamp
+	6, // 3: bugnet.router.v1.CheckPayerResponse.retry_after:type_name -> google.protobuf.Duration
+	3, // 4: bugnet.router.v1.PaymentsService.CheckPayer:input_type -> bugnet.router.v1.CheckPayerRequest
+	1, // 5: bugnet.router.v1.PaymentsService.GetOrder:input_type -> bugnet.router.v1.GetOrderRequest
+	4, // 6: bugnet.router.v1.PaymentsService.CheckPayer:output_type -> bugnet.router.v1.CheckPayerResponse
+	2, // 7: bugnet.router.v1.PaymentsService.GetOrder:output_type -> bugnet.router.v1.GetOrderResponse
+	6, // [6:8] is the sub-list for method output_type
+	4, // [4:6] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_bugnet_router_v1_payments_proto_init() }
@@ -285,7 +443,7 @@ func file_bugnet_router_v1_payments_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bugnet_router_v1_payments_proto_rawDesc), len(file_bugnet_router_v1_payments_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

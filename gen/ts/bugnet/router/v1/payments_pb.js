@@ -9,21 +9,35 @@ import { file_google_protobuf_duration, file_google_protobuf_timestamp } from "@
  * Describes the file bugnet/router/v1/payments.proto.
  */
 export const file_bugnet_router_v1_payments = /*@__PURE__*/
-  fileDesc("Ch9idWduZXQvcm91dGVyL3YxL3BheW1lbnRzLnByb3RvEhBidWduZXQucm91dGVyLnYxIlcKEUNoZWNrUGF5ZXJSZXF1ZXN0Eg0KBXBheWVyGAEgASgJEhEKCWZlZV9wYXllchgCIAEoCRISCgpwYWNrYWdlX2lkGAMgASgJEgwKBGtpbmQYBCABKAkiqAEKEkNoZWNrUGF5ZXJSZXNwb25zZRIvCgd2ZXJkaWN0GAEgASgOMh4uYnVnbmV0LnJvdXRlci52MS5QYXllclZlcmRpY3QSMQoNYmxvY2tlZF91bnRpbBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoLcmV0cnlfYWZ0ZXIYAyABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24qlgEKDFBheWVyVmVyZGljdBIdChlQQVlFUl9WRVJESUNUX1VOU1BFQ0lGSUVEEAASFAoQUEFZRVJfVkVSRElDVF9PSxABEhkKFVBBWUVSX1ZFUkRJQ1RfQkxPQ0tFRBACEhYKElBBWUVSX1ZFUkRJQ1RfQlVTWRADEh4KGlBBWUVSX1ZFUkRJQ1RfUkFURV9MSU1JVEVEEAQyagoPUGF5bWVudHNTZXJ2aWNlElcKCkNoZWNrUGF5ZXISIy5idWduZXQucm91dGVyLnYxLkNoZWNrUGF5ZXJSZXF1ZXN0GiQuYnVnbmV0LnJvdXRlci52MS5DaGVja1BheWVyUmVzcG9uc2VCQlpAZ2l0aHViLmNvbS9veW5vemFuL2J1Z25ldC1wcm90by9nZW4vZ28vYnVnbmV0L3JvdXRlci92MTtyb3V0ZXJ2MWIGcHJvdG8z", [file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("Ch9idWduZXQvcm91dGVyL3YxL3BheW1lbnRzLnByb3RvEhBidWduZXQucm91dGVyLnYxIiMKD0dldE9yZGVyUmVxdWVzdBIQCghvcmRlcl9pZBgBIAEoCSLBAQoQR2V0T3JkZXJSZXNwb25zZRIQCghyZWRlZW1lZBgBIAEoCBIMCgRraW5kGAIgASgJEhcKD3BsYWNlbWVudF9zdGF0ZRgDIAEoCRISCgpyZWZ1bmRhYmxlGAQgASgIEhYKDmZhaWx1cmVfcmVhc29uGAUgASgJEhoKEnRlcm1pbmF0aW9uX3JlYXNvbhgGIAEoCRIsCghlbmRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiVwoRQ2hlY2tQYXllclJlcXVlc3QSDQoFcGF5ZXIYASABKAkSEQoJZmVlX3BheWVyGAIgASgJEhIKCnBhY2thZ2VfaWQYAyABKAkSDAoEa2luZBgEIAEoCSKoAQoSQ2hlY2tQYXllclJlc3BvbnNlEi8KB3ZlcmRpY3QYASABKA4yHi5idWduZXQucm91dGVyLnYxLlBheWVyVmVyZGljdBIxCg1ibG9ja2VkX3VudGlsGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgtyZXRyeV9hZnRlchgDIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbiqWAQoMUGF5ZXJWZXJkaWN0Eh0KGVBBWUVSX1ZFUkRJQ1RfVU5TUEVDSUZJRUQQABIUChBQQVlFUl9WRVJESUNUX09LEAESGQoVUEFZRVJfVkVSRElDVF9CTE9DS0VEEAISFgoSUEFZRVJfVkVSRElDVF9CVVNZEAMSHgoaUEFZRVJfVkVSRElDVF9SQVRFX0xJTUlURUQQBDK9AQoPUGF5bWVudHNTZXJ2aWNlElcKCkNoZWNrUGF5ZXISIy5idWduZXQucm91dGVyLnYxLkNoZWNrUGF5ZXJSZXF1ZXN0GiQuYnVnbmV0LnJvdXRlci52MS5DaGVja1BheWVyUmVzcG9uc2USUQoIR2V0T3JkZXISIS5idWduZXQucm91dGVyLnYxLkdldE9yZGVyUmVxdWVzdBoiLmJ1Z25ldC5yb3V0ZXIudjEuR2V0T3JkZXJSZXNwb25zZUJCWkBnaXRodWIuY29tL295bm96YW4vYnVnbmV0LXByb3RvL2dlbi9nby9idWduZXQvcm91dGVyL3YxO3JvdXRlcnYxYgZwcm90bzM", [file_google_protobuf_duration, file_google_protobuf_timestamp]);
+
+/**
+ * Describes the message bugnet.router.v1.GetOrderRequest.
+ * Use `create(GetOrderRequestSchema)` to create a new message.
+ */
+export const GetOrderRequestSchema = /*@__PURE__*/
+  messageDesc(file_bugnet_router_v1_payments, 0);
+
+/**
+ * Describes the message bugnet.router.v1.GetOrderResponse.
+ * Use `create(GetOrderResponseSchema)` to create a new message.
+ */
+export const GetOrderResponseSchema = /*@__PURE__*/
+  messageDesc(file_bugnet_router_v1_payments, 1);
 
 /**
  * Describes the message bugnet.router.v1.CheckPayerRequest.
  * Use `create(CheckPayerRequestSchema)` to create a new message.
  */
 export const CheckPayerRequestSchema = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_payments, 0);
+  messageDesc(file_bugnet_router_v1_payments, 2);
 
 /**
  * Describes the message bugnet.router.v1.CheckPayerResponse.
  * Use `create(CheckPayerResponseSchema)` to create a new message.
  */
 export const CheckPayerResponseSchema = /*@__PURE__*/
-  messageDesc(file_bugnet_router_v1_payments, 1);
+  messageDesc(file_bugnet_router_v1_payments, 3);
 
 /**
  * Describes the enum bugnet.router.v1.PayerVerdict.
@@ -38,7 +52,7 @@ export const PayerVerdict = /*@__PURE__*/
   tsEnum(PayerVerdictSchema);
 
 /**
- * Called by Payments with BUGNET_PAYMENTS_TOKEN, never by the gateway or the edges
+ * Called by Payments with BUGNET_PAYMENTS_ROUTER_TOKEN, never by the gateway or the edges
  *
  * @generated from service bugnet.router.v1.PaymentsService
  */

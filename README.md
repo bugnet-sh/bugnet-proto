@@ -16,10 +16,15 @@ and admits no calls to a service whose token is empty.
 | `SshGatewayService` | `edge.proto` | `bugnet-ssh` | `BUGNET_SSH_TOKEN` |
 | `EgressService` | `edge.proto` | `bugnet-egress` | `BUGNET_EGRESS_TOKEN` |
 | `OperatorService` | `operator.proto` | `bugnet-dev`, operators only | `BUGNET_OPERATOR_TOKEN` |
-| `PaymentsService` | `payments.proto` | Payments | `BUGNET_PAYMENTS_TOKEN` |
+| `PaymentsService` | `payments.proto` | Payments | `BUGNET_PAYMENTS_ROUTER_TOKEN` |
 
 `router.proto` imports none of the other three files, so the gateway's generated client holds
 none of their services. Errors carry a `google.rpc.ErrorInfo` reason in domain `bugnet.router`.
+
+`BUGNET_PAYMENTS_ROUTER_TOKEN` has the same name and value in Payments' environment and the
+router's. It is not `BUGNET_PAYMENTS_TOKEN`, which the gateway sends to Payments.
+`PaymentsService` has two calls. `CheckPayer` says whether the router would refuse a payer's order
+now. `GetOrder` says what became of an order, so Payments can refund one no event reached it for.
 
 ## Generating
 

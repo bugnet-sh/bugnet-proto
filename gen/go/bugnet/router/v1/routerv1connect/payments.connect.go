@@ -36,12 +36,17 @@ const (
 	// PaymentsServiceCheckPayerProcedure is the fully-qualified name of the PaymentsService's
 	// CheckPayer RPC.
 	PaymentsServiceCheckPayerProcedure = "/bugnet.router.v1.PaymentsService/CheckPayer"
+	// PaymentsServiceGetOrderProcedure is the fully-qualified name of the PaymentsService's GetOrder
+	// RPC.
+	PaymentsServiceGetOrderProcedure = "/bugnet.router.v1.PaymentsService/GetOrder"
 )
 
 // PaymentsServiceClient is a client for the bugnet.router.v1.PaymentsService service.
 type PaymentsServiceClient interface {
 	// Says whether the router would refuse this payer's order now, and changes nothing
 	CheckPayer(context.Context, *connect.Request[v1.CheckPayerRequest]) (*connect.Response[v1.CheckPayerResponse], error)
+	// Says what became of an order, so Payments can refund when no event reached it
+	GetOrder(context.Context, *connect.Request[v1.GetOrderRequest]) (*connect.Response[v1.GetOrderResponse], error)
 }
 
 // NewPaymentsServiceClient constructs a client for the bugnet.router.v1.PaymentsService service. By
@@ -61,12 +66,19 @@ func NewPaymentsServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(paymentsServiceMethods.ByName("CheckPayer")),
 			connect.WithClientOptions(opts...),
 		),
+		getOrder: connect.NewClient[v1.GetOrderRequest, v1.GetOrderResponse](
+			httpClient,
+			baseURL+PaymentsServiceGetOrderProcedure,
+			connect.WithSchema(paymentsServiceMethods.ByName("GetOrder")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // paymentsServiceClient implements PaymentsServiceClient.
 type paymentsServiceClient struct {
 	checkPayer *connect.Client[v1.CheckPayerRequest, v1.CheckPayerResponse]
+	getOrder   *connect.Client[v1.GetOrderRequest, v1.GetOrderResponse]
 }
 
 // CheckPayer calls bugnet.router.v1.PaymentsService.CheckPayer.
@@ -74,10 +86,17 @@ func (c *paymentsServiceClient) CheckPayer(ctx context.Context, req *connect.Req
 	return c.checkPayer.CallUnary(ctx, req)
 }
 
+// GetOrder calls bugnet.router.v1.PaymentsService.GetOrder.
+func (c *paymentsServiceClient) GetOrder(ctx context.Context, req *connect.Request[v1.GetOrderRequest]) (*connect.Response[v1.GetOrderResponse], error) {
+	return c.getOrder.CallUnary(ctx, req)
+}
+
 // PaymentsServiceHandler is an implementation of the bugnet.router.v1.PaymentsService service.
 type PaymentsServiceHandler interface {
 	// Says whether the router would refuse this payer's order now, and changes nothing
 	CheckPayer(context.Context, *connect.Request[v1.CheckPayerRequest]) (*connect.Response[v1.CheckPayerResponse], error)
+	// Says what became of an order, so Payments can refund when no event reached it
+	GetOrder(context.Context, *connect.Request[v1.GetOrderRequest]) (*connect.Response[v1.GetOrderResponse], error)
 }
 
 // NewPaymentsServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -93,10 +112,18 @@ func NewPaymentsServiceHandler(svc PaymentsServiceHandler, opts ...connect.Handl
 		connect.WithSchema(paymentsServiceMethods.ByName("CheckPayer")),
 		connect.WithHandlerOptions(opts...),
 	)
+	paymentsServiceGetOrderHandler := connect.NewUnaryHandler(
+		PaymentsServiceGetOrderProcedure,
+		svc.GetOrder,
+		connect.WithSchema(paymentsServiceMethods.ByName("GetOrder")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/bugnet.router.v1.PaymentsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case PaymentsServiceCheckPayerProcedure:
 			paymentsServiceCheckPayerHandler.ServeHTTP(w, r)
+		case PaymentsServiceGetOrderProcedure:
+			paymentsServiceGetOrderHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -108,4 +135,8 @@ type UnimplementedPaymentsServiceHandler struct{}
 
 func (UnimplementedPaymentsServiceHandler) CheckPayer(context.Context, *connect.Request[v1.CheckPayerRequest]) (*connect.Response[v1.CheckPayerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.PaymentsService.CheckPayer is not implemented"))
+}
+
+func (UnimplementedPaymentsServiceHandler) GetOrder(context.Context, *connect.Request[v1.GetOrderRequest]) (*connect.Response[v1.GetOrderResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.PaymentsService.GetOrder is not implemented"))
 }
