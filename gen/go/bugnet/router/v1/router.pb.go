@@ -1774,7 +1774,9 @@ type Placement struct {
 	// stop, deadline, abuse, control_lost, provider_failed, sandbox_exited, wallet_blocked, operator
 	TerminationReason string `protobuf:"bytes,10,opt,name=termination_reason,json=terminationReason,proto3" json:"termination_reason,omitempty"`
 	// The repository the router placed in the sandbox
-	Bootstrap     *Bootstrap `protobuf:"bytes,11,opt,name=bootstrap,proto3" json:"bootstrap,omitempty"`
+	Bootstrap *Bootstrap `protobuf:"bytes,11,opt,name=bootstrap,proto3" json:"bootstrap,omitempty"`
+	// When the placement became terminated or failed, unset before
+	EndedAt       *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1882,6 +1884,13 @@ func (x *Placement) GetTerminationReason() string {
 func (x *Placement) GetBootstrap() *Bootstrap {
 	if x != nil {
 		return x.Bootstrap
+	}
+	return nil
+}
+
+func (x *Placement) GetEndedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndedAt
 	}
 	return nil
 }
@@ -5441,7 +5450,7 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"package_id\x18\x01 \x01(\tR\tpackageId\x12B\n" +
 	"\frequirements\x18\x02 \x01(\v2\x1e.bugnet.router.v1.RequirementsR\frequirements\"O\n" +
 	"\x14PricePackageResponse\x127\n" +
-	"\x06option\x18\x01 \x01(\v2\x1f.bugnet.router.v1.PackageOptionR\x06option\"\xfd\x03\n" +
+	"\x06option\x18\x01 \x01(\v2\x1f.bugnet.router.v1.PackageOptionR\x06option\"\xb4\x04\n" +
 	"\tPlacement\x12!\n" +
 	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\x126\n" +
 	"\x05state\x18\x02 \x01(\x0e2 .bugnet.router.v1.PlacementStateR\x05state\x12\x1d\n" +
@@ -5458,7 +5467,8 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"\tssh_alias\x18\t \x01(\tR\bsshAlias\x12-\n" +
 	"\x12termination_reason\x18\n" +
 	" \x01(\tR\x11terminationReason\x129\n" +
-	"\tbootstrap\x18\v \x01(\v2\x1b.bugnet.router.v1.BootstrapR\tbootstrap\"\x9e\x01\n" +
+	"\tbootstrap\x18\v \x01(\v2\x1b.bugnet.router.v1.BootstrapR\tbootstrap\x125\n" +
+	"\bended_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\x9e\x01\n" +
 	"\x16CreatePlacementRequest\x12\x1f\n" +
 	"\vorder_token\x18\x01 \x01(\tR\n" +
 	"orderToken\x12B\n" +
@@ -5972,102 +5982,103 @@ var file_bugnet_router_v1_router_proto_depIdxs = []int32{
 	86, // 21: bugnet.router.v1.Placement.created_at:type_name -> google.protobuf.Timestamp
 	86, // 22: bugnet.router.v1.Placement.ready_at:type_name -> google.protobuf.Timestamp
 	82, // 23: bugnet.router.v1.Placement.bootstrap:type_name -> bugnet.router.v1.Bootstrap
-	16, // 24: bugnet.router.v1.CreatePlacementRequest.requirements:type_name -> bugnet.router.v1.Requirements
-	26, // 25: bugnet.router.v1.CreatePlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	9,  // 26: bugnet.router.v1.GetPlacementRequest.known_state:type_name -> bugnet.router.v1.PlacementState
-	26, // 27: bugnet.router.v1.GetPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	26, // 28: bugnet.router.v1.WatchPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	26, // 29: bugnet.router.v1.ExtendPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	26, // 30: bugnet.router.v1.CheckExtendPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	86, // 31: bugnet.router.v1.CheckExtendPlacementResponse.deadline:type_name -> google.protobuf.Timestamp
-	17, // 32: bugnet.router.v1.CheckExtendPlacementResponse.package:type_name -> bugnet.router.v1.PackageOption
-	17, // 33: bugnet.router.v1.ListExtensionsResponse.options:type_name -> bugnet.router.v1.PackageOption
-	26, // 34: bugnet.router.v1.StopPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	85, // 35: bugnet.router.v1.ExecRequest.env:type_name -> bugnet.router.v1.ExecRequest.EnvEntry
-	41, // 36: bugnet.router.v1.ExecRequest.until:type_name -> bugnet.router.v1.Until
-	10, // 37: bugnet.router.v1.ExecResponse.state:type_name -> bugnet.router.v1.JobState
-	11, // 38: bugnet.router.v1.JobOutput.stream:type_name -> bugnet.router.v1.OutputStream
-	41, // 39: bugnet.router.v1.WatchJobRequest.until:type_name -> bugnet.router.v1.Until
-	44, // 40: bugnet.router.v1.WatchJobResponse.output:type_name -> bugnet.router.v1.JobOutput
-	45, // 41: bugnet.router.v1.WatchJobResponse.exit:type_name -> bugnet.router.v1.JobExit
-	46, // 42: bugnet.router.v1.WatchJobResponse.skip:type_name -> bugnet.router.v1.JobSkip
-	10, // 43: bugnet.router.v1.CancelJobResponse.state:type_name -> bugnet.router.v1.JobState
-	86, // 44: bugnet.router.v1.FileEntry.modified_at:type_name -> google.protobuf.Timestamp
-	55, // 45: bugnet.router.v1.ListFilesResponse.entries:type_name -> bugnet.router.v1.FileEntry
-	86, // 46: bugnet.router.v1.CreatePreviewResponse.expires_at:type_name -> google.protobuf.Timestamp
-	12, // 47: bugnet.router.v1.CreateTransferRequest.direction:type_name -> bugnet.router.v1.TransferDirection
-	86, // 48: bugnet.router.v1.CreateTransferResponse.expires_at:type_name -> google.protobuf.Timestamp
-	86, // 49: bugnet.router.v1.CreateTransferResponse.modified_at:type_name -> google.protobuf.Timestamp
-	86, // 50: bugnet.router.v1.AddSshKeyResponse.expires_at:type_name -> google.protobuf.Timestamp
-	66, // 51: bugnet.router.v1.SecretInfo.spec:type_name -> bugnet.router.v1.SecretSpec
-	13, // 52: bugnet.router.v1.SecretInfo.state:type_name -> bugnet.router.v1.SecretState
-	86, // 53: bugnet.router.v1.SecretInfo.updated_at:type_name -> google.protobuf.Timestamp
-	86, // 54: bugnet.router.v1.CreateSecretLinkResponse.expires_at:type_name -> google.protobuf.Timestamp
-	86, // 55: bugnet.router.v1.CreateSecretPutGrantResponse.expires_at:type_name -> google.protobuf.Timestamp
-	68, // 56: bugnet.router.v1.GetSecretSealingKeyResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
-	66, // 57: bugnet.router.v1.PutSecretRequest.spec:type_name -> bugnet.router.v1.SecretSpec
-	67, // 58: bugnet.router.v1.PutSecretRequest.value:type_name -> bugnet.router.v1.SealedValue
-	69, // 59: bugnet.router.v1.PutSecretResponse.secret:type_name -> bugnet.router.v1.SecretInfo
-	69, // 60: bugnet.router.v1.ListSecretsResponse.secrets:type_name -> bugnet.router.v1.SecretInfo
-	14, // 61: bugnet.router.v1.Bootstrap.state:type_name -> bugnet.router.v1.BootstrapState
-	82, // 62: bugnet.router.v1.FetchSourceResponse.bootstrap:type_name -> bugnet.router.v1.Bootstrap
-	18, // 63: bugnet.router.v1.SandboxRouterService.Estimate:input_type -> bugnet.router.v1.EstimateRequest
-	24, // 64: bugnet.router.v1.SandboxRouterService.PricePackage:input_type -> bugnet.router.v1.PricePackageRequest
-	27, // 65: bugnet.router.v1.SandboxRouterService.CreatePlacement:input_type -> bugnet.router.v1.CreatePlacementRequest
-	29, // 66: bugnet.router.v1.SandboxRouterService.GetPlacement:input_type -> bugnet.router.v1.GetPlacementRequest
-	31, // 67: bugnet.router.v1.SandboxRouterService.WatchPlacement:input_type -> bugnet.router.v1.WatchPlacementRequest
-	33, // 68: bugnet.router.v1.SandboxRouterService.ExtendPlacement:input_type -> bugnet.router.v1.ExtendPlacementRequest
-	35, // 69: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:input_type -> bugnet.router.v1.CheckExtendPlacementRequest
-	37, // 70: bugnet.router.v1.SandboxRouterService.ListExtensions:input_type -> bugnet.router.v1.ListExtensionsRequest
-	39, // 71: bugnet.router.v1.SandboxRouterService.StopPlacement:input_type -> bugnet.router.v1.StopPlacementRequest
-	42, // 72: bugnet.router.v1.SandboxRouterService.Exec:input_type -> bugnet.router.v1.ExecRequest
-	47, // 73: bugnet.router.v1.SandboxRouterService.WatchJob:input_type -> bugnet.router.v1.WatchJobRequest
-	49, // 74: bugnet.router.v1.SandboxRouterService.CancelJob:input_type -> bugnet.router.v1.CancelJobRequest
-	51, // 75: bugnet.router.v1.SandboxRouterService.ReadFile:input_type -> bugnet.router.v1.ReadFileRequest
-	53, // 76: bugnet.router.v1.SandboxRouterService.WriteFile:input_type -> bugnet.router.v1.WriteFileRequest
-	56, // 77: bugnet.router.v1.SandboxRouterService.ListFiles:input_type -> bugnet.router.v1.ListFilesRequest
-	58, // 78: bugnet.router.v1.SandboxRouterService.CreatePreview:input_type -> bugnet.router.v1.CreatePreviewRequest
-	60, // 79: bugnet.router.v1.SandboxRouterService.CreateTransfer:input_type -> bugnet.router.v1.CreateTransferRequest
-	62, // 80: bugnet.router.v1.SandboxRouterService.AddSshKey:input_type -> bugnet.router.v1.AddSshKeyRequest
-	64, // 81: bugnet.router.v1.SandboxRouterService.RemoveSshKey:input_type -> bugnet.router.v1.RemoveSshKeyRequest
-	70, // 82: bugnet.router.v1.SandboxRouterService.CreateSecretLink:input_type -> bugnet.router.v1.CreateSecretLinkRequest
-	72, // 83: bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant:input_type -> bugnet.router.v1.CreateSecretPutGrantRequest
-	74, // 84: bugnet.router.v1.SandboxRouterService.GetSecretSealingKey:input_type -> bugnet.router.v1.GetSecretSealingKeyRequest
-	76, // 85: bugnet.router.v1.SandboxRouterService.PutSecret:input_type -> bugnet.router.v1.PutSecretRequest
-	78, // 86: bugnet.router.v1.SandboxRouterService.ListSecrets:input_type -> bugnet.router.v1.ListSecretsRequest
-	80, // 87: bugnet.router.v1.SandboxRouterService.DeleteSecret:input_type -> bugnet.router.v1.DeleteSecretRequest
-	83, // 88: bugnet.router.v1.SandboxRouterService.FetchSource:input_type -> bugnet.router.v1.FetchSourceRequest
-	23, // 89: bugnet.router.v1.SandboxRouterService.Estimate:output_type -> bugnet.router.v1.EstimateResponse
-	25, // 90: bugnet.router.v1.SandboxRouterService.PricePackage:output_type -> bugnet.router.v1.PricePackageResponse
-	28, // 91: bugnet.router.v1.SandboxRouterService.CreatePlacement:output_type -> bugnet.router.v1.CreatePlacementResponse
-	30, // 92: bugnet.router.v1.SandboxRouterService.GetPlacement:output_type -> bugnet.router.v1.GetPlacementResponse
-	32, // 93: bugnet.router.v1.SandboxRouterService.WatchPlacement:output_type -> bugnet.router.v1.WatchPlacementResponse
-	34, // 94: bugnet.router.v1.SandboxRouterService.ExtendPlacement:output_type -> bugnet.router.v1.ExtendPlacementResponse
-	36, // 95: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:output_type -> bugnet.router.v1.CheckExtendPlacementResponse
-	38, // 96: bugnet.router.v1.SandboxRouterService.ListExtensions:output_type -> bugnet.router.v1.ListExtensionsResponse
-	40, // 97: bugnet.router.v1.SandboxRouterService.StopPlacement:output_type -> bugnet.router.v1.StopPlacementResponse
-	43, // 98: bugnet.router.v1.SandboxRouterService.Exec:output_type -> bugnet.router.v1.ExecResponse
-	48, // 99: bugnet.router.v1.SandboxRouterService.WatchJob:output_type -> bugnet.router.v1.WatchJobResponse
-	50, // 100: bugnet.router.v1.SandboxRouterService.CancelJob:output_type -> bugnet.router.v1.CancelJobResponse
-	52, // 101: bugnet.router.v1.SandboxRouterService.ReadFile:output_type -> bugnet.router.v1.ReadFileResponse
-	54, // 102: bugnet.router.v1.SandboxRouterService.WriteFile:output_type -> bugnet.router.v1.WriteFileResponse
-	57, // 103: bugnet.router.v1.SandboxRouterService.ListFiles:output_type -> bugnet.router.v1.ListFilesResponse
-	59, // 104: bugnet.router.v1.SandboxRouterService.CreatePreview:output_type -> bugnet.router.v1.CreatePreviewResponse
-	61, // 105: bugnet.router.v1.SandboxRouterService.CreateTransfer:output_type -> bugnet.router.v1.CreateTransferResponse
-	63, // 106: bugnet.router.v1.SandboxRouterService.AddSshKey:output_type -> bugnet.router.v1.AddSshKeyResponse
-	65, // 107: bugnet.router.v1.SandboxRouterService.RemoveSshKey:output_type -> bugnet.router.v1.RemoveSshKeyResponse
-	71, // 108: bugnet.router.v1.SandboxRouterService.CreateSecretLink:output_type -> bugnet.router.v1.CreateSecretLinkResponse
-	73, // 109: bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant:output_type -> bugnet.router.v1.CreateSecretPutGrantResponse
-	75, // 110: bugnet.router.v1.SandboxRouterService.GetSecretSealingKey:output_type -> bugnet.router.v1.GetSecretSealingKeyResponse
-	77, // 111: bugnet.router.v1.SandboxRouterService.PutSecret:output_type -> bugnet.router.v1.PutSecretResponse
-	79, // 112: bugnet.router.v1.SandboxRouterService.ListSecrets:output_type -> bugnet.router.v1.ListSecretsResponse
-	81, // 113: bugnet.router.v1.SandboxRouterService.DeleteSecret:output_type -> bugnet.router.v1.DeleteSecretResponse
-	84, // 114: bugnet.router.v1.SandboxRouterService.FetchSource:output_type -> bugnet.router.v1.FetchSourceResponse
-	89, // [89:115] is the sub-list for method output_type
-	63, // [63:89] is the sub-list for method input_type
-	63, // [63:63] is the sub-list for extension type_name
-	63, // [63:63] is the sub-list for extension extendee
-	0,  // [0:63] is the sub-list for field type_name
+	86, // 24: bugnet.router.v1.Placement.ended_at:type_name -> google.protobuf.Timestamp
+	16, // 25: bugnet.router.v1.CreatePlacementRequest.requirements:type_name -> bugnet.router.v1.Requirements
+	26, // 26: bugnet.router.v1.CreatePlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	9,  // 27: bugnet.router.v1.GetPlacementRequest.known_state:type_name -> bugnet.router.v1.PlacementState
+	26, // 28: bugnet.router.v1.GetPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	26, // 29: bugnet.router.v1.WatchPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	26, // 30: bugnet.router.v1.ExtendPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	26, // 31: bugnet.router.v1.CheckExtendPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	86, // 32: bugnet.router.v1.CheckExtendPlacementResponse.deadline:type_name -> google.protobuf.Timestamp
+	17, // 33: bugnet.router.v1.CheckExtendPlacementResponse.package:type_name -> bugnet.router.v1.PackageOption
+	17, // 34: bugnet.router.v1.ListExtensionsResponse.options:type_name -> bugnet.router.v1.PackageOption
+	26, // 35: bugnet.router.v1.StopPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	85, // 36: bugnet.router.v1.ExecRequest.env:type_name -> bugnet.router.v1.ExecRequest.EnvEntry
+	41, // 37: bugnet.router.v1.ExecRequest.until:type_name -> bugnet.router.v1.Until
+	10, // 38: bugnet.router.v1.ExecResponse.state:type_name -> bugnet.router.v1.JobState
+	11, // 39: bugnet.router.v1.JobOutput.stream:type_name -> bugnet.router.v1.OutputStream
+	41, // 40: bugnet.router.v1.WatchJobRequest.until:type_name -> bugnet.router.v1.Until
+	44, // 41: bugnet.router.v1.WatchJobResponse.output:type_name -> bugnet.router.v1.JobOutput
+	45, // 42: bugnet.router.v1.WatchJobResponse.exit:type_name -> bugnet.router.v1.JobExit
+	46, // 43: bugnet.router.v1.WatchJobResponse.skip:type_name -> bugnet.router.v1.JobSkip
+	10, // 44: bugnet.router.v1.CancelJobResponse.state:type_name -> bugnet.router.v1.JobState
+	86, // 45: bugnet.router.v1.FileEntry.modified_at:type_name -> google.protobuf.Timestamp
+	55, // 46: bugnet.router.v1.ListFilesResponse.entries:type_name -> bugnet.router.v1.FileEntry
+	86, // 47: bugnet.router.v1.CreatePreviewResponse.expires_at:type_name -> google.protobuf.Timestamp
+	12, // 48: bugnet.router.v1.CreateTransferRequest.direction:type_name -> bugnet.router.v1.TransferDirection
+	86, // 49: bugnet.router.v1.CreateTransferResponse.expires_at:type_name -> google.protobuf.Timestamp
+	86, // 50: bugnet.router.v1.CreateTransferResponse.modified_at:type_name -> google.protobuf.Timestamp
+	86, // 51: bugnet.router.v1.AddSshKeyResponse.expires_at:type_name -> google.protobuf.Timestamp
+	66, // 52: bugnet.router.v1.SecretInfo.spec:type_name -> bugnet.router.v1.SecretSpec
+	13, // 53: bugnet.router.v1.SecretInfo.state:type_name -> bugnet.router.v1.SecretState
+	86, // 54: bugnet.router.v1.SecretInfo.updated_at:type_name -> google.protobuf.Timestamp
+	86, // 55: bugnet.router.v1.CreateSecretLinkResponse.expires_at:type_name -> google.protobuf.Timestamp
+	86, // 56: bugnet.router.v1.CreateSecretPutGrantResponse.expires_at:type_name -> google.protobuf.Timestamp
+	68, // 57: bugnet.router.v1.GetSecretSealingKeyResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
+	66, // 58: bugnet.router.v1.PutSecretRequest.spec:type_name -> bugnet.router.v1.SecretSpec
+	67, // 59: bugnet.router.v1.PutSecretRequest.value:type_name -> bugnet.router.v1.SealedValue
+	69, // 60: bugnet.router.v1.PutSecretResponse.secret:type_name -> bugnet.router.v1.SecretInfo
+	69, // 61: bugnet.router.v1.ListSecretsResponse.secrets:type_name -> bugnet.router.v1.SecretInfo
+	14, // 62: bugnet.router.v1.Bootstrap.state:type_name -> bugnet.router.v1.BootstrapState
+	82, // 63: bugnet.router.v1.FetchSourceResponse.bootstrap:type_name -> bugnet.router.v1.Bootstrap
+	18, // 64: bugnet.router.v1.SandboxRouterService.Estimate:input_type -> bugnet.router.v1.EstimateRequest
+	24, // 65: bugnet.router.v1.SandboxRouterService.PricePackage:input_type -> bugnet.router.v1.PricePackageRequest
+	27, // 66: bugnet.router.v1.SandboxRouterService.CreatePlacement:input_type -> bugnet.router.v1.CreatePlacementRequest
+	29, // 67: bugnet.router.v1.SandboxRouterService.GetPlacement:input_type -> bugnet.router.v1.GetPlacementRequest
+	31, // 68: bugnet.router.v1.SandboxRouterService.WatchPlacement:input_type -> bugnet.router.v1.WatchPlacementRequest
+	33, // 69: bugnet.router.v1.SandboxRouterService.ExtendPlacement:input_type -> bugnet.router.v1.ExtendPlacementRequest
+	35, // 70: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:input_type -> bugnet.router.v1.CheckExtendPlacementRequest
+	37, // 71: bugnet.router.v1.SandboxRouterService.ListExtensions:input_type -> bugnet.router.v1.ListExtensionsRequest
+	39, // 72: bugnet.router.v1.SandboxRouterService.StopPlacement:input_type -> bugnet.router.v1.StopPlacementRequest
+	42, // 73: bugnet.router.v1.SandboxRouterService.Exec:input_type -> bugnet.router.v1.ExecRequest
+	47, // 74: bugnet.router.v1.SandboxRouterService.WatchJob:input_type -> bugnet.router.v1.WatchJobRequest
+	49, // 75: bugnet.router.v1.SandboxRouterService.CancelJob:input_type -> bugnet.router.v1.CancelJobRequest
+	51, // 76: bugnet.router.v1.SandboxRouterService.ReadFile:input_type -> bugnet.router.v1.ReadFileRequest
+	53, // 77: bugnet.router.v1.SandboxRouterService.WriteFile:input_type -> bugnet.router.v1.WriteFileRequest
+	56, // 78: bugnet.router.v1.SandboxRouterService.ListFiles:input_type -> bugnet.router.v1.ListFilesRequest
+	58, // 79: bugnet.router.v1.SandboxRouterService.CreatePreview:input_type -> bugnet.router.v1.CreatePreviewRequest
+	60, // 80: bugnet.router.v1.SandboxRouterService.CreateTransfer:input_type -> bugnet.router.v1.CreateTransferRequest
+	62, // 81: bugnet.router.v1.SandboxRouterService.AddSshKey:input_type -> bugnet.router.v1.AddSshKeyRequest
+	64, // 82: bugnet.router.v1.SandboxRouterService.RemoveSshKey:input_type -> bugnet.router.v1.RemoveSshKeyRequest
+	70, // 83: bugnet.router.v1.SandboxRouterService.CreateSecretLink:input_type -> bugnet.router.v1.CreateSecretLinkRequest
+	72, // 84: bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant:input_type -> bugnet.router.v1.CreateSecretPutGrantRequest
+	74, // 85: bugnet.router.v1.SandboxRouterService.GetSecretSealingKey:input_type -> bugnet.router.v1.GetSecretSealingKeyRequest
+	76, // 86: bugnet.router.v1.SandboxRouterService.PutSecret:input_type -> bugnet.router.v1.PutSecretRequest
+	78, // 87: bugnet.router.v1.SandboxRouterService.ListSecrets:input_type -> bugnet.router.v1.ListSecretsRequest
+	80, // 88: bugnet.router.v1.SandboxRouterService.DeleteSecret:input_type -> bugnet.router.v1.DeleteSecretRequest
+	83, // 89: bugnet.router.v1.SandboxRouterService.FetchSource:input_type -> bugnet.router.v1.FetchSourceRequest
+	23, // 90: bugnet.router.v1.SandboxRouterService.Estimate:output_type -> bugnet.router.v1.EstimateResponse
+	25, // 91: bugnet.router.v1.SandboxRouterService.PricePackage:output_type -> bugnet.router.v1.PricePackageResponse
+	28, // 92: bugnet.router.v1.SandboxRouterService.CreatePlacement:output_type -> bugnet.router.v1.CreatePlacementResponse
+	30, // 93: bugnet.router.v1.SandboxRouterService.GetPlacement:output_type -> bugnet.router.v1.GetPlacementResponse
+	32, // 94: bugnet.router.v1.SandboxRouterService.WatchPlacement:output_type -> bugnet.router.v1.WatchPlacementResponse
+	34, // 95: bugnet.router.v1.SandboxRouterService.ExtendPlacement:output_type -> bugnet.router.v1.ExtendPlacementResponse
+	36, // 96: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:output_type -> bugnet.router.v1.CheckExtendPlacementResponse
+	38, // 97: bugnet.router.v1.SandboxRouterService.ListExtensions:output_type -> bugnet.router.v1.ListExtensionsResponse
+	40, // 98: bugnet.router.v1.SandboxRouterService.StopPlacement:output_type -> bugnet.router.v1.StopPlacementResponse
+	43, // 99: bugnet.router.v1.SandboxRouterService.Exec:output_type -> bugnet.router.v1.ExecResponse
+	48, // 100: bugnet.router.v1.SandboxRouterService.WatchJob:output_type -> bugnet.router.v1.WatchJobResponse
+	50, // 101: bugnet.router.v1.SandboxRouterService.CancelJob:output_type -> bugnet.router.v1.CancelJobResponse
+	52, // 102: bugnet.router.v1.SandboxRouterService.ReadFile:output_type -> bugnet.router.v1.ReadFileResponse
+	54, // 103: bugnet.router.v1.SandboxRouterService.WriteFile:output_type -> bugnet.router.v1.WriteFileResponse
+	57, // 104: bugnet.router.v1.SandboxRouterService.ListFiles:output_type -> bugnet.router.v1.ListFilesResponse
+	59, // 105: bugnet.router.v1.SandboxRouterService.CreatePreview:output_type -> bugnet.router.v1.CreatePreviewResponse
+	61, // 106: bugnet.router.v1.SandboxRouterService.CreateTransfer:output_type -> bugnet.router.v1.CreateTransferResponse
+	63, // 107: bugnet.router.v1.SandboxRouterService.AddSshKey:output_type -> bugnet.router.v1.AddSshKeyResponse
+	65, // 108: bugnet.router.v1.SandboxRouterService.RemoveSshKey:output_type -> bugnet.router.v1.RemoveSshKeyResponse
+	71, // 109: bugnet.router.v1.SandboxRouterService.CreateSecretLink:output_type -> bugnet.router.v1.CreateSecretLinkResponse
+	73, // 110: bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant:output_type -> bugnet.router.v1.CreateSecretPutGrantResponse
+	75, // 111: bugnet.router.v1.SandboxRouterService.GetSecretSealingKey:output_type -> bugnet.router.v1.GetSecretSealingKeyResponse
+	77, // 112: bugnet.router.v1.SandboxRouterService.PutSecret:output_type -> bugnet.router.v1.PutSecretResponse
+	79, // 113: bugnet.router.v1.SandboxRouterService.ListSecrets:output_type -> bugnet.router.v1.ListSecretsResponse
+	81, // 114: bugnet.router.v1.SandboxRouterService.DeleteSecret:output_type -> bugnet.router.v1.DeleteSecretResponse
+	84, // 115: bugnet.router.v1.SandboxRouterService.FetchSource:output_type -> bugnet.router.v1.FetchSourceResponse
+	90, // [90:116] is the sub-list for method output_type
+	64, // [64:90] is the sub-list for method input_type
+	64, // [64:64] is the sub-list for extension type_name
+	64, // [64:64] is the sub-list for extension extendee
+	0,  // [0:64] is the sub-list for field type_name
 }
 
 func init() { file_bugnet_router_v1_router_proto_init() }

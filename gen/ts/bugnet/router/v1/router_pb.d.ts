@@ -524,6 +524,13 @@ export declare type Placement = Message<"bugnet.router.v1.Placement"> & {
    * @generated from field: bugnet.router.v1.Bootstrap bootstrap = 11;
    */
   bootstrap?: Bootstrap | undefined;
+
+  /**
+   * When the placement became terminated or failed, unset before
+   *
+   * @generated from field: google.protobuf.Timestamp ended_at = 13;
+   */
+  endedAt?: Timestamp | undefined;
 };
 
 /**

@@ -276,6 +276,11 @@ message Placement {
   string termination_reason = 10;
   // The repository the router placed in the sandbox
   Bootstrap bootstrap = 11;
+
+  // Field 12 belongs to the base image task
+
+  // When the placement became terminated or failed, unset before
+  google.protobuf.Timestamp ended_at = 13;
 }
 
 message CreatePlacementRequest {
