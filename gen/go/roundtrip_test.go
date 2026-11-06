@@ -161,12 +161,13 @@ func TestExpectedMinutesPresenceSurvives(t *testing.T) {
 	eq(t, roundTrip(t, &routerv1.EstimateRequest{}).ExpectedMinutes == nil, true)
 }
 
-func TestPlacementEndedAtRoundTripsAndLeavesTwelveFree(t *testing.T) {
+func TestPlacementEndedAtRoundTripsAndKeepsTwelveForImage(t *testing.T) {
 	ended := timestamppb.New(time.Date(2026, 11, 6, 1, 2, 3, 4000, time.UTC))
 	eq(t, proto.Equal(roundTrip(t, &routerv1.Placement{EndedAt: ended}).EndedAt, ended), true)
 	eq(t, roundTrip(t, &routerv1.Placement{}).EndedAt == nil, true)
 	md := (&routerv1.Placement{}).ProtoReflect().Descriptor()
-	eq(t, md.Fields().ByNumber(12) == nil, true)
+	twelve := md.Fields().ByNumber(12)
+	eq(t, twelve == nil || twelve.Name() == "image", true)
 	eq(t, md.ReservedRanges().Has(12), false)
 }
 
