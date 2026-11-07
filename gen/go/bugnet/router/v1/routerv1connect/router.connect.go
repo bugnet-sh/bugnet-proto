@@ -111,6 +111,15 @@ const (
 	// SandboxRouterServiceFetchSourceProcedure is the fully-qualified name of the
 	// SandboxRouterService's FetchSource RPC.
 	SandboxRouterServiceFetchSourceProcedure = "/bugnet.router.v1.SandboxRouterService/FetchSource"
+	// SandboxRouterServiceCheckX402Procedure is the fully-qualified name of the SandboxRouterService's
+	// CheckX402 RPC.
+	SandboxRouterServiceCheckX402Procedure = "/bugnet.router.v1.SandboxRouterService/CheckX402"
+	// SandboxRouterServiceEnableX402Procedure is the fully-qualified name of the SandboxRouterService's
+	// EnableX402 RPC.
+	SandboxRouterServiceEnableX402Procedure = "/bugnet.router.v1.SandboxRouterService/EnableX402"
+	// SandboxRouterServiceListX402Procedure is the fully-qualified name of the SandboxRouterService's
+	// ListX402 RPC.
+	SandboxRouterServiceListX402Procedure = "/bugnet.router.v1.SandboxRouterService/ListX402"
 )
 
 // SandboxRouterServiceClient is a client for the bugnet.router.v1.SandboxRouterService service.
@@ -144,6 +153,12 @@ type SandboxRouterServiceClient interface {
 	DeleteSecret(context.Context, *connect.Request[v1.DeleteSecretRequest]) (*connect.Response[v1.DeleteSecretResponse], error)
 	// Puts the placement's GitHub source in the sandbox, safe to call again
 	FetchSource(context.Context, *connect.Request[v1.FetchSourceRequest]) (*connect.Response[v1.FetchSourceResponse], error)
+	// Checks an x402 change without making it, and with no handle only what needs no placement
+	CheckX402(context.Context, *connect.Request[v1.CheckX402Request]) (*connect.Response[v1.CheckX402Response], error)
+	// Stores x402 services and applies them to the sandbox, idempotent by content
+	EnableX402(context.Context, *connect.Request[v1.EnableX402Request]) (*connect.Response[v1.EnableX402Response], error)
+	// Lists the placement's x402 services with their states and counts, and its refusals
+	ListX402(context.Context, *connect.Request[v1.ListX402Request]) (*connect.Response[v1.ListX402Response], error)
 }
 
 // NewSandboxRouterServiceClient constructs a client for the bugnet.router.v1.SandboxRouterService
@@ -313,6 +328,24 @@ func NewSandboxRouterServiceClient(httpClient connect.HTTPClient, baseURL string
 			connect.WithSchema(sandboxRouterServiceMethods.ByName("FetchSource")),
 			connect.WithClientOptions(opts...),
 		),
+		checkX402: connect.NewClient[v1.CheckX402Request, v1.CheckX402Response](
+			httpClient,
+			baseURL+SandboxRouterServiceCheckX402Procedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("CheckX402")),
+			connect.WithClientOptions(opts...),
+		),
+		enableX402: connect.NewClient[v1.EnableX402Request, v1.EnableX402Response](
+			httpClient,
+			baseURL+SandboxRouterServiceEnableX402Procedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("EnableX402")),
+			connect.WithClientOptions(opts...),
+		),
+		listX402: connect.NewClient[v1.ListX402Request, v1.ListX402Response](
+			httpClient,
+			baseURL+SandboxRouterServiceListX402Procedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("ListX402")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -344,6 +377,9 @@ type sandboxRouterServiceClient struct {
 	listSecrets          *connect.Client[v1.ListSecretsRequest, v1.ListSecretsResponse]
 	deleteSecret         *connect.Client[v1.DeleteSecretRequest, v1.DeleteSecretResponse]
 	fetchSource          *connect.Client[v1.FetchSourceRequest, v1.FetchSourceResponse]
+	checkX402            *connect.Client[v1.CheckX402Request, v1.CheckX402Response]
+	enableX402           *connect.Client[v1.EnableX402Request, v1.EnableX402Response]
+	listX402             *connect.Client[v1.ListX402Request, v1.ListX402Response]
 }
 
 // Estimate calls bugnet.router.v1.SandboxRouterService.Estimate.
@@ -476,6 +512,21 @@ func (c *sandboxRouterServiceClient) FetchSource(ctx context.Context, req *conne
 	return c.fetchSource.CallUnary(ctx, req)
 }
 
+// CheckX402 calls bugnet.router.v1.SandboxRouterService.CheckX402.
+func (c *sandboxRouterServiceClient) CheckX402(ctx context.Context, req *connect.Request[v1.CheckX402Request]) (*connect.Response[v1.CheckX402Response], error) {
+	return c.checkX402.CallUnary(ctx, req)
+}
+
+// EnableX402 calls bugnet.router.v1.SandboxRouterService.EnableX402.
+func (c *sandboxRouterServiceClient) EnableX402(ctx context.Context, req *connect.Request[v1.EnableX402Request]) (*connect.Response[v1.EnableX402Response], error) {
+	return c.enableX402.CallUnary(ctx, req)
+}
+
+// ListX402 calls bugnet.router.v1.SandboxRouterService.ListX402.
+func (c *sandboxRouterServiceClient) ListX402(ctx context.Context, req *connect.Request[v1.ListX402Request]) (*connect.Response[v1.ListX402Response], error) {
+	return c.listX402.CallUnary(ctx, req)
+}
+
 // SandboxRouterServiceHandler is an implementation of the bugnet.router.v1.SandboxRouterService
 // service.
 type SandboxRouterServiceHandler interface {
@@ -508,6 +559,12 @@ type SandboxRouterServiceHandler interface {
 	DeleteSecret(context.Context, *connect.Request[v1.DeleteSecretRequest]) (*connect.Response[v1.DeleteSecretResponse], error)
 	// Puts the placement's GitHub source in the sandbox, safe to call again
 	FetchSource(context.Context, *connect.Request[v1.FetchSourceRequest]) (*connect.Response[v1.FetchSourceResponse], error)
+	// Checks an x402 change without making it, and with no handle only what needs no placement
+	CheckX402(context.Context, *connect.Request[v1.CheckX402Request]) (*connect.Response[v1.CheckX402Response], error)
+	// Stores x402 services and applies them to the sandbox, idempotent by content
+	EnableX402(context.Context, *connect.Request[v1.EnableX402Request]) (*connect.Response[v1.EnableX402Response], error)
+	// Lists the placement's x402 services with their states and counts, and its refusals
+	ListX402(context.Context, *connect.Request[v1.ListX402Request]) (*connect.Response[v1.ListX402Response], error)
 }
 
 // NewSandboxRouterServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -673,6 +730,24 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 		connect.WithSchema(sandboxRouterServiceMethods.ByName("FetchSource")),
 		connect.WithHandlerOptions(opts...),
 	)
+	sandboxRouterServiceCheckX402Handler := connect.NewUnaryHandler(
+		SandboxRouterServiceCheckX402Procedure,
+		svc.CheckX402,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("CheckX402")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceEnableX402Handler := connect.NewUnaryHandler(
+		SandboxRouterServiceEnableX402Procedure,
+		svc.EnableX402,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("EnableX402")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceListX402Handler := connect.NewUnaryHandler(
+		SandboxRouterServiceListX402Procedure,
+		svc.ListX402,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("ListX402")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/bugnet.router.v1.SandboxRouterService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SandboxRouterServiceEstimateProcedure:
@@ -727,6 +802,12 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 			sandboxRouterServiceDeleteSecretHandler.ServeHTTP(w, r)
 		case SandboxRouterServiceFetchSourceProcedure:
 			sandboxRouterServiceFetchSourceHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceCheckX402Procedure:
+			sandboxRouterServiceCheckX402Handler.ServeHTTP(w, r)
+		case SandboxRouterServiceEnableX402Procedure:
+			sandboxRouterServiceEnableX402Handler.ServeHTTP(w, r)
+		case SandboxRouterServiceListX402Procedure:
+			sandboxRouterServiceListX402Handler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -838,4 +919,16 @@ func (UnimplementedSandboxRouterServiceHandler) DeleteSecret(context.Context, *c
 
 func (UnimplementedSandboxRouterServiceHandler) FetchSource(context.Context, *connect.Request[v1.FetchSourceRequest]) (*connect.Response[v1.FetchSourceResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.FetchSource is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) CheckX402(context.Context, *connect.Request[v1.CheckX402Request]) (*connect.Response[v1.CheckX402Response], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.CheckX402 is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) EnableX402(context.Context, *connect.Request[v1.EnableX402Request]) (*connect.Response[v1.EnableX402Response], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.EnableX402 is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) ListX402(context.Context, *connect.Request[v1.ListX402Request]) (*connect.Response[v1.ListX402Response], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.ListX402 is not implemented"))
 }

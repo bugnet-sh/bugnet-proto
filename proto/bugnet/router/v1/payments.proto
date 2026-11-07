@@ -13,6 +13,12 @@ service PaymentsService {
   rpc CheckPayer(CheckPayerRequest) returns (CheckPayerResponse);
   // Says what became of an order, so Payments can refund when no event reached it
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  // Which placement a handle hash or a start order names, so Payments finds the allowance account
+  rpc LookupPlacement(LookupPlacementRequest) returns (LookupPlacementResponse);
+  // Stores an allowance event for the session page, idempotent on order_id and phase
+  rpc AppendAllowanceEvent(AppendAllowanceEventRequest) returns (AppendAllowanceEventResponse);
+  // Payments' final word on one x402 call, idempotent on ref
+  rpc AppendX402Resolved(AppendX402ResolvedRequest) returns (AppendX402ResolvedResponse);
 }
 
 message GetOrderRequest {
@@ -61,3 +67,68 @@ message CheckPayerResponse {
   // Set for RATE_LIMITED, the bucket's wait
   google.protobuf.Duration retry_after = 3;
 }
+
+message LookupPlacementRequest {
+  oneof key {
+    // Lowercase hex SHA-256 of the handle
+    string handle_sha256 = 1;
+    // The placement's start order id, for an account with no handle hash yet
+    string start_order_id = 2;
+  }
+}
+
+message LookupPlacementResponse {
+  string placement_id = 1;
+  string start_order_id = 2;
+  // placing, ready, terminating, terminated or failed, as GetOrderResponse.placement_state
+  string state = 3;
+  google.protobuf.Timestamp deadline = 4;
+  google.protobuf.Timestamp ended_at = 5;
+  // While placing the order asked for secrets, from ready the provider has the Secrets capability
+  bool x402_capable = 6;
+  // The package the placement runs, for CheckPayer on allowance orders
+  string package_id = 7;
+}
+
+message AllowanceEvent {
+  // paid, refunded or kept
+  string phase = 1;
+  int64 amount_micros = 2;
+  // The mint, base58
+  string asset = 3;
+  // CAIP-2
+  string network = 4;
+  // Base58 of a 64-byte signature, empty for kept
+  string tx = 5;
+  // Under the refund minimum and kept by Bugnet, set only for kept
+  int64 kept_micros = 6;
+}
+
+message AppendAllowanceEventRequest {
+  // The order the event is about, a top-up or the start order, equal to start_order_id for kept
+  string order_id = 1;
+  AllowanceEvent event = 2;
+  // The placement's start order, which names the allowance account
+  string start_order_id = 3;
+}
+
+message AppendAllowanceEventResponse {}
+
+message AppendX402ResolvedRequest {
+  string start_order_id = 1;
+  // The paying row's ref, which x402 rows carry as payment_ref
+  string ref = 2;
+  // paid or released
+  string status = 3;
+  int64 amount_micros = 4;
+  // Set when paid, confirmed on chain by Payments
+  string tx = 5;
+  // With host, method and path, enough to draw the call when egress's own row never arrived
+  google.protobuf.Timestamp at = 6;
+  string host = 7;
+  string method = 8;
+  string path = 9;
+  string pay_to = 10;
+}
+
+message AppendX402ResolvedResponse {}

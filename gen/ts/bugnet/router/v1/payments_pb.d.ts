@@ -149,6 +149,264 @@ export declare type CheckPayerResponse = Message<"bugnet.router.v1.CheckPayerRes
 export declare const CheckPayerResponseSchema: GenMessage<CheckPayerResponse>;
 
 /**
+ * @generated from message bugnet.router.v1.LookupPlacementRequest
+ */
+export declare type LookupPlacementRequest = Message<"bugnet.router.v1.LookupPlacementRequest"> & {
+  /**
+   * @generated from oneof bugnet.router.v1.LookupPlacementRequest.key
+   */
+  key: {
+    /**
+     * Lowercase hex SHA-256 of the handle
+     *
+     * @generated from field: string handle_sha256 = 1;
+     */
+    value: string;
+    case: "handleSha256";
+  } | {
+    /**
+     * The placement's start order id, for an account with no handle hash yet
+     *
+     * @generated from field: string start_order_id = 2;
+     */
+    value: string;
+    case: "startOrderId";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message bugnet.router.v1.LookupPlacementRequest.
+ * Use `create(LookupPlacementRequestSchema)` to create a new message.
+ */
+export declare const LookupPlacementRequestSchema: GenMessage<LookupPlacementRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.LookupPlacementResponse
+ */
+export declare type LookupPlacementResponse = Message<"bugnet.router.v1.LookupPlacementResponse"> & {
+  /**
+   * @generated from field: string placement_id = 1;
+   */
+  placementId: string;
+
+  /**
+   * @generated from field: string start_order_id = 2;
+   */
+  startOrderId: string;
+
+  /**
+   * placing, ready, terminating, terminated or failed, as GetOrderResponse.placement_state
+   *
+   * @generated from field: string state = 3;
+   */
+  state: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp deadline = 4;
+   */
+  deadline?: Timestamp | undefined;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp ended_at = 5;
+   */
+  endedAt?: Timestamp | undefined;
+
+  /**
+   * While placing the order asked for secrets, from ready the provider has the Secrets capability
+   *
+   * @generated from field: bool x402_capable = 6;
+   */
+  x402Capable: boolean;
+
+  /**
+   * The package the placement runs, for CheckPayer on allowance orders
+   *
+   * @generated from field: string package_id = 7;
+   */
+  packageId: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.LookupPlacementResponse.
+ * Use `create(LookupPlacementResponseSchema)` to create a new message.
+ */
+export declare const LookupPlacementResponseSchema: GenMessage<LookupPlacementResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.AllowanceEvent
+ */
+export declare type AllowanceEvent = Message<"bugnet.router.v1.AllowanceEvent"> & {
+  /**
+   * paid, refunded or kept
+   *
+   * @generated from field: string phase = 1;
+   */
+  phase: string;
+
+  /**
+   * @generated from field: int64 amount_micros = 2;
+   */
+  amountMicros: bigint;
+
+  /**
+   * The mint, base58
+   *
+   * @generated from field: string asset = 3;
+   */
+  asset: string;
+
+  /**
+   * CAIP-2
+   *
+   * @generated from field: string network = 4;
+   */
+  network: string;
+
+  /**
+   * Base58 of a 64-byte signature, empty for kept
+   *
+   * @generated from field: string tx = 5;
+   */
+  tx: string;
+
+  /**
+   * Under the refund minimum and kept by Bugnet, set only for kept
+   *
+   * @generated from field: int64 kept_micros = 6;
+   */
+  keptMicros: bigint;
+};
+
+/**
+ * Describes the message bugnet.router.v1.AllowanceEvent.
+ * Use `create(AllowanceEventSchema)` to create a new message.
+ */
+export declare const AllowanceEventSchema: GenMessage<AllowanceEvent>;
+
+/**
+ * @generated from message bugnet.router.v1.AppendAllowanceEventRequest
+ */
+export declare type AppendAllowanceEventRequest = Message<"bugnet.router.v1.AppendAllowanceEventRequest"> & {
+  /**
+   * The order the event is about, a top-up or the start order, equal to start_order_id for kept
+   *
+   * @generated from field: string order_id = 1;
+   */
+  orderId: string;
+
+  /**
+   * @generated from field: bugnet.router.v1.AllowanceEvent event = 2;
+   */
+  event?: AllowanceEvent | undefined;
+
+  /**
+   * The placement's start order, which names the allowance account
+   *
+   * @generated from field: string start_order_id = 3;
+   */
+  startOrderId: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.AppendAllowanceEventRequest.
+ * Use `create(AppendAllowanceEventRequestSchema)` to create a new message.
+ */
+export declare const AppendAllowanceEventRequestSchema: GenMessage<AppendAllowanceEventRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.AppendAllowanceEventResponse
+ */
+export declare type AppendAllowanceEventResponse = Message<"bugnet.router.v1.AppendAllowanceEventResponse"> & {
+};
+
+/**
+ * Describes the message bugnet.router.v1.AppendAllowanceEventResponse.
+ * Use `create(AppendAllowanceEventResponseSchema)` to create a new message.
+ */
+export declare const AppendAllowanceEventResponseSchema: GenMessage<AppendAllowanceEventResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.AppendX402ResolvedRequest
+ */
+export declare type AppendX402ResolvedRequest = Message<"bugnet.router.v1.AppendX402ResolvedRequest"> & {
+  /**
+   * @generated from field: string start_order_id = 1;
+   */
+  startOrderId: string;
+
+  /**
+   * The paying row's ref, which x402 rows carry as payment_ref
+   *
+   * @generated from field: string ref = 2;
+   */
+  ref: string;
+
+  /**
+   * paid or released
+   *
+   * @generated from field: string status = 3;
+   */
+  status: string;
+
+  /**
+   * @generated from field: int64 amount_micros = 4;
+   */
+  amountMicros: bigint;
+
+  /**
+   * Set when paid, confirmed on chain by Payments
+   *
+   * @generated from field: string tx = 5;
+   */
+  tx: string;
+
+  /**
+   * With host, method and path, enough to draw the call when egress's own row never arrived
+   *
+   * @generated from field: google.protobuf.Timestamp at = 6;
+   */
+  at?: Timestamp | undefined;
+
+  /**
+   * @generated from field: string host = 7;
+   */
+  host: string;
+
+  /**
+   * @generated from field: string method = 8;
+   */
+  method: string;
+
+  /**
+   * @generated from field: string path = 9;
+   */
+  path: string;
+
+  /**
+   * @generated from field: string pay_to = 10;
+   */
+  payTo: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.AppendX402ResolvedRequest.
+ * Use `create(AppendX402ResolvedRequestSchema)` to create a new message.
+ */
+export declare const AppendX402ResolvedRequestSchema: GenMessage<AppendX402ResolvedRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.AppendX402ResolvedResponse
+ */
+export declare type AppendX402ResolvedResponse = Message<"bugnet.router.v1.AppendX402ResolvedResponse"> & {
+};
+
+/**
+ * Describes the message bugnet.router.v1.AppendX402ResolvedResponse.
+ * Use `create(AppendX402ResolvedResponseSchema)` to create a new message.
+ */
+export declare const AppendX402ResolvedResponseSchema: GenMessage<AppendX402ResolvedResponse>;
+
+/**
  * @generated from enum bugnet.router.v1.PayerVerdict
  */
 export enum PayerVerdict {
@@ -214,6 +472,36 @@ export declare const PaymentsService: GenService<{
     methodKind: "unary";
     input: typeof GetOrderRequestSchema;
     output: typeof GetOrderResponseSchema;
+  },
+  /**
+   * Which placement a handle hash or a start order names, so Payments finds the allowance account
+   *
+   * @generated from rpc bugnet.router.v1.PaymentsService.LookupPlacement
+   */
+  lookupPlacement: {
+    methodKind: "unary";
+    input: typeof LookupPlacementRequestSchema;
+    output: typeof LookupPlacementResponseSchema;
+  },
+  /**
+   * Stores an allowance event for the session page, idempotent on order_id and phase
+   *
+   * @generated from rpc bugnet.router.v1.PaymentsService.AppendAllowanceEvent
+   */
+  appendAllowanceEvent: {
+    methodKind: "unary";
+    input: typeof AppendAllowanceEventRequestSchema;
+    output: typeof AppendAllowanceEventResponseSchema;
+  },
+  /**
+   * Payments' final word on one x402 call, idempotent on ref
+   *
+   * @generated from rpc bugnet.router.v1.PaymentsService.AppendX402Resolved
+   */
+  appendX402Resolved: {
+    methodKind: "unary";
+    input: typeof AppendX402ResolvedRequestSchema;
+    output: typeof AppendX402ResolvedResponseSchema;
   },
 }>;
 

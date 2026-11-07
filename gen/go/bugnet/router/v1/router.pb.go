@@ -891,6 +891,61 @@ func (BootstrapState) EnumDescriptor() ([]byte, []int) {
 	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{14}
 }
 
+type X402ServiceState int32
+
+const (
+	X402ServiceState_X402_SERVICE_STATE_UNSPECIFIED X402ServiceState = 0
+	X402ServiceState_X402_SERVICE_STATE_APPLYING    X402ServiceState = 1
+	X402ServiceState_X402_SERVICE_STATE_ACTIVE      X402ServiceState = 2
+	X402ServiceState_X402_SERVICE_STATE_FAILED      X402ServiceState = 3
+	X402ServiceState_X402_SERVICE_STATE_DISABLED    X402ServiceState = 4
+)
+
+// Enum value maps for X402ServiceState.
+var (
+	X402ServiceState_name = map[int32]string{
+		0: "X402_SERVICE_STATE_UNSPECIFIED",
+		1: "X402_SERVICE_STATE_APPLYING",
+		2: "X402_SERVICE_STATE_ACTIVE",
+		3: "X402_SERVICE_STATE_FAILED",
+		4: "X402_SERVICE_STATE_DISABLED",
+	}
+	X402ServiceState_value = map[string]int32{
+		"X402_SERVICE_STATE_UNSPECIFIED": 0,
+		"X402_SERVICE_STATE_APPLYING":    1,
+		"X402_SERVICE_STATE_ACTIVE":      2,
+		"X402_SERVICE_STATE_FAILED":      3,
+		"X402_SERVICE_STATE_DISABLED":    4,
+	}
+)
+
+func (x X402ServiceState) Enum() *X402ServiceState {
+	p := new(X402ServiceState)
+	*p = x
+	return p
+}
+
+func (x X402ServiceState) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (X402ServiceState) Descriptor() protoreflect.EnumDescriptor {
+	return file_bugnet_router_v1_router_proto_enumTypes[15].Descriptor()
+}
+
+func (X402ServiceState) Type() protoreflect.EnumType {
+	return &file_bugnet_router_v1_router_proto_enumTypes[15]
+}
+
+func (x X402ServiceState) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use X402ServiceState.Descriptor instead.
+func (X402ServiceState) EnumDescriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{15}
+}
+
 type Resources struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Vcpu          uint32                 `protobuf:"varint,1,opt,name=vcpu,proto3" json:"vcpu,omitempty"`
@@ -5370,6 +5425,585 @@ func (x *FetchSourceResponse) GetBootstrap() *Bootstrap {
 	return nil
 }
 
+type X402ServiceSpec struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Host  string                 `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
+	// Starts and ends with a slash, at most 200 characters
+	Prefix string `protobuf:"bytes,2,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	// GET or POST
+	Method         string `protobuf:"bytes,3,opt,name=method,proto3" json:"method,omitempty"`
+	MaxPriceMicros int64  `protobuf:"varint,4,opt,name=max_price_micros,json=maxPriceMicros,proto3" json:"max_price_micros,omitempty"`
+	// Canonical base58 of 32 bytes
+	PayTo string `protobuf:"bytes,5,opt,name=pay_to,json=payTo,proto3" json:"pay_to,omitempty"`
+	// In Bugnet's index, so every path under the prefix is paid
+	Indexed bool `protobuf:"varint,6,opt,name=indexed,proto3" json:"indexed,omitempty"`
+	// The one paid path of a service that is not indexed, empty when indexed
+	PaidPath      string `protobuf:"bytes,7,opt,name=paid_path,json=paidPath,proto3" json:"paid_path,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *X402ServiceSpec) Reset() {
+	*x = X402ServiceSpec{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[70]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *X402ServiceSpec) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*X402ServiceSpec) ProtoMessage() {}
+
+func (x *X402ServiceSpec) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[70]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use X402ServiceSpec.ProtoReflect.Descriptor instead.
+func (*X402ServiceSpec) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{70}
+}
+
+func (x *X402ServiceSpec) GetHost() string {
+	if x != nil {
+		return x.Host
+	}
+	return ""
+}
+
+func (x *X402ServiceSpec) GetPrefix() string {
+	if x != nil {
+		return x.Prefix
+	}
+	return ""
+}
+
+func (x *X402ServiceSpec) GetMethod() string {
+	if x != nil {
+		return x.Method
+	}
+	return ""
+}
+
+func (x *X402ServiceSpec) GetMaxPriceMicros() int64 {
+	if x != nil {
+		return x.MaxPriceMicros
+	}
+	return 0
+}
+
+func (x *X402ServiceSpec) GetPayTo() string {
+	if x != nil {
+		return x.PayTo
+	}
+	return ""
+}
+
+func (x *X402ServiceSpec) GetIndexed() bool {
+	if x != nil {
+		return x.Indexed
+	}
+	return false
+}
+
+func (x *X402ServiceSpec) GetPaidPath() string {
+	if x != nil {
+		return x.PaidPath
+	}
+	return ""
+}
+
+type X402ServiceInfo struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	ServiceId string                 `protobuf:"bytes,1,opt,name=service_id,json=serviceId,proto3" json:"service_id,omitempty"`
+	Spec      *X402ServiceSpec       `protobuf:"bytes,2,opt,name=spec,proto3" json:"spec,omitempty"`
+	State     X402ServiceState       `protobuf:"varint,3,opt,name=state,proto3,enum=bugnet.router.v1.X402ServiceState" json:"state,omitempty"`
+	// A code such as PORT_443_TAKEN, FEATURE_UNAVAILABLE or HOST_BLOCKED, empty unless failed
+	FailureReason string `protobuf:"bytes,4,opt,name=failure_reason,json=failureReason,proto3" json:"failure_reason,omitempty"`
+	Requests      uint32 `protobuf:"varint,5,opt,name=requests,proto3" json:"requests,omitempty"`
+	Paid          uint32 `protobuf:"varint,6,opt,name=paid,proto3" json:"paid,omitempty"`
+	Uncertain     uint32 `protobuf:"varint,7,opt,name=uncertain,proto3" json:"uncertain,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *X402ServiceInfo) Reset() {
+	*x = X402ServiceInfo{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[71]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *X402ServiceInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*X402ServiceInfo) ProtoMessage() {}
+
+func (x *X402ServiceInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[71]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use X402ServiceInfo.ProtoReflect.Descriptor instead.
+func (*X402ServiceInfo) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{71}
+}
+
+func (x *X402ServiceInfo) GetServiceId() string {
+	if x != nil {
+		return x.ServiceId
+	}
+	return ""
+}
+
+func (x *X402ServiceInfo) GetSpec() *X402ServiceSpec {
+	if x != nil {
+		return x.Spec
+	}
+	return nil
+}
+
+func (x *X402ServiceInfo) GetState() X402ServiceState {
+	if x != nil {
+		return x.State
+	}
+	return X402ServiceState_X402_SERVICE_STATE_UNSPECIFIED
+}
+
+func (x *X402ServiceInfo) GetFailureReason() string {
+	if x != nil {
+		return x.FailureReason
+	}
+	return ""
+}
+
+func (x *X402ServiceInfo) GetRequests() uint32 {
+	if x != nil {
+		return x.Requests
+	}
+	return 0
+}
+
+func (x *X402ServiceInfo) GetPaid() uint32 {
+	if x != nil {
+		return x.Paid
+	}
+	return 0
+}
+
+func (x *X402ServiceInfo) GetUncertain() uint32 {
+	if x != nil {
+		return x.Uncertain
+	}
+	return 0
+}
+
+type X402Refusal struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// A refusal code of x402 spec 6.13, or refused_host
+	Reason        string                 `protobuf:"bytes,1,opt,name=reason,proto3" json:"reason,omitempty"`
+	Count         uint32                 `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	LastAt        *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=last_at,json=lastAt,proto3" json:"last_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *X402Refusal) Reset() {
+	*x = X402Refusal{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[72]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *X402Refusal) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*X402Refusal) ProtoMessage() {}
+
+func (x *X402Refusal) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[72]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use X402Refusal.ProtoReflect.Descriptor instead.
+func (*X402Refusal) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{72}
+}
+
+func (x *X402Refusal) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *X402Refusal) GetCount() uint32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+func (x *X402Refusal) GetLastAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastAt
+	}
+	return nil
+}
+
+// With a handle and nothing to add or disable, checks the switch, the capability and the state
+type CheckX402Request struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Empty runs only the checks that need no placement, and then disable must be empty
+	Handle string             `protobuf:"bytes,1,opt,name=handle,proto3" json:"handle,omitempty"`
+	Add    []*X402ServiceSpec `protobuf:"bytes,2,rep,name=add,proto3" json:"add,omitempty"`
+	// Service ids
+	Disable       []string `protobuf:"bytes,3,rep,name=disable,proto3" json:"disable,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckX402Request) Reset() {
+	*x = CheckX402Request{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[73]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckX402Request) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckX402Request) ProtoMessage() {}
+
+func (x *CheckX402Request) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[73]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckX402Request.ProtoReflect.Descriptor instead.
+func (*CheckX402Request) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{73}
+}
+
+func (x *CheckX402Request) GetHandle() string {
+	if x != nil {
+		return x.Handle
+	}
+	return ""
+}
+
+func (x *CheckX402Request) GetAdd() []*X402ServiceSpec {
+	if x != nil {
+		return x.Add
+	}
+	return nil
+}
+
+func (x *CheckX402Request) GetDisable() []string {
+	if x != nil {
+		return x.Disable
+	}
+	return nil
+}
+
+// A per-service refusal names the first failing add entry in ErrorInfo metadata service_id and host
+type CheckX402Response struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckX402Response) Reset() {
+	*x = CheckX402Response{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[74]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckX402Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckX402Response) ProtoMessage() {}
+
+func (x *CheckX402Response) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[74]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckX402Response.ProtoReflect.Descriptor instead.
+func (*CheckX402Response) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{74}
+}
+
+type EnableX402Request struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Handle string                 `protobuf:"bytes,1,opt,name=handle,proto3" json:"handle,omitempty"`
+	Add    []*X402ServiceSpec     `protobuf:"bytes,2,rep,name=add,proto3" json:"add,omitempty"`
+	// Service ids
+	Disable []string `protobuf:"bytes,3,rep,name=disable,proto3" json:"disable,omitempty"`
+	// 1 to 128 printable ASCII, logged and traced only
+	RequestId string `protobuf:"bytes,4,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	// On a ready placement, waits up to secrets.apply_wait for the added rows to leave APPLYING
+	WaitActive    bool `protobuf:"varint,5,opt,name=wait_active,json=waitActive,proto3" json:"wait_active,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnableX402Request) Reset() {
+	*x = EnableX402Request{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[75]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnableX402Request) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnableX402Request) ProtoMessage() {}
+
+func (x *EnableX402Request) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[75]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnableX402Request.ProtoReflect.Descriptor instead.
+func (*EnableX402Request) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{75}
+}
+
+func (x *EnableX402Request) GetHandle() string {
+	if x != nil {
+		return x.Handle
+	}
+	return ""
+}
+
+func (x *EnableX402Request) GetAdd() []*X402ServiceSpec {
+	if x != nil {
+		return x.Add
+	}
+	return nil
+}
+
+func (x *EnableX402Request) GetDisable() []string {
+	if x != nil {
+		return x.Disable
+	}
+	return nil
+}
+
+func (x *EnableX402Request) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *EnableX402Request) GetWaitActive() bool {
+	if x != nil {
+		return x.WaitActive
+	}
+	return false
+}
+
+type EnableX402Response struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Services      []*X402ServiceInfo     `protobuf:"bytes,1,rep,name=services,proto3" json:"services,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnableX402Response) Reset() {
+	*x = EnableX402Response{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[76]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnableX402Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnableX402Response) ProtoMessage() {}
+
+func (x *EnableX402Response) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[76]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnableX402Response.ProtoReflect.Descriptor instead.
+func (*EnableX402Response) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{76}
+}
+
+func (x *EnableX402Response) GetServices() []*X402ServiceInfo {
+	if x != nil {
+		return x.Services
+	}
+	return nil
+}
+
+type ListX402Request struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Handle        string                 `protobuf:"bytes,1,opt,name=handle,proto3" json:"handle,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListX402Request) Reset() {
+	*x = ListX402Request{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[77]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListX402Request) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListX402Request) ProtoMessage() {}
+
+func (x *ListX402Request) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[77]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListX402Request.ProtoReflect.Descriptor instead.
+func (*ListX402Request) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{77}
+}
+
+func (x *ListX402Request) GetHandle() string {
+	if x != nil {
+		return x.Handle
+	}
+	return ""
+}
+
+type ListX402Response struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Enabled  bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Services []*X402ServiceInfo     `protobuf:"bytes,2,rep,name=services,proto3" json:"services,omitempty"`
+	// The placement's refusals by reason, with the last time each was seen
+	Refusals      []*X402Refusal `protobuf:"bytes,3,rep,name=refusals,proto3" json:"refusals,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListX402Response) Reset() {
+	*x = ListX402Response{}
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[78]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListX402Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListX402Response) ProtoMessage() {}
+
+func (x *ListX402Response) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_router_proto_msgTypes[78]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListX402Response.ProtoReflect.Descriptor instead.
+func (*ListX402Response) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_router_proto_rawDescGZIP(), []int{78}
+}
+
+func (x *ListX402Response) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *ListX402Response) GetServices() []*X402ServiceInfo {
+	if x != nil {
+		return x.Services
+	}
+	return nil
+}
+
+func (x *ListX402Response) GetRefusals() []*X402Refusal {
+	if x != nil {
+		return x.Refusals
+	}
+	return nil
+}
+
 var File_bugnet_router_v1_router_proto protoreflect.FileDescriptor
 
 const file_bugnet_router_v1_router_proto_rawDesc = "" +
@@ -5722,7 +6356,49 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"\x12FetchSourceRequest\x12\x16\n" +
 	"\x06handle\x18\x01 \x01(\tR\x06handle\"P\n" +
 	"\x13FetchSourceResponse\x129\n" +
-	"\tbootstrap\x18\x01 \x01(\v2\x1b.bugnet.router.v1.BootstrapR\tbootstrap*\xa8\x01\n" +
+	"\tbootstrap\x18\x01 \x01(\v2\x1b.bugnet.router.v1.BootstrapR\tbootstrap\"\xcd\x01\n" +
+	"\x0fX402ServiceSpec\x12\x12\n" +
+	"\x04host\x18\x01 \x01(\tR\x04host\x12\x16\n" +
+	"\x06prefix\x18\x02 \x01(\tR\x06prefix\x12\x16\n" +
+	"\x06method\x18\x03 \x01(\tR\x06method\x12(\n" +
+	"\x10max_price_micros\x18\x04 \x01(\x03R\x0emaxPriceMicros\x12\x15\n" +
+	"\x06pay_to\x18\x05 \x01(\tR\x05payTo\x12\x18\n" +
+	"\aindexed\x18\x06 \x01(\bR\aindexed\x12\x1b\n" +
+	"\tpaid_path\x18\a \x01(\tR\bpaidPath\"\x96\x02\n" +
+	"\x0fX402ServiceInfo\x12\x1d\n" +
+	"\n" +
+	"service_id\x18\x01 \x01(\tR\tserviceId\x125\n" +
+	"\x04spec\x18\x02 \x01(\v2!.bugnet.router.v1.X402ServiceSpecR\x04spec\x128\n" +
+	"\x05state\x18\x03 \x01(\x0e2\".bugnet.router.v1.X402ServiceStateR\x05state\x12%\n" +
+	"\x0efailure_reason\x18\x04 \x01(\tR\rfailureReason\x12\x1a\n" +
+	"\brequests\x18\x05 \x01(\rR\brequests\x12\x12\n" +
+	"\x04paid\x18\x06 \x01(\rR\x04paid\x12\x1c\n" +
+	"\tuncertain\x18\a \x01(\rR\tuncertain\"p\n" +
+	"\vX402Refusal\x12\x16\n" +
+	"\x06reason\x18\x01 \x01(\tR\x06reason\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\rR\x05count\x123\n" +
+	"\alast_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x06lastAt\"y\n" +
+	"\x10CheckX402Request\x12\x16\n" +
+	"\x06handle\x18\x01 \x01(\tR\x06handle\x123\n" +
+	"\x03add\x18\x02 \x03(\v2!.bugnet.router.v1.X402ServiceSpecR\x03add\x12\x18\n" +
+	"\adisable\x18\x03 \x03(\tR\adisable\"\x13\n" +
+	"\x11CheckX402Response\"\xba\x01\n" +
+	"\x11EnableX402Request\x12\x16\n" +
+	"\x06handle\x18\x01 \x01(\tR\x06handle\x123\n" +
+	"\x03add\x18\x02 \x03(\v2!.bugnet.router.v1.X402ServiceSpecR\x03add\x12\x18\n" +
+	"\adisable\x18\x03 \x03(\tR\adisable\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x04 \x01(\tR\trequestId\x12\x1f\n" +
+	"\vwait_active\x18\x05 \x01(\bR\n" +
+	"waitActive\"S\n" +
+	"\x12EnableX402Response\x12=\n" +
+	"\bservices\x18\x01 \x03(\v2!.bugnet.router.v1.X402ServiceInfoR\bservices\")\n" +
+	"\x0fListX402Request\x12\x16\n" +
+	"\x06handle\x18\x01 \x01(\tR\x06handle\"\xa6\x01\n" +
+	"\x10ListX402Response\x12\x18\n" +
+	"\aenabled\x18\x01 \x01(\bR\aenabled\x12=\n" +
+	"\bservices\x18\x02 \x03(\v2!.bugnet.router.v1.X402ServiceInfoR\bservices\x129\n" +
+	"\brefusals\x18\x03 \x03(\v2\x1d.bugnet.router.v1.X402RefusalR\brefusals*\xa8\x01\n" +
 	"\tDimension\x12\x19\n" +
 	"\x15DIMENSION_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eDIMENSION_VCPU\x10\x01\x12\x14\n" +
@@ -5825,7 +6501,13 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"\x17BOOTSTRAP_STATE_RUNNING\x10\x03\x12\x18\n" +
 	"\x14BOOTSTRAP_STATE_DONE\x10\x04\x12\x1a\n" +
 	"\x16BOOTSTRAP_STATE_FAILED\x10\x05\x12 \n" +
-	"\x1cBOOTSTRAP_STATE_NEEDS_SECRET\x10\x062\xcc\x13\n" +
+	"\x1cBOOTSTRAP_STATE_NEEDS_SECRET\x10\x06*\xb6\x01\n" +
+	"\x10X402ServiceState\x12\"\n" +
+	"\x1eX402_SERVICE_STATE_UNSPECIFIED\x10\x00\x12\x1f\n" +
+	"\x1bX402_SERVICE_STATE_APPLYING\x10\x01\x12\x1d\n" +
+	"\x19X402_SERVICE_STATE_ACTIVE\x10\x02\x12\x1d\n" +
+	"\x19X402_SERVICE_STATE_FAILED\x10\x03\x12\x1f\n" +
+	"\x1bX402_SERVICE_STATE_DISABLED\x10\x042\xce\x15\n" +
 	"\x14SandboxRouterService\x12Q\n" +
 	"\bEstimate\x12!.bugnet.router.v1.EstimateRequest\x1a\".bugnet.router.v1.EstimateResponse\x12]\n" +
 	"\fPricePackage\x12%.bugnet.router.v1.PricePackageRequest\x1a&.bugnet.router.v1.PricePackageResponse\x12f\n" +
@@ -5852,7 +6534,11 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"\tPutSecret\x12\".bugnet.router.v1.PutSecretRequest\x1a#.bugnet.router.v1.PutSecretResponse\x12Z\n" +
 	"\vListSecrets\x12$.bugnet.router.v1.ListSecretsRequest\x1a%.bugnet.router.v1.ListSecretsResponse\x12]\n" +
 	"\fDeleteSecret\x12%.bugnet.router.v1.DeleteSecretRequest\x1a&.bugnet.router.v1.DeleteSecretResponse\x12Z\n" +
-	"\vFetchSource\x12$.bugnet.router.v1.FetchSourceRequest\x1a%.bugnet.router.v1.FetchSourceResponseBBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"\vFetchSource\x12$.bugnet.router.v1.FetchSourceRequest\x1a%.bugnet.router.v1.FetchSourceResponse\x12T\n" +
+	"\tCheckX402\x12\".bugnet.router.v1.CheckX402Request\x1a#.bugnet.router.v1.CheckX402Response\x12W\n" +
+	"\n" +
+	"EnableX402\x12#.bugnet.router.v1.EnableX402Request\x1a$.bugnet.router.v1.EnableX402Response\x12Q\n" +
+	"\bListX402\x12!.bugnet.router.v1.ListX402Request\x1a\".bugnet.router.v1.ListX402ResponseBBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_router_proto_rawDescOnce sync.Once
@@ -5866,8 +6552,8 @@ func file_bugnet_router_v1_router_proto_rawDescGZIP() []byte {
 	return file_bugnet_router_v1_router_proto_rawDescData
 }
 
-var file_bugnet_router_v1_router_proto_enumTypes = make([]protoimpl.EnumInfo, 15)
-var file_bugnet_router_v1_router_proto_msgTypes = make([]protoimpl.MessageInfo, 71)
+var file_bugnet_router_v1_router_proto_enumTypes = make([]protoimpl.EnumInfo, 16)
+var file_bugnet_router_v1_router_proto_msgTypes = make([]protoimpl.MessageInfo, 80)
 var file_bugnet_router_v1_router_proto_goTypes = []any{
 	(Dimension)(0),                       // 0: bugnet.router.v1.Dimension
 	(Workload)(0),                        // 1: bugnet.router.v1.Workload
@@ -5884,201 +6570,225 @@ var file_bugnet_router_v1_router_proto_goTypes = []any{
 	(TransferDirection)(0),               // 12: bugnet.router.v1.TransferDirection
 	(SecretState)(0),                     // 13: bugnet.router.v1.SecretState
 	(BootstrapState)(0),                  // 14: bugnet.router.v1.BootstrapState
-	(*Resources)(nil),                    // 15: bugnet.router.v1.Resources
-	(*Requirements)(nil),                 // 16: bugnet.router.v1.Requirements
-	(*PackageOption)(nil),                // 17: bugnet.router.v1.PackageOption
-	(*EstimateRequest)(nil),              // 18: bugnet.router.v1.EstimateRequest
-	(*ResolvedSource)(nil),               // 19: bugnet.router.v1.ResolvedSource
-	(*ResourceFloor)(nil),                // 20: bugnet.router.v1.ResourceFloor
-	(*EstimateWarning)(nil),              // 21: bugnet.router.v1.EstimateWarning
-	(*EstimateReason)(nil),               // 22: bugnet.router.v1.EstimateReason
-	(*EstimateResponse)(nil),             // 23: bugnet.router.v1.EstimateResponse
-	(*PricePackageRequest)(nil),          // 24: bugnet.router.v1.PricePackageRequest
-	(*PricePackageResponse)(nil),         // 25: bugnet.router.v1.PricePackageResponse
-	(*Placement)(nil),                    // 26: bugnet.router.v1.Placement
-	(*CreatePlacementRequest)(nil),       // 27: bugnet.router.v1.CreatePlacementRequest
-	(*CreatePlacementResponse)(nil),      // 28: bugnet.router.v1.CreatePlacementResponse
-	(*GetPlacementRequest)(nil),          // 29: bugnet.router.v1.GetPlacementRequest
-	(*GetPlacementResponse)(nil),         // 30: bugnet.router.v1.GetPlacementResponse
-	(*WatchPlacementRequest)(nil),        // 31: bugnet.router.v1.WatchPlacementRequest
-	(*WatchPlacementResponse)(nil),       // 32: bugnet.router.v1.WatchPlacementResponse
-	(*ExtendPlacementRequest)(nil),       // 33: bugnet.router.v1.ExtendPlacementRequest
-	(*ExtendPlacementResponse)(nil),      // 34: bugnet.router.v1.ExtendPlacementResponse
-	(*CheckExtendPlacementRequest)(nil),  // 35: bugnet.router.v1.CheckExtendPlacementRequest
-	(*CheckExtendPlacementResponse)(nil), // 36: bugnet.router.v1.CheckExtendPlacementResponse
-	(*ListExtensionsRequest)(nil),        // 37: bugnet.router.v1.ListExtensionsRequest
-	(*ListExtensionsResponse)(nil),       // 38: bugnet.router.v1.ListExtensionsResponse
-	(*StopPlacementRequest)(nil),         // 39: bugnet.router.v1.StopPlacementRequest
-	(*StopPlacementResponse)(nil),        // 40: bugnet.router.v1.StopPlacementResponse
-	(*Until)(nil),                        // 41: bugnet.router.v1.Until
-	(*ExecRequest)(nil),                  // 42: bugnet.router.v1.ExecRequest
-	(*ExecResponse)(nil),                 // 43: bugnet.router.v1.ExecResponse
-	(*JobOutput)(nil),                    // 44: bugnet.router.v1.JobOutput
-	(*JobExit)(nil),                      // 45: bugnet.router.v1.JobExit
-	(*JobSkip)(nil),                      // 46: bugnet.router.v1.JobSkip
-	(*WatchJobRequest)(nil),              // 47: bugnet.router.v1.WatchJobRequest
-	(*WatchJobResponse)(nil),             // 48: bugnet.router.v1.WatchJobResponse
-	(*CancelJobRequest)(nil),             // 49: bugnet.router.v1.CancelJobRequest
-	(*CancelJobResponse)(nil),            // 50: bugnet.router.v1.CancelJobResponse
-	(*ReadFileRequest)(nil),              // 51: bugnet.router.v1.ReadFileRequest
-	(*ReadFileResponse)(nil),             // 52: bugnet.router.v1.ReadFileResponse
-	(*WriteFileRequest)(nil),             // 53: bugnet.router.v1.WriteFileRequest
-	(*WriteFileResponse)(nil),            // 54: bugnet.router.v1.WriteFileResponse
-	(*FileEntry)(nil),                    // 55: bugnet.router.v1.FileEntry
-	(*ListFilesRequest)(nil),             // 56: bugnet.router.v1.ListFilesRequest
-	(*ListFilesResponse)(nil),            // 57: bugnet.router.v1.ListFilesResponse
-	(*CreatePreviewRequest)(nil),         // 58: bugnet.router.v1.CreatePreviewRequest
-	(*CreatePreviewResponse)(nil),        // 59: bugnet.router.v1.CreatePreviewResponse
-	(*CreateTransferRequest)(nil),        // 60: bugnet.router.v1.CreateTransferRequest
-	(*CreateTransferResponse)(nil),       // 61: bugnet.router.v1.CreateTransferResponse
-	(*AddSshKeyRequest)(nil),             // 62: bugnet.router.v1.AddSshKeyRequest
-	(*AddSshKeyResponse)(nil),            // 63: bugnet.router.v1.AddSshKeyResponse
-	(*RemoveSshKeyRequest)(nil),          // 64: bugnet.router.v1.RemoveSshKeyRequest
-	(*RemoveSshKeyResponse)(nil),         // 65: bugnet.router.v1.RemoveSshKeyResponse
-	(*SecretSpec)(nil),                   // 66: bugnet.router.v1.SecretSpec
-	(*SealedValue)(nil),                  // 67: bugnet.router.v1.SealedValue
-	(*SealingKey)(nil),                   // 68: bugnet.router.v1.SealingKey
-	(*SecretInfo)(nil),                   // 69: bugnet.router.v1.SecretInfo
-	(*CreateSecretLinkRequest)(nil),      // 70: bugnet.router.v1.CreateSecretLinkRequest
-	(*CreateSecretLinkResponse)(nil),     // 71: bugnet.router.v1.CreateSecretLinkResponse
-	(*CreateSecretPutGrantRequest)(nil),  // 72: bugnet.router.v1.CreateSecretPutGrantRequest
-	(*CreateSecretPutGrantResponse)(nil), // 73: bugnet.router.v1.CreateSecretPutGrantResponse
-	(*GetSecretSealingKeyRequest)(nil),   // 74: bugnet.router.v1.GetSecretSealingKeyRequest
-	(*GetSecretSealingKeyResponse)(nil),  // 75: bugnet.router.v1.GetSecretSealingKeyResponse
-	(*PutSecretRequest)(nil),             // 76: bugnet.router.v1.PutSecretRequest
-	(*PutSecretResponse)(nil),            // 77: bugnet.router.v1.PutSecretResponse
-	(*ListSecretsRequest)(nil),           // 78: bugnet.router.v1.ListSecretsRequest
-	(*ListSecretsResponse)(nil),          // 79: bugnet.router.v1.ListSecretsResponse
-	(*DeleteSecretRequest)(nil),          // 80: bugnet.router.v1.DeleteSecretRequest
-	(*DeleteSecretResponse)(nil),         // 81: bugnet.router.v1.DeleteSecretResponse
-	(*Bootstrap)(nil),                    // 82: bugnet.router.v1.Bootstrap
-	(*FetchSourceRequest)(nil),           // 83: bugnet.router.v1.FetchSourceRequest
-	(*FetchSourceResponse)(nil),          // 84: bugnet.router.v1.FetchSourceResponse
-	nil,                                  // 85: bugnet.router.v1.ExecRequest.EnvEntry
-	(*timestamppb.Timestamp)(nil),        // 86: google.protobuf.Timestamp
+	(X402ServiceState)(0),                // 15: bugnet.router.v1.X402ServiceState
+	(*Resources)(nil),                    // 16: bugnet.router.v1.Resources
+	(*Requirements)(nil),                 // 17: bugnet.router.v1.Requirements
+	(*PackageOption)(nil),                // 18: bugnet.router.v1.PackageOption
+	(*EstimateRequest)(nil),              // 19: bugnet.router.v1.EstimateRequest
+	(*ResolvedSource)(nil),               // 20: bugnet.router.v1.ResolvedSource
+	(*ResourceFloor)(nil),                // 21: bugnet.router.v1.ResourceFloor
+	(*EstimateWarning)(nil),              // 22: bugnet.router.v1.EstimateWarning
+	(*EstimateReason)(nil),               // 23: bugnet.router.v1.EstimateReason
+	(*EstimateResponse)(nil),             // 24: bugnet.router.v1.EstimateResponse
+	(*PricePackageRequest)(nil),          // 25: bugnet.router.v1.PricePackageRequest
+	(*PricePackageResponse)(nil),         // 26: bugnet.router.v1.PricePackageResponse
+	(*Placement)(nil),                    // 27: bugnet.router.v1.Placement
+	(*CreatePlacementRequest)(nil),       // 28: bugnet.router.v1.CreatePlacementRequest
+	(*CreatePlacementResponse)(nil),      // 29: bugnet.router.v1.CreatePlacementResponse
+	(*GetPlacementRequest)(nil),          // 30: bugnet.router.v1.GetPlacementRequest
+	(*GetPlacementResponse)(nil),         // 31: bugnet.router.v1.GetPlacementResponse
+	(*WatchPlacementRequest)(nil),        // 32: bugnet.router.v1.WatchPlacementRequest
+	(*WatchPlacementResponse)(nil),       // 33: bugnet.router.v1.WatchPlacementResponse
+	(*ExtendPlacementRequest)(nil),       // 34: bugnet.router.v1.ExtendPlacementRequest
+	(*ExtendPlacementResponse)(nil),      // 35: bugnet.router.v1.ExtendPlacementResponse
+	(*CheckExtendPlacementRequest)(nil),  // 36: bugnet.router.v1.CheckExtendPlacementRequest
+	(*CheckExtendPlacementResponse)(nil), // 37: bugnet.router.v1.CheckExtendPlacementResponse
+	(*ListExtensionsRequest)(nil),        // 38: bugnet.router.v1.ListExtensionsRequest
+	(*ListExtensionsResponse)(nil),       // 39: bugnet.router.v1.ListExtensionsResponse
+	(*StopPlacementRequest)(nil),         // 40: bugnet.router.v1.StopPlacementRequest
+	(*StopPlacementResponse)(nil),        // 41: bugnet.router.v1.StopPlacementResponse
+	(*Until)(nil),                        // 42: bugnet.router.v1.Until
+	(*ExecRequest)(nil),                  // 43: bugnet.router.v1.ExecRequest
+	(*ExecResponse)(nil),                 // 44: bugnet.router.v1.ExecResponse
+	(*JobOutput)(nil),                    // 45: bugnet.router.v1.JobOutput
+	(*JobExit)(nil),                      // 46: bugnet.router.v1.JobExit
+	(*JobSkip)(nil),                      // 47: bugnet.router.v1.JobSkip
+	(*WatchJobRequest)(nil),              // 48: bugnet.router.v1.WatchJobRequest
+	(*WatchJobResponse)(nil),             // 49: bugnet.router.v1.WatchJobResponse
+	(*CancelJobRequest)(nil),             // 50: bugnet.router.v1.CancelJobRequest
+	(*CancelJobResponse)(nil),            // 51: bugnet.router.v1.CancelJobResponse
+	(*ReadFileRequest)(nil),              // 52: bugnet.router.v1.ReadFileRequest
+	(*ReadFileResponse)(nil),             // 53: bugnet.router.v1.ReadFileResponse
+	(*WriteFileRequest)(nil),             // 54: bugnet.router.v1.WriteFileRequest
+	(*WriteFileResponse)(nil),            // 55: bugnet.router.v1.WriteFileResponse
+	(*FileEntry)(nil),                    // 56: bugnet.router.v1.FileEntry
+	(*ListFilesRequest)(nil),             // 57: bugnet.router.v1.ListFilesRequest
+	(*ListFilesResponse)(nil),            // 58: bugnet.router.v1.ListFilesResponse
+	(*CreatePreviewRequest)(nil),         // 59: bugnet.router.v1.CreatePreviewRequest
+	(*CreatePreviewResponse)(nil),        // 60: bugnet.router.v1.CreatePreviewResponse
+	(*CreateTransferRequest)(nil),        // 61: bugnet.router.v1.CreateTransferRequest
+	(*CreateTransferResponse)(nil),       // 62: bugnet.router.v1.CreateTransferResponse
+	(*AddSshKeyRequest)(nil),             // 63: bugnet.router.v1.AddSshKeyRequest
+	(*AddSshKeyResponse)(nil),            // 64: bugnet.router.v1.AddSshKeyResponse
+	(*RemoveSshKeyRequest)(nil),          // 65: bugnet.router.v1.RemoveSshKeyRequest
+	(*RemoveSshKeyResponse)(nil),         // 66: bugnet.router.v1.RemoveSshKeyResponse
+	(*SecretSpec)(nil),                   // 67: bugnet.router.v1.SecretSpec
+	(*SealedValue)(nil),                  // 68: bugnet.router.v1.SealedValue
+	(*SealingKey)(nil),                   // 69: bugnet.router.v1.SealingKey
+	(*SecretInfo)(nil),                   // 70: bugnet.router.v1.SecretInfo
+	(*CreateSecretLinkRequest)(nil),      // 71: bugnet.router.v1.CreateSecretLinkRequest
+	(*CreateSecretLinkResponse)(nil),     // 72: bugnet.router.v1.CreateSecretLinkResponse
+	(*CreateSecretPutGrantRequest)(nil),  // 73: bugnet.router.v1.CreateSecretPutGrantRequest
+	(*CreateSecretPutGrantResponse)(nil), // 74: bugnet.router.v1.CreateSecretPutGrantResponse
+	(*GetSecretSealingKeyRequest)(nil),   // 75: bugnet.router.v1.GetSecretSealingKeyRequest
+	(*GetSecretSealingKeyResponse)(nil),  // 76: bugnet.router.v1.GetSecretSealingKeyResponse
+	(*PutSecretRequest)(nil),             // 77: bugnet.router.v1.PutSecretRequest
+	(*PutSecretResponse)(nil),            // 78: bugnet.router.v1.PutSecretResponse
+	(*ListSecretsRequest)(nil),           // 79: bugnet.router.v1.ListSecretsRequest
+	(*ListSecretsResponse)(nil),          // 80: bugnet.router.v1.ListSecretsResponse
+	(*DeleteSecretRequest)(nil),          // 81: bugnet.router.v1.DeleteSecretRequest
+	(*DeleteSecretResponse)(nil),         // 82: bugnet.router.v1.DeleteSecretResponse
+	(*Bootstrap)(nil),                    // 83: bugnet.router.v1.Bootstrap
+	(*FetchSourceRequest)(nil),           // 84: bugnet.router.v1.FetchSourceRequest
+	(*FetchSourceResponse)(nil),          // 85: bugnet.router.v1.FetchSourceResponse
+	(*X402ServiceSpec)(nil),              // 86: bugnet.router.v1.X402ServiceSpec
+	(*X402ServiceInfo)(nil),              // 87: bugnet.router.v1.X402ServiceInfo
+	(*X402Refusal)(nil),                  // 88: bugnet.router.v1.X402Refusal
+	(*CheckX402Request)(nil),             // 89: bugnet.router.v1.CheckX402Request
+	(*CheckX402Response)(nil),            // 90: bugnet.router.v1.CheckX402Response
+	(*EnableX402Request)(nil),            // 91: bugnet.router.v1.EnableX402Request
+	(*EnableX402Response)(nil),           // 92: bugnet.router.v1.EnableX402Response
+	(*ListX402Request)(nil),              // 93: bugnet.router.v1.ListX402Request
+	(*ListX402Response)(nil),             // 94: bugnet.router.v1.ListX402Response
+	nil,                                  // 95: bugnet.router.v1.ExecRequest.EnvEntry
+	(*timestamppb.Timestamp)(nil),        // 96: google.protobuf.Timestamp
 }
 var file_bugnet_router_v1_router_proto_depIdxs = []int32{
-	15, // 0: bugnet.router.v1.PackageOption.resources:type_name -> bugnet.router.v1.Resources
-	0,  // 1: bugnet.router.v1.PackageOption.short_on:type_name -> bugnet.router.v1.Dimension
-	16, // 2: bugnet.router.v1.EstimateRequest.requirements:type_name -> bugnet.router.v1.Requirements
-	1,  // 3: bugnet.router.v1.EstimateRequest.workload:type_name -> bugnet.router.v1.Workload
-	2,  // 4: bugnet.router.v1.EstimateRequest.needs:type_name -> bugnet.router.v1.Need
-	3,  // 5: bugnet.router.v1.ResolvedSource.kind:type_name -> bugnet.router.v1.SourceKind
-	4,  // 6: bugnet.router.v1.ResolvedSource.unread_reason:type_name -> bugnet.router.v1.UnreadReason
-	15, // 7: bugnet.router.v1.ResourceFloor.resources:type_name -> bugnet.router.v1.Resources
-	5,  // 8: bugnet.router.v1.ResourceFloor.gpu:type_name -> bugnet.router.v1.GpuNeed
-	8,  // 9: bugnet.router.v1.EstimateWarning.code:type_name -> bugnet.router.v1.WarningCode
-	17, // 10: bugnet.router.v1.EstimateResponse.options:type_name -> bugnet.router.v1.PackageOption
-	19, // 11: bugnet.router.v1.EstimateResponse.source:type_name -> bugnet.router.v1.ResolvedSource
-	20, // 12: bugnet.router.v1.EstimateResponse.floor:type_name -> bugnet.router.v1.ResourceFloor
-	22, // 13: bugnet.router.v1.EstimateResponse.reasons:type_name -> bugnet.router.v1.EstimateReason
-	21, // 14: bugnet.router.v1.EstimateResponse.warnings:type_name -> bugnet.router.v1.EstimateWarning
-	6,  // 15: bugnet.router.v1.EstimateResponse.basis:type_name -> bugnet.router.v1.EstimateBasis
-	7,  // 16: bugnet.router.v1.EstimateResponse.confidence:type_name -> bugnet.router.v1.Confidence
-	16, // 17: bugnet.router.v1.PricePackageRequest.requirements:type_name -> bugnet.router.v1.Requirements
-	17, // 18: bugnet.router.v1.PricePackageResponse.option:type_name -> bugnet.router.v1.PackageOption
-	9,  // 19: bugnet.router.v1.Placement.state:type_name -> bugnet.router.v1.PlacementState
-	86, // 20: bugnet.router.v1.Placement.deadline:type_name -> google.protobuf.Timestamp
-	86, // 21: bugnet.router.v1.Placement.created_at:type_name -> google.protobuf.Timestamp
-	86, // 22: bugnet.router.v1.Placement.ready_at:type_name -> google.protobuf.Timestamp
-	82, // 23: bugnet.router.v1.Placement.bootstrap:type_name -> bugnet.router.v1.Bootstrap
-	86, // 24: bugnet.router.v1.Placement.ended_at:type_name -> google.protobuf.Timestamp
-	16, // 25: bugnet.router.v1.CreatePlacementRequest.requirements:type_name -> bugnet.router.v1.Requirements
-	26, // 26: bugnet.router.v1.CreatePlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	9,  // 27: bugnet.router.v1.GetPlacementRequest.known_state:type_name -> bugnet.router.v1.PlacementState
-	26, // 28: bugnet.router.v1.GetPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	26, // 29: bugnet.router.v1.WatchPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	26, // 30: bugnet.router.v1.ExtendPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	26, // 31: bugnet.router.v1.CheckExtendPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	86, // 32: bugnet.router.v1.CheckExtendPlacementResponse.deadline:type_name -> google.protobuf.Timestamp
-	17, // 33: bugnet.router.v1.CheckExtendPlacementResponse.package:type_name -> bugnet.router.v1.PackageOption
-	17, // 34: bugnet.router.v1.ListExtensionsResponse.options:type_name -> bugnet.router.v1.PackageOption
-	26, // 35: bugnet.router.v1.StopPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
-	85, // 36: bugnet.router.v1.ExecRequest.env:type_name -> bugnet.router.v1.ExecRequest.EnvEntry
-	41, // 37: bugnet.router.v1.ExecRequest.until:type_name -> bugnet.router.v1.Until
-	10, // 38: bugnet.router.v1.ExecResponse.state:type_name -> bugnet.router.v1.JobState
-	11, // 39: bugnet.router.v1.JobOutput.stream:type_name -> bugnet.router.v1.OutputStream
-	41, // 40: bugnet.router.v1.WatchJobRequest.until:type_name -> bugnet.router.v1.Until
-	44, // 41: bugnet.router.v1.WatchJobResponse.output:type_name -> bugnet.router.v1.JobOutput
-	45, // 42: bugnet.router.v1.WatchJobResponse.exit:type_name -> bugnet.router.v1.JobExit
-	46, // 43: bugnet.router.v1.WatchJobResponse.skip:type_name -> bugnet.router.v1.JobSkip
-	10, // 44: bugnet.router.v1.CancelJobResponse.state:type_name -> bugnet.router.v1.JobState
-	86, // 45: bugnet.router.v1.FileEntry.modified_at:type_name -> google.protobuf.Timestamp
-	55, // 46: bugnet.router.v1.ListFilesResponse.entries:type_name -> bugnet.router.v1.FileEntry
-	86, // 47: bugnet.router.v1.CreatePreviewResponse.expires_at:type_name -> google.protobuf.Timestamp
-	12, // 48: bugnet.router.v1.CreateTransferRequest.direction:type_name -> bugnet.router.v1.TransferDirection
-	86, // 49: bugnet.router.v1.CreateTransferResponse.expires_at:type_name -> google.protobuf.Timestamp
-	86, // 50: bugnet.router.v1.CreateTransferResponse.modified_at:type_name -> google.protobuf.Timestamp
-	86, // 51: bugnet.router.v1.AddSshKeyResponse.expires_at:type_name -> google.protobuf.Timestamp
-	66, // 52: bugnet.router.v1.SecretInfo.spec:type_name -> bugnet.router.v1.SecretSpec
-	13, // 53: bugnet.router.v1.SecretInfo.state:type_name -> bugnet.router.v1.SecretState
-	86, // 54: bugnet.router.v1.SecretInfo.updated_at:type_name -> google.protobuf.Timestamp
-	86, // 55: bugnet.router.v1.CreateSecretLinkResponse.expires_at:type_name -> google.protobuf.Timestamp
-	86, // 56: bugnet.router.v1.CreateSecretPutGrantResponse.expires_at:type_name -> google.protobuf.Timestamp
-	68, // 57: bugnet.router.v1.GetSecretSealingKeyResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
-	66, // 58: bugnet.router.v1.PutSecretRequest.spec:type_name -> bugnet.router.v1.SecretSpec
-	67, // 59: bugnet.router.v1.PutSecretRequest.value:type_name -> bugnet.router.v1.SealedValue
-	69, // 60: bugnet.router.v1.PutSecretResponse.secret:type_name -> bugnet.router.v1.SecretInfo
-	69, // 61: bugnet.router.v1.ListSecretsResponse.secrets:type_name -> bugnet.router.v1.SecretInfo
-	14, // 62: bugnet.router.v1.Bootstrap.state:type_name -> bugnet.router.v1.BootstrapState
-	82, // 63: bugnet.router.v1.FetchSourceResponse.bootstrap:type_name -> bugnet.router.v1.Bootstrap
-	18, // 64: bugnet.router.v1.SandboxRouterService.Estimate:input_type -> bugnet.router.v1.EstimateRequest
-	24, // 65: bugnet.router.v1.SandboxRouterService.PricePackage:input_type -> bugnet.router.v1.PricePackageRequest
-	27, // 66: bugnet.router.v1.SandboxRouterService.CreatePlacement:input_type -> bugnet.router.v1.CreatePlacementRequest
-	29, // 67: bugnet.router.v1.SandboxRouterService.GetPlacement:input_type -> bugnet.router.v1.GetPlacementRequest
-	31, // 68: bugnet.router.v1.SandboxRouterService.WatchPlacement:input_type -> bugnet.router.v1.WatchPlacementRequest
-	33, // 69: bugnet.router.v1.SandboxRouterService.ExtendPlacement:input_type -> bugnet.router.v1.ExtendPlacementRequest
-	35, // 70: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:input_type -> bugnet.router.v1.CheckExtendPlacementRequest
-	37, // 71: bugnet.router.v1.SandboxRouterService.ListExtensions:input_type -> bugnet.router.v1.ListExtensionsRequest
-	39, // 72: bugnet.router.v1.SandboxRouterService.StopPlacement:input_type -> bugnet.router.v1.StopPlacementRequest
-	42, // 73: bugnet.router.v1.SandboxRouterService.Exec:input_type -> bugnet.router.v1.ExecRequest
-	47, // 74: bugnet.router.v1.SandboxRouterService.WatchJob:input_type -> bugnet.router.v1.WatchJobRequest
-	49, // 75: bugnet.router.v1.SandboxRouterService.CancelJob:input_type -> bugnet.router.v1.CancelJobRequest
-	51, // 76: bugnet.router.v1.SandboxRouterService.ReadFile:input_type -> bugnet.router.v1.ReadFileRequest
-	53, // 77: bugnet.router.v1.SandboxRouterService.WriteFile:input_type -> bugnet.router.v1.WriteFileRequest
-	56, // 78: bugnet.router.v1.SandboxRouterService.ListFiles:input_type -> bugnet.router.v1.ListFilesRequest
-	58, // 79: bugnet.router.v1.SandboxRouterService.CreatePreview:input_type -> bugnet.router.v1.CreatePreviewRequest
-	60, // 80: bugnet.router.v1.SandboxRouterService.CreateTransfer:input_type -> bugnet.router.v1.CreateTransferRequest
-	62, // 81: bugnet.router.v1.SandboxRouterService.AddSshKey:input_type -> bugnet.router.v1.AddSshKeyRequest
-	64, // 82: bugnet.router.v1.SandboxRouterService.RemoveSshKey:input_type -> bugnet.router.v1.RemoveSshKeyRequest
-	70, // 83: bugnet.router.v1.SandboxRouterService.CreateSecretLink:input_type -> bugnet.router.v1.CreateSecretLinkRequest
-	72, // 84: bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant:input_type -> bugnet.router.v1.CreateSecretPutGrantRequest
-	74, // 85: bugnet.router.v1.SandboxRouterService.GetSecretSealingKey:input_type -> bugnet.router.v1.GetSecretSealingKeyRequest
-	76, // 86: bugnet.router.v1.SandboxRouterService.PutSecret:input_type -> bugnet.router.v1.PutSecretRequest
-	78, // 87: bugnet.router.v1.SandboxRouterService.ListSecrets:input_type -> bugnet.router.v1.ListSecretsRequest
-	80, // 88: bugnet.router.v1.SandboxRouterService.DeleteSecret:input_type -> bugnet.router.v1.DeleteSecretRequest
-	83, // 89: bugnet.router.v1.SandboxRouterService.FetchSource:input_type -> bugnet.router.v1.FetchSourceRequest
-	23, // 90: bugnet.router.v1.SandboxRouterService.Estimate:output_type -> bugnet.router.v1.EstimateResponse
-	25, // 91: bugnet.router.v1.SandboxRouterService.PricePackage:output_type -> bugnet.router.v1.PricePackageResponse
-	28, // 92: bugnet.router.v1.SandboxRouterService.CreatePlacement:output_type -> bugnet.router.v1.CreatePlacementResponse
-	30, // 93: bugnet.router.v1.SandboxRouterService.GetPlacement:output_type -> bugnet.router.v1.GetPlacementResponse
-	32, // 94: bugnet.router.v1.SandboxRouterService.WatchPlacement:output_type -> bugnet.router.v1.WatchPlacementResponse
-	34, // 95: bugnet.router.v1.SandboxRouterService.ExtendPlacement:output_type -> bugnet.router.v1.ExtendPlacementResponse
-	36, // 96: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:output_type -> bugnet.router.v1.CheckExtendPlacementResponse
-	38, // 97: bugnet.router.v1.SandboxRouterService.ListExtensions:output_type -> bugnet.router.v1.ListExtensionsResponse
-	40, // 98: bugnet.router.v1.SandboxRouterService.StopPlacement:output_type -> bugnet.router.v1.StopPlacementResponse
-	43, // 99: bugnet.router.v1.SandboxRouterService.Exec:output_type -> bugnet.router.v1.ExecResponse
-	48, // 100: bugnet.router.v1.SandboxRouterService.WatchJob:output_type -> bugnet.router.v1.WatchJobResponse
-	50, // 101: bugnet.router.v1.SandboxRouterService.CancelJob:output_type -> bugnet.router.v1.CancelJobResponse
-	52, // 102: bugnet.router.v1.SandboxRouterService.ReadFile:output_type -> bugnet.router.v1.ReadFileResponse
-	54, // 103: bugnet.router.v1.SandboxRouterService.WriteFile:output_type -> bugnet.router.v1.WriteFileResponse
-	57, // 104: bugnet.router.v1.SandboxRouterService.ListFiles:output_type -> bugnet.router.v1.ListFilesResponse
-	59, // 105: bugnet.router.v1.SandboxRouterService.CreatePreview:output_type -> bugnet.router.v1.CreatePreviewResponse
-	61, // 106: bugnet.router.v1.SandboxRouterService.CreateTransfer:output_type -> bugnet.router.v1.CreateTransferResponse
-	63, // 107: bugnet.router.v1.SandboxRouterService.AddSshKey:output_type -> bugnet.router.v1.AddSshKeyResponse
-	65, // 108: bugnet.router.v1.SandboxRouterService.RemoveSshKey:output_type -> bugnet.router.v1.RemoveSshKeyResponse
-	71, // 109: bugnet.router.v1.SandboxRouterService.CreateSecretLink:output_type -> bugnet.router.v1.CreateSecretLinkResponse
-	73, // 110: bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant:output_type -> bugnet.router.v1.CreateSecretPutGrantResponse
-	75, // 111: bugnet.router.v1.SandboxRouterService.GetSecretSealingKey:output_type -> bugnet.router.v1.GetSecretSealingKeyResponse
-	77, // 112: bugnet.router.v1.SandboxRouterService.PutSecret:output_type -> bugnet.router.v1.PutSecretResponse
-	79, // 113: bugnet.router.v1.SandboxRouterService.ListSecrets:output_type -> bugnet.router.v1.ListSecretsResponse
-	81, // 114: bugnet.router.v1.SandboxRouterService.DeleteSecret:output_type -> bugnet.router.v1.DeleteSecretResponse
-	84, // 115: bugnet.router.v1.SandboxRouterService.FetchSource:output_type -> bugnet.router.v1.FetchSourceResponse
-	90, // [90:116] is the sub-list for method output_type
-	64, // [64:90] is the sub-list for method input_type
-	64, // [64:64] is the sub-list for extension type_name
-	64, // [64:64] is the sub-list for extension extendee
-	0,  // [0:64] is the sub-list for field type_name
+	16,  // 0: bugnet.router.v1.PackageOption.resources:type_name -> bugnet.router.v1.Resources
+	0,   // 1: bugnet.router.v1.PackageOption.short_on:type_name -> bugnet.router.v1.Dimension
+	17,  // 2: bugnet.router.v1.EstimateRequest.requirements:type_name -> bugnet.router.v1.Requirements
+	1,   // 3: bugnet.router.v1.EstimateRequest.workload:type_name -> bugnet.router.v1.Workload
+	2,   // 4: bugnet.router.v1.EstimateRequest.needs:type_name -> bugnet.router.v1.Need
+	3,   // 5: bugnet.router.v1.ResolvedSource.kind:type_name -> bugnet.router.v1.SourceKind
+	4,   // 6: bugnet.router.v1.ResolvedSource.unread_reason:type_name -> bugnet.router.v1.UnreadReason
+	16,  // 7: bugnet.router.v1.ResourceFloor.resources:type_name -> bugnet.router.v1.Resources
+	5,   // 8: bugnet.router.v1.ResourceFloor.gpu:type_name -> bugnet.router.v1.GpuNeed
+	8,   // 9: bugnet.router.v1.EstimateWarning.code:type_name -> bugnet.router.v1.WarningCode
+	18,  // 10: bugnet.router.v1.EstimateResponse.options:type_name -> bugnet.router.v1.PackageOption
+	20,  // 11: bugnet.router.v1.EstimateResponse.source:type_name -> bugnet.router.v1.ResolvedSource
+	21,  // 12: bugnet.router.v1.EstimateResponse.floor:type_name -> bugnet.router.v1.ResourceFloor
+	23,  // 13: bugnet.router.v1.EstimateResponse.reasons:type_name -> bugnet.router.v1.EstimateReason
+	22,  // 14: bugnet.router.v1.EstimateResponse.warnings:type_name -> bugnet.router.v1.EstimateWarning
+	6,   // 15: bugnet.router.v1.EstimateResponse.basis:type_name -> bugnet.router.v1.EstimateBasis
+	7,   // 16: bugnet.router.v1.EstimateResponse.confidence:type_name -> bugnet.router.v1.Confidence
+	17,  // 17: bugnet.router.v1.PricePackageRequest.requirements:type_name -> bugnet.router.v1.Requirements
+	18,  // 18: bugnet.router.v1.PricePackageResponse.option:type_name -> bugnet.router.v1.PackageOption
+	9,   // 19: bugnet.router.v1.Placement.state:type_name -> bugnet.router.v1.PlacementState
+	96,  // 20: bugnet.router.v1.Placement.deadline:type_name -> google.protobuf.Timestamp
+	96,  // 21: bugnet.router.v1.Placement.created_at:type_name -> google.protobuf.Timestamp
+	96,  // 22: bugnet.router.v1.Placement.ready_at:type_name -> google.protobuf.Timestamp
+	83,  // 23: bugnet.router.v1.Placement.bootstrap:type_name -> bugnet.router.v1.Bootstrap
+	96,  // 24: bugnet.router.v1.Placement.ended_at:type_name -> google.protobuf.Timestamp
+	17,  // 25: bugnet.router.v1.CreatePlacementRequest.requirements:type_name -> bugnet.router.v1.Requirements
+	27,  // 26: bugnet.router.v1.CreatePlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	9,   // 27: bugnet.router.v1.GetPlacementRequest.known_state:type_name -> bugnet.router.v1.PlacementState
+	27,  // 28: bugnet.router.v1.GetPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	27,  // 29: bugnet.router.v1.WatchPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	27,  // 30: bugnet.router.v1.ExtendPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	27,  // 31: bugnet.router.v1.CheckExtendPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	96,  // 32: bugnet.router.v1.CheckExtendPlacementResponse.deadline:type_name -> google.protobuf.Timestamp
+	18,  // 33: bugnet.router.v1.CheckExtendPlacementResponse.package:type_name -> bugnet.router.v1.PackageOption
+	18,  // 34: bugnet.router.v1.ListExtensionsResponse.options:type_name -> bugnet.router.v1.PackageOption
+	27,  // 35: bugnet.router.v1.StopPlacementResponse.placement:type_name -> bugnet.router.v1.Placement
+	95,  // 36: bugnet.router.v1.ExecRequest.env:type_name -> bugnet.router.v1.ExecRequest.EnvEntry
+	42,  // 37: bugnet.router.v1.ExecRequest.until:type_name -> bugnet.router.v1.Until
+	10,  // 38: bugnet.router.v1.ExecResponse.state:type_name -> bugnet.router.v1.JobState
+	11,  // 39: bugnet.router.v1.JobOutput.stream:type_name -> bugnet.router.v1.OutputStream
+	42,  // 40: bugnet.router.v1.WatchJobRequest.until:type_name -> bugnet.router.v1.Until
+	45,  // 41: bugnet.router.v1.WatchJobResponse.output:type_name -> bugnet.router.v1.JobOutput
+	46,  // 42: bugnet.router.v1.WatchJobResponse.exit:type_name -> bugnet.router.v1.JobExit
+	47,  // 43: bugnet.router.v1.WatchJobResponse.skip:type_name -> bugnet.router.v1.JobSkip
+	10,  // 44: bugnet.router.v1.CancelJobResponse.state:type_name -> bugnet.router.v1.JobState
+	96,  // 45: bugnet.router.v1.FileEntry.modified_at:type_name -> google.protobuf.Timestamp
+	56,  // 46: bugnet.router.v1.ListFilesResponse.entries:type_name -> bugnet.router.v1.FileEntry
+	96,  // 47: bugnet.router.v1.CreatePreviewResponse.expires_at:type_name -> google.protobuf.Timestamp
+	12,  // 48: bugnet.router.v1.CreateTransferRequest.direction:type_name -> bugnet.router.v1.TransferDirection
+	96,  // 49: bugnet.router.v1.CreateTransferResponse.expires_at:type_name -> google.protobuf.Timestamp
+	96,  // 50: bugnet.router.v1.CreateTransferResponse.modified_at:type_name -> google.protobuf.Timestamp
+	96,  // 51: bugnet.router.v1.AddSshKeyResponse.expires_at:type_name -> google.protobuf.Timestamp
+	67,  // 52: bugnet.router.v1.SecretInfo.spec:type_name -> bugnet.router.v1.SecretSpec
+	13,  // 53: bugnet.router.v1.SecretInfo.state:type_name -> bugnet.router.v1.SecretState
+	96,  // 54: bugnet.router.v1.SecretInfo.updated_at:type_name -> google.protobuf.Timestamp
+	96,  // 55: bugnet.router.v1.CreateSecretLinkResponse.expires_at:type_name -> google.protobuf.Timestamp
+	96,  // 56: bugnet.router.v1.CreateSecretPutGrantResponse.expires_at:type_name -> google.protobuf.Timestamp
+	69,  // 57: bugnet.router.v1.GetSecretSealingKeyResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
+	67,  // 58: bugnet.router.v1.PutSecretRequest.spec:type_name -> bugnet.router.v1.SecretSpec
+	68,  // 59: bugnet.router.v1.PutSecretRequest.value:type_name -> bugnet.router.v1.SealedValue
+	70,  // 60: bugnet.router.v1.PutSecretResponse.secret:type_name -> bugnet.router.v1.SecretInfo
+	70,  // 61: bugnet.router.v1.ListSecretsResponse.secrets:type_name -> bugnet.router.v1.SecretInfo
+	14,  // 62: bugnet.router.v1.Bootstrap.state:type_name -> bugnet.router.v1.BootstrapState
+	83,  // 63: bugnet.router.v1.FetchSourceResponse.bootstrap:type_name -> bugnet.router.v1.Bootstrap
+	86,  // 64: bugnet.router.v1.X402ServiceInfo.spec:type_name -> bugnet.router.v1.X402ServiceSpec
+	15,  // 65: bugnet.router.v1.X402ServiceInfo.state:type_name -> bugnet.router.v1.X402ServiceState
+	96,  // 66: bugnet.router.v1.X402Refusal.last_at:type_name -> google.protobuf.Timestamp
+	86,  // 67: bugnet.router.v1.CheckX402Request.add:type_name -> bugnet.router.v1.X402ServiceSpec
+	86,  // 68: bugnet.router.v1.EnableX402Request.add:type_name -> bugnet.router.v1.X402ServiceSpec
+	87,  // 69: bugnet.router.v1.EnableX402Response.services:type_name -> bugnet.router.v1.X402ServiceInfo
+	87,  // 70: bugnet.router.v1.ListX402Response.services:type_name -> bugnet.router.v1.X402ServiceInfo
+	88,  // 71: bugnet.router.v1.ListX402Response.refusals:type_name -> bugnet.router.v1.X402Refusal
+	19,  // 72: bugnet.router.v1.SandboxRouterService.Estimate:input_type -> bugnet.router.v1.EstimateRequest
+	25,  // 73: bugnet.router.v1.SandboxRouterService.PricePackage:input_type -> bugnet.router.v1.PricePackageRequest
+	28,  // 74: bugnet.router.v1.SandboxRouterService.CreatePlacement:input_type -> bugnet.router.v1.CreatePlacementRequest
+	30,  // 75: bugnet.router.v1.SandboxRouterService.GetPlacement:input_type -> bugnet.router.v1.GetPlacementRequest
+	32,  // 76: bugnet.router.v1.SandboxRouterService.WatchPlacement:input_type -> bugnet.router.v1.WatchPlacementRequest
+	34,  // 77: bugnet.router.v1.SandboxRouterService.ExtendPlacement:input_type -> bugnet.router.v1.ExtendPlacementRequest
+	36,  // 78: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:input_type -> bugnet.router.v1.CheckExtendPlacementRequest
+	38,  // 79: bugnet.router.v1.SandboxRouterService.ListExtensions:input_type -> bugnet.router.v1.ListExtensionsRequest
+	40,  // 80: bugnet.router.v1.SandboxRouterService.StopPlacement:input_type -> bugnet.router.v1.StopPlacementRequest
+	43,  // 81: bugnet.router.v1.SandboxRouterService.Exec:input_type -> bugnet.router.v1.ExecRequest
+	48,  // 82: bugnet.router.v1.SandboxRouterService.WatchJob:input_type -> bugnet.router.v1.WatchJobRequest
+	50,  // 83: bugnet.router.v1.SandboxRouterService.CancelJob:input_type -> bugnet.router.v1.CancelJobRequest
+	52,  // 84: bugnet.router.v1.SandboxRouterService.ReadFile:input_type -> bugnet.router.v1.ReadFileRequest
+	54,  // 85: bugnet.router.v1.SandboxRouterService.WriteFile:input_type -> bugnet.router.v1.WriteFileRequest
+	57,  // 86: bugnet.router.v1.SandboxRouterService.ListFiles:input_type -> bugnet.router.v1.ListFilesRequest
+	59,  // 87: bugnet.router.v1.SandboxRouterService.CreatePreview:input_type -> bugnet.router.v1.CreatePreviewRequest
+	61,  // 88: bugnet.router.v1.SandboxRouterService.CreateTransfer:input_type -> bugnet.router.v1.CreateTransferRequest
+	63,  // 89: bugnet.router.v1.SandboxRouterService.AddSshKey:input_type -> bugnet.router.v1.AddSshKeyRequest
+	65,  // 90: bugnet.router.v1.SandboxRouterService.RemoveSshKey:input_type -> bugnet.router.v1.RemoveSshKeyRequest
+	71,  // 91: bugnet.router.v1.SandboxRouterService.CreateSecretLink:input_type -> bugnet.router.v1.CreateSecretLinkRequest
+	73,  // 92: bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant:input_type -> bugnet.router.v1.CreateSecretPutGrantRequest
+	75,  // 93: bugnet.router.v1.SandboxRouterService.GetSecretSealingKey:input_type -> bugnet.router.v1.GetSecretSealingKeyRequest
+	77,  // 94: bugnet.router.v1.SandboxRouterService.PutSecret:input_type -> bugnet.router.v1.PutSecretRequest
+	79,  // 95: bugnet.router.v1.SandboxRouterService.ListSecrets:input_type -> bugnet.router.v1.ListSecretsRequest
+	81,  // 96: bugnet.router.v1.SandboxRouterService.DeleteSecret:input_type -> bugnet.router.v1.DeleteSecretRequest
+	84,  // 97: bugnet.router.v1.SandboxRouterService.FetchSource:input_type -> bugnet.router.v1.FetchSourceRequest
+	89,  // 98: bugnet.router.v1.SandboxRouterService.CheckX402:input_type -> bugnet.router.v1.CheckX402Request
+	91,  // 99: bugnet.router.v1.SandboxRouterService.EnableX402:input_type -> bugnet.router.v1.EnableX402Request
+	93,  // 100: bugnet.router.v1.SandboxRouterService.ListX402:input_type -> bugnet.router.v1.ListX402Request
+	24,  // 101: bugnet.router.v1.SandboxRouterService.Estimate:output_type -> bugnet.router.v1.EstimateResponse
+	26,  // 102: bugnet.router.v1.SandboxRouterService.PricePackage:output_type -> bugnet.router.v1.PricePackageResponse
+	29,  // 103: bugnet.router.v1.SandboxRouterService.CreatePlacement:output_type -> bugnet.router.v1.CreatePlacementResponse
+	31,  // 104: bugnet.router.v1.SandboxRouterService.GetPlacement:output_type -> bugnet.router.v1.GetPlacementResponse
+	33,  // 105: bugnet.router.v1.SandboxRouterService.WatchPlacement:output_type -> bugnet.router.v1.WatchPlacementResponse
+	35,  // 106: bugnet.router.v1.SandboxRouterService.ExtendPlacement:output_type -> bugnet.router.v1.ExtendPlacementResponse
+	37,  // 107: bugnet.router.v1.SandboxRouterService.CheckExtendPlacement:output_type -> bugnet.router.v1.CheckExtendPlacementResponse
+	39,  // 108: bugnet.router.v1.SandboxRouterService.ListExtensions:output_type -> bugnet.router.v1.ListExtensionsResponse
+	41,  // 109: bugnet.router.v1.SandboxRouterService.StopPlacement:output_type -> bugnet.router.v1.StopPlacementResponse
+	44,  // 110: bugnet.router.v1.SandboxRouterService.Exec:output_type -> bugnet.router.v1.ExecResponse
+	49,  // 111: bugnet.router.v1.SandboxRouterService.WatchJob:output_type -> bugnet.router.v1.WatchJobResponse
+	51,  // 112: bugnet.router.v1.SandboxRouterService.CancelJob:output_type -> bugnet.router.v1.CancelJobResponse
+	53,  // 113: bugnet.router.v1.SandboxRouterService.ReadFile:output_type -> bugnet.router.v1.ReadFileResponse
+	55,  // 114: bugnet.router.v1.SandboxRouterService.WriteFile:output_type -> bugnet.router.v1.WriteFileResponse
+	58,  // 115: bugnet.router.v1.SandboxRouterService.ListFiles:output_type -> bugnet.router.v1.ListFilesResponse
+	60,  // 116: bugnet.router.v1.SandboxRouterService.CreatePreview:output_type -> bugnet.router.v1.CreatePreviewResponse
+	62,  // 117: bugnet.router.v1.SandboxRouterService.CreateTransfer:output_type -> bugnet.router.v1.CreateTransferResponse
+	64,  // 118: bugnet.router.v1.SandboxRouterService.AddSshKey:output_type -> bugnet.router.v1.AddSshKeyResponse
+	66,  // 119: bugnet.router.v1.SandboxRouterService.RemoveSshKey:output_type -> bugnet.router.v1.RemoveSshKeyResponse
+	72,  // 120: bugnet.router.v1.SandboxRouterService.CreateSecretLink:output_type -> bugnet.router.v1.CreateSecretLinkResponse
+	74,  // 121: bugnet.router.v1.SandboxRouterService.CreateSecretPutGrant:output_type -> bugnet.router.v1.CreateSecretPutGrantResponse
+	76,  // 122: bugnet.router.v1.SandboxRouterService.GetSecretSealingKey:output_type -> bugnet.router.v1.GetSecretSealingKeyResponse
+	78,  // 123: bugnet.router.v1.SandboxRouterService.PutSecret:output_type -> bugnet.router.v1.PutSecretResponse
+	80,  // 124: bugnet.router.v1.SandboxRouterService.ListSecrets:output_type -> bugnet.router.v1.ListSecretsResponse
+	82,  // 125: bugnet.router.v1.SandboxRouterService.DeleteSecret:output_type -> bugnet.router.v1.DeleteSecretResponse
+	85,  // 126: bugnet.router.v1.SandboxRouterService.FetchSource:output_type -> bugnet.router.v1.FetchSourceResponse
+	90,  // 127: bugnet.router.v1.SandboxRouterService.CheckX402:output_type -> bugnet.router.v1.CheckX402Response
+	92,  // 128: bugnet.router.v1.SandboxRouterService.EnableX402:output_type -> bugnet.router.v1.EnableX402Response
+	94,  // 129: bugnet.router.v1.SandboxRouterService.ListX402:output_type -> bugnet.router.v1.ListX402Response
+	101, // [101:130] is the sub-list for method output_type
+	72,  // [72:101] is the sub-list for method input_type
+	72,  // [72:72] is the sub-list for extension type_name
+	72,  // [72:72] is the sub-list for extension extendee
+	0,   // [0:72] is the sub-list for field type_name
 }
 
 func init() { file_bugnet_router_v1_router_proto_init() }
@@ -6100,8 +6810,8 @@ func file_bugnet_router_v1_router_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bugnet_router_v1_router_proto_rawDesc), len(file_bugnet_router_v1_router_proto_rawDesc)),
-			NumEnums:      15,
-			NumMessages:   71,
+			NumEnums:      16,
+			NumMessages:   80,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

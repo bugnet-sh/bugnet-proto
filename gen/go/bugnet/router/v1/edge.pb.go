@@ -2450,9 +2450,11 @@ func (x *ReportSshUsageResponse) GetBytesPerSecond() map[string]uint64 {
 }
 
 type ReportEgressUsageRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ReporterId    string                 `protobuf:"bytes,1,opt,name=reporter_id,json=reporterId,proto3" json:"reporter_id,omitempty"`
-	Usage         []*PlacementUsage      `protobuf:"bytes,2,rep,name=usage,proto3" json:"usage,omitempty"`
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	ReporterId string                 `protobuf:"bytes,1,opt,name=reporter_id,json=reporterId,proto3" json:"reporter_id,omitempty"`
+	Usage      []*PlacementUsage      `protobuf:"bytes,2,rep,name=usage,proto3" json:"usage,omitempty"`
+	// Unpaid x402 use since the last report by placement id, then by host
+	X402Unpaid    map[string]*X402UnpaidByHost `protobuf:"bytes,3,rep,name=x402_unpaid,json=x402Unpaid,proto3" json:"x402_unpaid,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2497,6 +2499,13 @@ func (x *ReportEgressUsageRequest) GetReporterId() string {
 func (x *ReportEgressUsageRequest) GetUsage() []*PlacementUsage {
 	if x != nil {
 		return x.Usage
+	}
+	return nil
+}
+
+func (x *ReportEgressUsageRequest) GetX402Unpaid() map[string]*X402UnpaidByHost {
+	if x != nil {
+		return x.X402Unpaid
 	}
 	return nil
 }
@@ -4157,8 +4166,10 @@ type ResolveTunnelResponse struct {
 	// Each way, per placement
 	BytesPerSecond   uint64 `protobuf:"varint,8,opt,name=bytes_per_second,json=bytesPerSecond,proto3" json:"bytes_per_second,omitempty"`
 	RequestsInFlight uint32 `protobuf:"varint,9,opt,name=requests_in_flight,json=requestsInFlight,proto3" json:"requests_in_flight,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// The placement's x402 services, caps and unpaid use
+	X402          *X402Config `protobuf:"bytes,11,opt,name=x402,proto3" json:"x402,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ResolveTunnelResponse) Reset() {
@@ -4252,6 +4263,619 @@ func (x *ResolveTunnelResponse) GetRequestsInFlight() uint32 {
 		return x.RequestsInFlight
 	}
 	return 0
+}
+
+func (x *ResolveTunnelResponse) GetX402() *X402Config {
+	if x != nil {
+		return x.X402
+	}
+	return nil
+}
+
+type X402Service struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ServiceId      string                 `protobuf:"bytes,1,opt,name=service_id,json=serviceId,proto3" json:"service_id,omitempty"`
+	Host           string                 `protobuf:"bytes,2,opt,name=host,proto3" json:"host,omitempty"`
+	Prefix         string                 `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Method         string                 `protobuf:"bytes,4,opt,name=method,proto3" json:"method,omitempty"`
+	MaxPriceMicros int64                  `protobuf:"varint,5,opt,name=max_price_micros,json=maxPriceMicros,proto3" json:"max_price_micros,omitempty"`
+	PayTo          string                 `protobuf:"bytes,6,opt,name=pay_to,json=payTo,proto3" json:"pay_to,omitempty"`
+	// The one paid path, empty when every path under the prefix is paid
+	PaidPath      string `protobuf:"bytes,7,opt,name=paid_path,json=paidPath,proto3" json:"paid_path,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *X402Service) Reset() {
+	*x = X402Service{}
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[68]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *X402Service) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*X402Service) ProtoMessage() {}
+
+func (x *X402Service) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[68]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use X402Service.ProtoReflect.Descriptor instead.
+func (*X402Service) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{68}
+}
+
+func (x *X402Service) GetServiceId() string {
+	if x != nil {
+		return x.ServiceId
+	}
+	return ""
+}
+
+func (x *X402Service) GetHost() string {
+	if x != nil {
+		return x.Host
+	}
+	return ""
+}
+
+func (x *X402Service) GetPrefix() string {
+	if x != nil {
+		return x.Prefix
+	}
+	return ""
+}
+
+func (x *X402Service) GetMethod() string {
+	if x != nil {
+		return x.Method
+	}
+	return ""
+}
+
+func (x *X402Service) GetMaxPriceMicros() int64 {
+	if x != nil {
+		return x.MaxPriceMicros
+	}
+	return 0
+}
+
+func (x *X402Service) GetPayTo() string {
+	if x != nil {
+		return x.PayTo
+	}
+	return ""
+}
+
+func (x *X402Service) GetPaidPath() string {
+	if x != nil {
+		return x.PaidPath
+	}
+	return ""
+}
+
+type X402Unpaid struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Requests      uint32                 `protobuf:"varint,1,opt,name=requests,proto3" json:"requests,omitempty"`
+	Bytes         uint64                 `protobuf:"varint,2,opt,name=bytes,proto3" json:"bytes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *X402Unpaid) Reset() {
+	*x = X402Unpaid{}
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[69]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *X402Unpaid) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*X402Unpaid) ProtoMessage() {}
+
+func (x *X402Unpaid) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[69]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use X402Unpaid.ProtoReflect.Descriptor instead.
+func (*X402Unpaid) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{69}
+}
+
+func (x *X402Unpaid) GetRequests() uint32 {
+	if x != nil {
+		return x.Requests
+	}
+	return 0
+}
+
+func (x *X402Unpaid) GetBytes() uint64 {
+	if x != nil {
+		return x.Bytes
+	}
+	return 0
+}
+
+type X402Config struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// False when the router's kill switch is off, so egress forwards and never pays
+	Enabled bool `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	// The placement's start order id, which names its allowance account in Payments
+	AccountId string `protobuf:"bytes,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	// Every applying, active or failed service, less blocked hosts
+	Services              []*X402Service `protobuf:"bytes,3,rep,name=services,proto3" json:"services,omitempty"`
+	UnpaidRequestsPerHost uint32         `protobuf:"varint,4,opt,name=unpaid_requests_per_host,json=unpaidRequestsPerHost,proto3" json:"unpaid_requests_per_host,omitempty"`
+	UnpaidBytesPerHost    uint64         `protobuf:"varint,5,opt,name=unpaid_bytes_per_host,json=unpaidBytesPerHost,proto3" json:"unpaid_bytes_per_host,omitempty"`
+	// Unpaid use reported so far by host, totals across egress processes
+	UnpaidUsed    map[string]*X402Unpaid `protobuf:"bytes,6,rep,name=unpaid_used,json=unpaidUsed,proto3" json:"unpaid_used,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *X402Config) Reset() {
+	*x = X402Config{}
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[70]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *X402Config) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*X402Config) ProtoMessage() {}
+
+func (x *X402Config) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[70]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use X402Config.ProtoReflect.Descriptor instead.
+func (*X402Config) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{70}
+}
+
+func (x *X402Config) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *X402Config) GetAccountId() string {
+	if x != nil {
+		return x.AccountId
+	}
+	return ""
+}
+
+func (x *X402Config) GetServices() []*X402Service {
+	if x != nil {
+		return x.Services
+	}
+	return nil
+}
+
+func (x *X402Config) GetUnpaidRequestsPerHost() uint32 {
+	if x != nil {
+		return x.UnpaidRequestsPerHost
+	}
+	return 0
+}
+
+func (x *X402Config) GetUnpaidBytesPerHost() uint64 {
+	if x != nil {
+		return x.UnpaidBytesPerHost
+	}
+	return 0
+}
+
+func (x *X402Config) GetUnpaidUsed() map[string]*X402Unpaid {
+	if x != nil {
+		return x.UnpaidUsed
+	}
+	return nil
+}
+
+type X402UnpaidByHost struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Hosts         map[string]*X402Unpaid `protobuf:"bytes,1,rep,name=hosts,proto3" json:"hosts,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *X402UnpaidByHost) Reset() {
+	*x = X402UnpaidByHost{}
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[71]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *X402UnpaidByHost) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*X402UnpaidByHost) ProtoMessage() {}
+
+func (x *X402UnpaidByHost) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[71]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use X402UnpaidByHost.ProtoReflect.Descriptor instead.
+func (*X402UnpaidByHost) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{71}
+}
+
+func (x *X402UnpaidByHost) GetHosts() map[string]*X402Unpaid {
+	if x != nil {
+		return x.Hosts
+	}
+	return nil
+}
+
+type X402Event struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	At    *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=at,proto3" json:"at,omitempty"`
+	// 16 random base32 characters made by egress, never shown
+	Ref string `protobuf:"bytes,2,opt,name=ref,proto3" json:"ref,omitempty"`
+	// At most 253 characters, a refused_host name cut to 63, empty only on the overflow row
+	Host string `protobuf:"bytes,3,opt,name=host,proto3" json:"host,omitempty"`
+	// One to ten capital letters or OTHER, empty on refused_host
+	Method string `protobuf:"bytes,4,opt,name=method,proto3" json:"method,omitempty"`
+	// Normalised without the query, cut to 80 characters on store, empty as x402 spec 8.1 lists
+	Path string `protobuf:"bytes,5,opt,name=path,proto3" json:"path,omitempty"`
+	// A status of x402 spec 8.2
+	Status string `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	// A code of x402 spec 6.13, empty for the statuses x402 spec 8.1 names
+	Reason string `protobuf:"bytes,7,opt,name=reason,proto3" json:"reason,omitempty"`
+	// Set with fields 10 to 14 only when the 402 offered exact USDC on Solana
+	AskedMicros int64 `protobuf:"varint,8,opt,name=asked_micros,json=askedMicros,proto3" json:"asked_micros,omitempty"`
+	// Signed by Payments, 0 when nothing was signed
+	AmountMicros int64  `protobuf:"varint,9,opt,name=amount_micros,json=amountMicros,proto3" json:"amount_micros,omitempty"`
+	Asset        string `protobuf:"bytes,10,opt,name=asset,proto3" json:"asset,omitempty"`
+	Network      string `protobuf:"bytes,11,opt,name=network,proto3" json:"network,omitempty"`
+	Scheme       string `protobuf:"bytes,12,opt,name=scheme,proto3" json:"scheme,omitempty"`
+	X402Version  uint32 `protobuf:"varint,13,opt,name=x402_version,json=x402Version,proto3" json:"x402_version,omitempty"`
+	// Set only when it also decodes to 32 bytes
+	PayTo               string `protobuf:"bytes,14,opt,name=pay_to,json=payTo,proto3" json:"pay_to,omitempty"`
+	HttpStatus          uint32 `protobuf:"varint,15,opt,name=http_status,json=httpStatus,proto3" json:"http_status,omitempty"`
+	DurationMs          uint32 `protobuf:"varint,16,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`
+	BytesOut            uint64 `protobuf:"varint,17,opt,name=bytes_out,json=bytesOut,proto3" json:"bytes_out,omitempty"`
+	BytesIn             uint64 `protobuf:"varint,18,opt,name=bytes_in,json=bytesIn,proto3" json:"bytes_in,omitempty"`
+	StreamCut           bool   `protobuf:"varint,19,opt,name=stream_cut,json=streamCut,proto3" json:"stream_cut,omitempty"`
+	AllowanceLeftMicros int64  `protobuf:"varint,20,opt,name=allowance_left_micros,json=allowanceLeftMicros,proto3" json:"allowance_left_micros,omitempty"`
+	// 1, or the calls in a folded row
+	Count uint32 `protobuf:"varint,21,opt,name=count,proto3" json:"count,omitempty"`
+	// The matched service, empty when none matched, for counters only and never served
+	ServiceId string `protobuf:"bytes,22,opt,name=service_id,json=serviceId,proto3" json:"service_id,omitempty"`
+	// Signed.payment_ref when a payload was attached, else empty
+	PaymentRef    string `protobuf:"bytes,23,opt,name=payment_ref,json=paymentRef,proto3" json:"payment_ref,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *X402Event) Reset() {
+	*x = X402Event{}
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[72]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *X402Event) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*X402Event) ProtoMessage() {}
+
+func (x *X402Event) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[72]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use X402Event.ProtoReflect.Descriptor instead.
+func (*X402Event) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{72}
+}
+
+func (x *X402Event) GetAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.At
+	}
+	return nil
+}
+
+func (x *X402Event) GetRef() string {
+	if x != nil {
+		return x.Ref
+	}
+	return ""
+}
+
+func (x *X402Event) GetHost() string {
+	if x != nil {
+		return x.Host
+	}
+	return ""
+}
+
+func (x *X402Event) GetMethod() string {
+	if x != nil {
+		return x.Method
+	}
+	return ""
+}
+
+func (x *X402Event) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *X402Event) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *X402Event) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *X402Event) GetAskedMicros() int64 {
+	if x != nil {
+		return x.AskedMicros
+	}
+	return 0
+}
+
+func (x *X402Event) GetAmountMicros() int64 {
+	if x != nil {
+		return x.AmountMicros
+	}
+	return 0
+}
+
+func (x *X402Event) GetAsset() string {
+	if x != nil {
+		return x.Asset
+	}
+	return ""
+}
+
+func (x *X402Event) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *X402Event) GetScheme() string {
+	if x != nil {
+		return x.Scheme
+	}
+	return ""
+}
+
+func (x *X402Event) GetX402Version() uint32 {
+	if x != nil {
+		return x.X402Version
+	}
+	return 0
+}
+
+func (x *X402Event) GetPayTo() string {
+	if x != nil {
+		return x.PayTo
+	}
+	return ""
+}
+
+func (x *X402Event) GetHttpStatus() uint32 {
+	if x != nil {
+		return x.HttpStatus
+	}
+	return 0
+}
+
+func (x *X402Event) GetDurationMs() uint32 {
+	if x != nil {
+		return x.DurationMs
+	}
+	return 0
+}
+
+func (x *X402Event) GetBytesOut() uint64 {
+	if x != nil {
+		return x.BytesOut
+	}
+	return 0
+}
+
+func (x *X402Event) GetBytesIn() uint64 {
+	if x != nil {
+		return x.BytesIn
+	}
+	return 0
+}
+
+func (x *X402Event) GetStreamCut() bool {
+	if x != nil {
+		return x.StreamCut
+	}
+	return false
+}
+
+func (x *X402Event) GetAllowanceLeftMicros() int64 {
+	if x != nil {
+		return x.AllowanceLeftMicros
+	}
+	return 0
+}
+
+func (x *X402Event) GetCount() uint32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+func (x *X402Event) GetServiceId() string {
+	if x != nil {
+		return x.ServiceId
+	}
+	return ""
+}
+
+func (x *X402Event) GetPaymentRef() string {
+	if x != nil {
+		return x.PaymentRef
+	}
+	return ""
+}
+
+type AppendX402EventsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlacementId   string                 `protobuf:"bytes,1,opt,name=placement_id,json=placementId,proto3" json:"placement_id,omitempty"`
+	Events        []*X402Event           `protobuf:"bytes,2,rep,name=events,proto3" json:"events,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppendX402EventsRequest) Reset() {
+	*x = AppendX402EventsRequest{}
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[73]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppendX402EventsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppendX402EventsRequest) ProtoMessage() {}
+
+func (x *AppendX402EventsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[73]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppendX402EventsRequest.ProtoReflect.Descriptor instead.
+func (*AppendX402EventsRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{73}
+}
+
+func (x *AppendX402EventsRequest) GetPlacementId() string {
+	if x != nil {
+		return x.PlacementId
+	}
+	return ""
+}
+
+func (x *AppendX402EventsRequest) GetEvents() []*X402Event {
+	if x != nil {
+		return x.Events
+	}
+	return nil
+}
+
+type AppendX402EventsResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Indexes of the events dropped for a bad shape
+	Rejected      []uint32 `protobuf:"varint,1,rep,packed,name=rejected,proto3" json:"rejected,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppendX402EventsResponse) Reset() {
+	*x = AppendX402EventsResponse{}
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[74]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppendX402EventsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppendX402EventsResponse) ProtoMessage() {}
+
+func (x *AppendX402EventsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[74]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppendX402EventsResponse.ProtoReflect.Descriptor instead.
+func (*AppendX402EventsResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{74}
+}
+
+func (x *AppendX402EventsResponse) GetRejected() []uint32 {
+	if x != nil {
+		return x.Rejected
+	}
+	return nil
 }
 
 var File_bugnet_router_v1_edge_proto protoreflect.FileDescriptor
@@ -4440,11 +5064,16 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\x04R\x05value:\x028\x01\x1aA\n" +
 	"\x13BytesPerSecondEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x04R\x05value:\x028\x01\"s\n" +
+	"\x05value\x18\x02 \x01(\x04R\x05value:\x028\x01\"\xb3\x02\n" +
 	"\x18ReportEgressUsageRequest\x12\x1f\n" +
 	"\vreporter_id\x18\x01 \x01(\tR\n" +
 	"reporterId\x126\n" +
-	"\x05usage\x18\x02 \x03(\v2 .bugnet.router.v1.PlacementUsageR\x05usage\"\xc8\x01\n" +
+	"\x05usage\x18\x02 \x03(\v2 .bugnet.router.v1.PlacementUsageR\x05usage\x12[\n" +
+	"\vx402_unpaid\x18\x03 \x03(\v2:.bugnet.router.v1.ReportEgressUsageRequest.X402UnpaidEntryR\n" +
+	"x402Unpaid\x1aa\n" +
+	"\x0fX402UnpaidEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x128\n" +
+	"\x05value\x18\x02 \x01(\v2\".bugnet.router.v1.X402UnpaidByHostR\x05value:\x028\x01\"\xc8\x01\n" +
 	"\x19ReportEgressUsageResponse\x12h\n" +
 	"\x0fbytes_remaining\x18\x01 \x03(\v2?.bugnet.router.v1.ReportEgressUsageResponse.BytesRemainingEntryR\x0ebytesRemaining\x1aA\n" +
 	"\x13BytesRemainingEntry\x12\x10\n" +
@@ -4553,7 +5182,7 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x12placeholder_sha256\x18\x01 \x01(\fR\x11placeholderSha256\x120\n" +
 	"\x04spec\x18\x02 \x01(\v2\x1c.bugnet.router.v1.SecretSpecR\x04spec\x123\n" +
 	"\x05value\x18\x03 \x01(\v2\x1d.bugnet.router.v1.SealedValueR\x05value\x12!\n" +
-	"\fcustom_hosts\x18\x04 \x03(\tR\vcustomHosts\"\x96\x03\n" +
+	"\fcustom_hosts\x18\x04 \x03(\tR\vcustomHosts\"\xc8\x03\n" +
 	"\x15ResolveTunnelResponse\x12!\n" +
 	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\x126\n" +
 	"\bdeadline\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bdeadline\x12\x1d\n" +
@@ -4565,7 +5194,75 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"maxTunnels\x12'\n" +
 	"\x0fsecrets_version\x18\a \x01(\x04R\x0esecretsVersion\x12(\n" +
 	"\x10bytes_per_second\x18\b \x01(\x04R\x0ebytesPerSecond\x12,\n" +
-	"\x12requests_in_flight\x18\t \x01(\rR\x10requestsInFlight*\x84\x02\n" +
+	"\x12requests_in_flight\x18\t \x01(\rR\x10requestsInFlight\x120\n" +
+	"\x04x402\x18\v \x01(\v2\x1c.bugnet.router.v1.X402ConfigR\x04x402\"\xce\x01\n" +
+	"\vX402Service\x12\x1d\n" +
+	"\n" +
+	"service_id\x18\x01 \x01(\tR\tserviceId\x12\x12\n" +
+	"\x04host\x18\x02 \x01(\tR\x04host\x12\x16\n" +
+	"\x06prefix\x18\x03 \x01(\tR\x06prefix\x12\x16\n" +
+	"\x06method\x18\x04 \x01(\tR\x06method\x12(\n" +
+	"\x10max_price_micros\x18\x05 \x01(\x03R\x0emaxPriceMicros\x12\x15\n" +
+	"\x06pay_to\x18\x06 \x01(\tR\x05payTo\x12\x1b\n" +
+	"\tpaid_path\x18\a \x01(\tR\bpaidPath\">\n" +
+	"\n" +
+	"X402Unpaid\x12\x1a\n" +
+	"\brequests\x18\x01 \x01(\rR\brequests\x12\x14\n" +
+	"\x05bytes\x18\x02 \x01(\x04R\x05bytes\"\x98\x03\n" +
+	"\n" +
+	"X402Config\x12\x18\n" +
+	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x1d\n" +
+	"\n" +
+	"account_id\x18\x02 \x01(\tR\taccountId\x129\n" +
+	"\bservices\x18\x03 \x03(\v2\x1d.bugnet.router.v1.X402ServiceR\bservices\x127\n" +
+	"\x18unpaid_requests_per_host\x18\x04 \x01(\rR\x15unpaidRequestsPerHost\x121\n" +
+	"\x15unpaid_bytes_per_host\x18\x05 \x01(\x04R\x12unpaidBytesPerHost\x12M\n" +
+	"\vunpaid_used\x18\x06 \x03(\v2,.bugnet.router.v1.X402Config.UnpaidUsedEntryR\n" +
+	"unpaidUsed\x1a[\n" +
+	"\x0fUnpaidUsedEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x122\n" +
+	"\x05value\x18\x02 \x01(\v2\x1c.bugnet.router.v1.X402UnpaidR\x05value:\x028\x01\"\xaf\x01\n" +
+	"\x10X402UnpaidByHost\x12C\n" +
+	"\x05hosts\x18\x01 \x03(\v2-.bugnet.router.v1.X402UnpaidByHost.HostsEntryR\x05hosts\x1aV\n" +
+	"\n" +
+	"HostsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x122\n" +
+	"\x05value\x18\x02 \x01(\v2\x1c.bugnet.router.v1.X402UnpaidR\x05value:\x028\x01\"\xa6\x05\n" +
+	"\tX402Event\x12*\n" +
+	"\x02at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x02at\x12\x10\n" +
+	"\x03ref\x18\x02 \x01(\tR\x03ref\x12\x12\n" +
+	"\x04host\x18\x03 \x01(\tR\x04host\x12\x16\n" +
+	"\x06method\x18\x04 \x01(\tR\x06method\x12\x12\n" +
+	"\x04path\x18\x05 \x01(\tR\x04path\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\x12\x16\n" +
+	"\x06reason\x18\a \x01(\tR\x06reason\x12!\n" +
+	"\fasked_micros\x18\b \x01(\x03R\vaskedMicros\x12#\n" +
+	"\ramount_micros\x18\t \x01(\x03R\famountMicros\x12\x14\n" +
+	"\x05asset\x18\n" +
+	" \x01(\tR\x05asset\x12\x18\n" +
+	"\anetwork\x18\v \x01(\tR\anetwork\x12\x16\n" +
+	"\x06scheme\x18\f \x01(\tR\x06scheme\x12!\n" +
+	"\fx402_version\x18\r \x01(\rR\vx402Version\x12\x15\n" +
+	"\x06pay_to\x18\x0e \x01(\tR\x05payTo\x12\x1f\n" +
+	"\vhttp_status\x18\x0f \x01(\rR\n" +
+	"httpStatus\x12\x1f\n" +
+	"\vduration_ms\x18\x10 \x01(\rR\n" +
+	"durationMs\x12\x1b\n" +
+	"\tbytes_out\x18\x11 \x01(\x04R\bbytesOut\x12\x19\n" +
+	"\bbytes_in\x18\x12 \x01(\x04R\abytesIn\x12\x1d\n" +
+	"\n" +
+	"stream_cut\x18\x13 \x01(\bR\tstreamCut\x122\n" +
+	"\x15allowance_left_micros\x18\x14 \x01(\x03R\x13allowanceLeftMicros\x12\x14\n" +
+	"\x05count\x18\x15 \x01(\rR\x05count\x12\x1d\n" +
+	"\n" +
+	"service_id\x18\x16 \x01(\tR\tserviceId\x12\x1f\n" +
+	"\vpayment_ref\x18\x17 \x01(\tR\n" +
+	"paymentRef\"q\n" +
+	"\x17AppendX402EventsRequest\x12!\n" +
+	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\x123\n" +
+	"\x06events\x18\x02 \x03(\v2\x1b.bugnet.router.v1.X402EventR\x06events\"6\n" +
+	"\x18AppendX402EventsResponse\x12\x1a\n" +
+	"\brejected\x18\x01 \x03(\rR\brejected*\x84\x02\n" +
 	"\tEndReason\x12\x1a\n" +
 	"\x16END_REASON_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12END_REASON_STOPPED\x10\x01\x12\x16\n" +
@@ -4604,12 +5301,13 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x0fOpenSshUpstream\x12(.bugnet.router.v1.OpenSshUpstreamRequest\x1a).bugnet.router.v1.OpenSshUpstreamResponse\x12c\n" +
 	"\x0eCheckSshGrants\x12'.bugnet.router.v1.CheckSshGrantsRequest\x1a(.bugnet.router.v1.CheckSshGrantsResponse\x12c\n" +
 	"\x0eReportSshUsage\x12'.bugnet.router.v1.ReportSshUsageRequest\x1a(.bugnet.router.v1.ReportSshUsageResponse\x12e\n" +
-	"\x0eWatchSshEvents\x12'.bugnet.router.v1.WatchSshEventsRequest\x1a(.bugnet.router.v1.WatchSshEventsResponse0\x012\xbd\x03\n" +
+	"\x0eWatchSshEvents\x12'.bugnet.router.v1.WatchSshEventsRequest\x1a(.bugnet.router.v1.WatchSshEventsResponse0\x012\xa8\x04\n" +
 	"\rEgressService\x12`\n" +
 	"\rResolveTunnel\x12&.bugnet.router.v1.ResolveTunnelRequest\x1a'.bugnet.router.v1.ResolveTunnelResponse\x12l\n" +
 	"\x11ReportEgressUsage\x12*.bugnet.router.v1.ReportEgressUsageRequest\x1a+.bugnet.router.v1.ReportEgressUsageResponse\x12l\n" +
 	"\x11CheckEgressLeases\x12*.bugnet.router.v1.CheckEgressLeasesRequest\x1a+.bugnet.router.v1.CheckEgressLeasesResponse\x12n\n" +
-	"\x11WatchEgressEvents\x12*.bugnet.router.v1.WatchEgressEventsRequest\x1a+.bugnet.router.v1.WatchEgressEventsResponse0\x01BBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"\x11WatchEgressEvents\x12*.bugnet.router.v1.WatchEgressEventsRequest\x1a+.bugnet.router.v1.WatchEgressEventsResponse0\x01\x12i\n" +
+	"\x10AppendX402Events\x12).bugnet.router.v1.AppendX402EventsRequest\x1a*.bugnet.router.v1.AppendX402EventsResponseBBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_edge_proto_rawDescOnce sync.Once
@@ -4624,7 +5322,7 @@ func file_bugnet_router_v1_edge_proto_rawDescGZIP() []byte {
 }
 
 var file_bugnet_router_v1_edge_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_bugnet_router_v1_edge_proto_msgTypes = make([]protoimpl.MessageInfo, 76)
+var file_bugnet_router_v1_edge_proto_msgTypes = make([]protoimpl.MessageInfo, 86)
 var file_bugnet_router_v1_edge_proto_goTypes = []any{
 	(EndReason)(0),                       // 0: bugnet.router.v1.EndReason
 	(BudgetKind)(0),                      // 1: bugnet.router.v1.BudgetKind
@@ -4696,143 +5394,165 @@ var file_bugnet_router_v1_edge_proto_goTypes = []any{
 	(*ResolveTunnelRequest)(nil),         // 67: bugnet.router.v1.ResolveTunnelRequest
 	(*EgressSecret)(nil),                 // 68: bugnet.router.v1.EgressSecret
 	(*ResolveTunnelResponse)(nil),        // 69: bugnet.router.v1.ResolveTunnelResponse
-	nil,                                  // 70: bugnet.router.v1.ReportEdgeUsageResponse.BytesRemainingEntry
-	nil,                                  // 71: bugnet.router.v1.ReportEdgeUsageResponse.BytesPerSecondEntry
-	nil,                                  // 72: bugnet.router.v1.ReportSshUsageResponse.BytesRemainingEntry
-	nil,                                  // 73: bugnet.router.v1.ReportSshUsageResponse.BytesPerSecondEntry
-	nil,                                  // 74: bugnet.router.v1.ReportEgressUsageResponse.BytesRemainingEntry
-	nil,                                  // 75: bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry
-	nil,                                  // 76: bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry
-	nil,                                  // 77: bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry
-	(*timestamppb.Timestamp)(nil),        // 78: google.protobuf.Timestamp
-	(TransferDirection)(0),               // 79: bugnet.router.v1.TransferDirection
-	(*SecretSpec)(nil),                   // 80: bugnet.router.v1.SecretSpec
-	(*SealingKey)(nil),                   // 81: bugnet.router.v1.SealingKey
-	(*SealedValue)(nil),                  // 82: bugnet.router.v1.SealedValue
-	(*SecretInfo)(nil),                   // 83: bugnet.router.v1.SecretInfo
+	(*X402Service)(nil),                  // 70: bugnet.router.v1.X402Service
+	(*X402Unpaid)(nil),                   // 71: bugnet.router.v1.X402Unpaid
+	(*X402Config)(nil),                   // 72: bugnet.router.v1.X402Config
+	(*X402UnpaidByHost)(nil),             // 73: bugnet.router.v1.X402UnpaidByHost
+	(*X402Event)(nil),                    // 74: bugnet.router.v1.X402Event
+	(*AppendX402EventsRequest)(nil),      // 75: bugnet.router.v1.AppendX402EventsRequest
+	(*AppendX402EventsResponse)(nil),     // 76: bugnet.router.v1.AppendX402EventsResponse
+	nil,                                  // 77: bugnet.router.v1.ReportEdgeUsageResponse.BytesRemainingEntry
+	nil,                                  // 78: bugnet.router.v1.ReportEdgeUsageResponse.BytesPerSecondEntry
+	nil,                                  // 79: bugnet.router.v1.ReportSshUsageResponse.BytesRemainingEntry
+	nil,                                  // 80: bugnet.router.v1.ReportSshUsageResponse.BytesPerSecondEntry
+	nil,                                  // 81: bugnet.router.v1.ReportEgressUsageRequest.X402UnpaidEntry
+	nil,                                  // 82: bugnet.router.v1.ReportEgressUsageResponse.BytesRemainingEntry
+	nil,                                  // 83: bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry
+	nil,                                  // 84: bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry
+	nil,                                  // 85: bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry
+	nil,                                  // 86: bugnet.router.v1.X402Config.UnpaidUsedEntry
+	nil,                                  // 87: bugnet.router.v1.X402UnpaidByHost.HostsEntry
+	(*timestamppb.Timestamp)(nil),        // 88: google.protobuf.Timestamp
+	(TransferDirection)(0),               // 89: bugnet.router.v1.TransferDirection
+	(*SecretSpec)(nil),                   // 90: bugnet.router.v1.SecretSpec
+	(*SealingKey)(nil),                   // 91: bugnet.router.v1.SealingKey
+	(*SealedValue)(nil),                  // 92: bugnet.router.v1.SealedValue
+	(*SecretInfo)(nil),                   // 93: bugnet.router.v1.SecretInfo
 }
 var file_bugnet_router_v1_edge_proto_depIdxs = []int32{
-	2,  // 0: bugnet.router.v1.GateUpstream.headers:type_name -> bugnet.router.v1.HeaderValue
-	2,  // 1: bugnet.router.v1.GateUpstream.cookies:type_name -> bugnet.router.v1.HeaderValue
-	0,  // 2: bugnet.router.v1.PlacementEnded.reason:type_name -> bugnet.router.v1.EndReason
-	78, // 3: bugnet.router.v1.DeadlineMoved.deadline:type_name -> google.protobuf.Timestamp
-	1,  // 4: bugnet.router.v1.BudgetSpent.kind:type_name -> bugnet.router.v1.BudgetKind
-	6,  // 5: bugnet.router.v1.EdgeEvent.placement_ended:type_name -> bugnet.router.v1.PlacementEnded
-	7,  // 6: bugnet.router.v1.EdgeEvent.deadline_moved:type_name -> bugnet.router.v1.DeadlineMoved
-	8,  // 7: bugnet.router.v1.EdgeEvent.preview_revoked:type_name -> bugnet.router.v1.PreviewRevoked
-	9,  // 8: bugnet.router.v1.EdgeEvent.ssh_key_removed:type_name -> bugnet.router.v1.SshKeyRemoved
-	10, // 9: bugnet.router.v1.EdgeEvent.budget_spent:type_name -> bugnet.router.v1.BudgetSpent
-	11, // 10: bugnet.router.v1.EdgeEvent.secrets_changed:type_name -> bugnet.router.v1.SecretsChanged
-	12, // 11: bugnet.router.v1.EdgeEvent.resync:type_name -> bugnet.router.v1.Resync
-	3,  // 12: bugnet.router.v1.ResolvePreviewResponse.upstream:type_name -> bugnet.router.v1.GateUpstream
-	78, // 13: bugnet.router.v1.ResolvePreviewResponse.expires_at:type_name -> google.protobuf.Timestamp
-	4,  // 14: bugnet.router.v1.ResolvePreviewResponse.budget:type_name -> bugnet.router.v1.EdgeBudget
-	78, // 15: bugnet.router.v1.ResolvePreviewResponse.started_at:type_name -> google.protobuf.Timestamp
-	79, // 16: bugnet.router.v1.OpenTransferRequest.direction:type_name -> bugnet.router.v1.TransferDirection
-	78, // 17: bugnet.router.v1.OpenTransferResponse.modified_at:type_name -> google.protobuf.Timestamp
-	78, // 18: bugnet.router.v1.OpenTransferResponse.hard_stop:type_name -> google.protobuf.Timestamp
-	78, // 19: bugnet.router.v1.OpenTransferResponse.expires_at:type_name -> google.protobuf.Timestamp
-	4,  // 20: bugnet.router.v1.OpenTransferResponse.budget:type_name -> bugnet.router.v1.EdgeBudget
-	78, // 21: bugnet.router.v1.GetSecretLinkResponse.sandbox_created_at:type_name -> google.protobuf.Timestamp
-	78, // 22: bugnet.router.v1.GetSecretLinkResponse.expires_at:type_name -> google.protobuf.Timestamp
-	80, // 23: bugnet.router.v1.GetSecretLinkResponse.suggested:type_name -> bugnet.router.v1.SecretSpec
-	81, // 24: bugnet.router.v1.GetSecretLinkResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
-	80, // 25: bugnet.router.v1.SubmitSecretLinkRequest.spec:type_name -> bugnet.router.v1.SecretSpec
-	82, // 26: bugnet.router.v1.SubmitSecretLinkRequest.value:type_name -> bugnet.router.v1.SealedValue
-	83, // 27: bugnet.router.v1.SubmitSecretLinkResponse.secret:type_name -> bugnet.router.v1.SecretInfo
-	81, // 28: bugnet.router.v1.GetBridgeSealingKeyResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
-	80, // 29: bugnet.router.v1.PutBridgeSecretRequest.spec:type_name -> bugnet.router.v1.SecretSpec
-	82, // 30: bugnet.router.v1.PutBridgeSecretRequest.value:type_name -> bugnet.router.v1.SealedValue
-	83, // 31: bugnet.router.v1.PutBridgeSecretResponse.secret:type_name -> bugnet.router.v1.SecretInfo
-	2,  // 32: bugnet.router.v1.DeliverHookRequest.headers:type_name -> bugnet.router.v1.HeaderValue
-	5,  // 33: bugnet.router.v1.ReportEdgeUsageRequest.usage:type_name -> bugnet.router.v1.PlacementUsage
-	70, // 34: bugnet.router.v1.ReportEdgeUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportEdgeUsageResponse.BytesRemainingEntry
-	71, // 35: bugnet.router.v1.ReportEdgeUsageResponse.bytes_per_second:type_name -> bugnet.router.v1.ReportEdgeUsageResponse.BytesPerSecondEntry
-	5,  // 36: bugnet.router.v1.ReportSshUsageRequest.usage:type_name -> bugnet.router.v1.PlacementUsage
-	72, // 37: bugnet.router.v1.ReportSshUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportSshUsageResponse.BytesRemainingEntry
-	73, // 38: bugnet.router.v1.ReportSshUsageResponse.bytes_per_second:type_name -> bugnet.router.v1.ReportSshUsageResponse.BytesPerSecondEntry
-	5,  // 39: bugnet.router.v1.ReportEgressUsageRequest.usage:type_name -> bugnet.router.v1.PlacementUsage
-	74, // 40: bugnet.router.v1.ReportEgressUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportEgressUsageResponse.BytesRemainingEntry
-	40, // 41: bugnet.router.v1.CheckEdgeLeasesRequest.previews:type_name -> bugnet.router.v1.HeldPreview
-	78, // 42: bugnet.router.v1.EdgeLease.deadline:type_name -> google.protobuf.Timestamp
-	75, // 43: bugnet.router.v1.CheckEdgeLeasesResponse.leases:type_name -> bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry
-	78, // 44: bugnet.router.v1.EgressLease.deadline:type_name -> google.protobuf.Timestamp
-	76, // 45: bugnet.router.v1.CheckEgressLeasesResponse.leases:type_name -> bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry
-	13, // 46: bugnet.router.v1.WatchEdgeEventsResponse.event:type_name -> bugnet.router.v1.EdgeEvent
-	13, // 47: bugnet.router.v1.WatchSshEventsResponse.event:type_name -> bugnet.router.v1.EdgeEvent
-	13, // 48: bugnet.router.v1.WatchEgressEventsResponse.event:type_name -> bugnet.router.v1.EdgeEvent
-	78, // 49: bugnet.router.v1.AuthorizeSshKeyResponse.deadline:type_name -> google.protobuf.Timestamp
-	78, // 50: bugnet.router.v1.AcquireSshConnectionResponse.lease_expires_at:type_name -> google.protobuf.Timestamp
-	4,  // 51: bugnet.router.v1.AcquireSshConnectionResponse.budget:type_name -> bugnet.router.v1.EdgeBudget
-	78, // 52: bugnet.router.v1.RenewSshConnectionResponse.lease_expires_at:type_name -> google.protobuf.Timestamp
-	2,  // 53: bugnet.router.v1.WebSocketUpstream.headers:type_name -> bugnet.router.v1.HeaderValue
-	2,  // 54: bugnet.router.v1.WebSocketUpstream.cookies:type_name -> bugnet.router.v1.HeaderValue
-	62, // 55: bugnet.router.v1.OpenSshUpstreamResponse.websocket:type_name -> bugnet.router.v1.WebSocketUpstream
-	63, // 56: bugnet.router.v1.OpenSshUpstreamResponse.tcp:type_name -> bugnet.router.v1.TcpUpstream
-	78, // 57: bugnet.router.v1.OpenSshUpstreamResponse.deadline:type_name -> google.protobuf.Timestamp
-	77, // 58: bugnet.router.v1.CheckSshGrantsResponse.deadlines:type_name -> bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry
-	80, // 59: bugnet.router.v1.EgressSecret.spec:type_name -> bugnet.router.v1.SecretSpec
-	82, // 60: bugnet.router.v1.EgressSecret.value:type_name -> bugnet.router.v1.SealedValue
-	78, // 61: bugnet.router.v1.ResolveTunnelResponse.deadline:type_name -> google.protobuf.Timestamp
-	68, // 62: bugnet.router.v1.ResolveTunnelResponse.secrets:type_name -> bugnet.router.v1.EgressSecret
-	42, // 63: bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry.value:type_name -> bugnet.router.v1.EdgeLease
-	45, // 64: bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry.value:type_name -> bugnet.router.v1.EgressLease
-	78, // 65: bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry.value:type_name -> google.protobuf.Timestamp
-	14, // 66: bugnet.router.v1.EdgeService.ResolvePreview:input_type -> bugnet.router.v1.ResolvePreviewRequest
-	16, // 67: bugnet.router.v1.EdgeService.RepairPreview:input_type -> bugnet.router.v1.RepairPreviewRequest
-	18, // 68: bugnet.router.v1.EdgeService.OpenTransfer:input_type -> bugnet.router.v1.OpenTransferRequest
-	20, // 69: bugnet.router.v1.EdgeService.ReadTransfer:input_type -> bugnet.router.v1.ReadTransferRequest
-	22, // 70: bugnet.router.v1.EdgeService.WriteTransfer:input_type -> bugnet.router.v1.WriteTransferRequest
-	32, // 71: bugnet.router.v1.EdgeService.DeliverHook:input_type -> bugnet.router.v1.DeliverHookRequest
-	34, // 72: bugnet.router.v1.EdgeService.ReportEdgeUsage:input_type -> bugnet.router.v1.ReportEdgeUsageRequest
-	41, // 73: bugnet.router.v1.EdgeService.CheckEdgeLeases:input_type -> bugnet.router.v1.CheckEdgeLeasesRequest
-	47, // 74: bugnet.router.v1.EdgeService.WatchEdgeEvents:input_type -> bugnet.router.v1.WatchEdgeEventsRequest
-	24, // 75: bugnet.router.v1.SecretsRouteService.GetSecretLink:input_type -> bugnet.router.v1.GetSecretLinkRequest
-	26, // 76: bugnet.router.v1.SecretsRouteService.SubmitSecretLink:input_type -> bugnet.router.v1.SubmitSecretLinkRequest
-	28, // 77: bugnet.router.v1.SecretsRouteService.GetBridgeSealingKey:input_type -> bugnet.router.v1.GetBridgeSealingKeyRequest
-	30, // 78: bugnet.router.v1.SecretsRouteService.PutBridgeSecret:input_type -> bugnet.router.v1.PutBridgeSecretRequest
-	53, // 79: bugnet.router.v1.SshGatewayService.AuthorizeSshKey:input_type -> bugnet.router.v1.AuthorizeSshKeyRequest
-	55, // 80: bugnet.router.v1.SshGatewayService.AcquireSshConnection:input_type -> bugnet.router.v1.AcquireSshConnectionRequest
-	57, // 81: bugnet.router.v1.SshGatewayService.RenewSshConnection:input_type -> bugnet.router.v1.RenewSshConnectionRequest
-	59, // 82: bugnet.router.v1.SshGatewayService.ReleaseSshConnection:input_type -> bugnet.router.v1.ReleaseSshConnectionRequest
-	61, // 83: bugnet.router.v1.SshGatewayService.OpenSshUpstream:input_type -> bugnet.router.v1.OpenSshUpstreamRequest
-	65, // 84: bugnet.router.v1.SshGatewayService.CheckSshGrants:input_type -> bugnet.router.v1.CheckSshGrantsRequest
-	36, // 85: bugnet.router.v1.SshGatewayService.ReportSshUsage:input_type -> bugnet.router.v1.ReportSshUsageRequest
-	49, // 86: bugnet.router.v1.SshGatewayService.WatchSshEvents:input_type -> bugnet.router.v1.WatchSshEventsRequest
-	67, // 87: bugnet.router.v1.EgressService.ResolveTunnel:input_type -> bugnet.router.v1.ResolveTunnelRequest
-	38, // 88: bugnet.router.v1.EgressService.ReportEgressUsage:input_type -> bugnet.router.v1.ReportEgressUsageRequest
-	44, // 89: bugnet.router.v1.EgressService.CheckEgressLeases:input_type -> bugnet.router.v1.CheckEgressLeasesRequest
-	51, // 90: bugnet.router.v1.EgressService.WatchEgressEvents:input_type -> bugnet.router.v1.WatchEgressEventsRequest
-	15, // 91: bugnet.router.v1.EdgeService.ResolvePreview:output_type -> bugnet.router.v1.ResolvePreviewResponse
-	17, // 92: bugnet.router.v1.EdgeService.RepairPreview:output_type -> bugnet.router.v1.RepairPreviewResponse
-	19, // 93: bugnet.router.v1.EdgeService.OpenTransfer:output_type -> bugnet.router.v1.OpenTransferResponse
-	21, // 94: bugnet.router.v1.EdgeService.ReadTransfer:output_type -> bugnet.router.v1.ReadTransferResponse
-	23, // 95: bugnet.router.v1.EdgeService.WriteTransfer:output_type -> bugnet.router.v1.WriteTransferResponse
-	33, // 96: bugnet.router.v1.EdgeService.DeliverHook:output_type -> bugnet.router.v1.DeliverHookResponse
-	35, // 97: bugnet.router.v1.EdgeService.ReportEdgeUsage:output_type -> bugnet.router.v1.ReportEdgeUsageResponse
-	43, // 98: bugnet.router.v1.EdgeService.CheckEdgeLeases:output_type -> bugnet.router.v1.CheckEdgeLeasesResponse
-	48, // 99: bugnet.router.v1.EdgeService.WatchEdgeEvents:output_type -> bugnet.router.v1.WatchEdgeEventsResponse
-	25, // 100: bugnet.router.v1.SecretsRouteService.GetSecretLink:output_type -> bugnet.router.v1.GetSecretLinkResponse
-	27, // 101: bugnet.router.v1.SecretsRouteService.SubmitSecretLink:output_type -> bugnet.router.v1.SubmitSecretLinkResponse
-	29, // 102: bugnet.router.v1.SecretsRouteService.GetBridgeSealingKey:output_type -> bugnet.router.v1.GetBridgeSealingKeyResponse
-	31, // 103: bugnet.router.v1.SecretsRouteService.PutBridgeSecret:output_type -> bugnet.router.v1.PutBridgeSecretResponse
-	54, // 104: bugnet.router.v1.SshGatewayService.AuthorizeSshKey:output_type -> bugnet.router.v1.AuthorizeSshKeyResponse
-	56, // 105: bugnet.router.v1.SshGatewayService.AcquireSshConnection:output_type -> bugnet.router.v1.AcquireSshConnectionResponse
-	58, // 106: bugnet.router.v1.SshGatewayService.RenewSshConnection:output_type -> bugnet.router.v1.RenewSshConnectionResponse
-	60, // 107: bugnet.router.v1.SshGatewayService.ReleaseSshConnection:output_type -> bugnet.router.v1.ReleaseSshConnectionResponse
-	64, // 108: bugnet.router.v1.SshGatewayService.OpenSshUpstream:output_type -> bugnet.router.v1.OpenSshUpstreamResponse
-	66, // 109: bugnet.router.v1.SshGatewayService.CheckSshGrants:output_type -> bugnet.router.v1.CheckSshGrantsResponse
-	37, // 110: bugnet.router.v1.SshGatewayService.ReportSshUsage:output_type -> bugnet.router.v1.ReportSshUsageResponse
-	50, // 111: bugnet.router.v1.SshGatewayService.WatchSshEvents:output_type -> bugnet.router.v1.WatchSshEventsResponse
-	69, // 112: bugnet.router.v1.EgressService.ResolveTunnel:output_type -> bugnet.router.v1.ResolveTunnelResponse
-	39, // 113: bugnet.router.v1.EgressService.ReportEgressUsage:output_type -> bugnet.router.v1.ReportEgressUsageResponse
-	46, // 114: bugnet.router.v1.EgressService.CheckEgressLeases:output_type -> bugnet.router.v1.CheckEgressLeasesResponse
-	52, // 115: bugnet.router.v1.EgressService.WatchEgressEvents:output_type -> bugnet.router.v1.WatchEgressEventsResponse
-	91, // [91:116] is the sub-list for method output_type
-	66, // [66:91] is the sub-list for method input_type
-	66, // [66:66] is the sub-list for extension type_name
-	66, // [66:66] is the sub-list for extension extendee
-	0,  // [0:66] is the sub-list for field type_name
+	2,   // 0: bugnet.router.v1.GateUpstream.headers:type_name -> bugnet.router.v1.HeaderValue
+	2,   // 1: bugnet.router.v1.GateUpstream.cookies:type_name -> bugnet.router.v1.HeaderValue
+	0,   // 2: bugnet.router.v1.PlacementEnded.reason:type_name -> bugnet.router.v1.EndReason
+	88,  // 3: bugnet.router.v1.DeadlineMoved.deadline:type_name -> google.protobuf.Timestamp
+	1,   // 4: bugnet.router.v1.BudgetSpent.kind:type_name -> bugnet.router.v1.BudgetKind
+	6,   // 5: bugnet.router.v1.EdgeEvent.placement_ended:type_name -> bugnet.router.v1.PlacementEnded
+	7,   // 6: bugnet.router.v1.EdgeEvent.deadline_moved:type_name -> bugnet.router.v1.DeadlineMoved
+	8,   // 7: bugnet.router.v1.EdgeEvent.preview_revoked:type_name -> bugnet.router.v1.PreviewRevoked
+	9,   // 8: bugnet.router.v1.EdgeEvent.ssh_key_removed:type_name -> bugnet.router.v1.SshKeyRemoved
+	10,  // 9: bugnet.router.v1.EdgeEvent.budget_spent:type_name -> bugnet.router.v1.BudgetSpent
+	11,  // 10: bugnet.router.v1.EdgeEvent.secrets_changed:type_name -> bugnet.router.v1.SecretsChanged
+	12,  // 11: bugnet.router.v1.EdgeEvent.resync:type_name -> bugnet.router.v1.Resync
+	3,   // 12: bugnet.router.v1.ResolvePreviewResponse.upstream:type_name -> bugnet.router.v1.GateUpstream
+	88,  // 13: bugnet.router.v1.ResolvePreviewResponse.expires_at:type_name -> google.protobuf.Timestamp
+	4,   // 14: bugnet.router.v1.ResolvePreviewResponse.budget:type_name -> bugnet.router.v1.EdgeBudget
+	88,  // 15: bugnet.router.v1.ResolvePreviewResponse.started_at:type_name -> google.protobuf.Timestamp
+	89,  // 16: bugnet.router.v1.OpenTransferRequest.direction:type_name -> bugnet.router.v1.TransferDirection
+	88,  // 17: bugnet.router.v1.OpenTransferResponse.modified_at:type_name -> google.protobuf.Timestamp
+	88,  // 18: bugnet.router.v1.OpenTransferResponse.hard_stop:type_name -> google.protobuf.Timestamp
+	88,  // 19: bugnet.router.v1.OpenTransferResponse.expires_at:type_name -> google.protobuf.Timestamp
+	4,   // 20: bugnet.router.v1.OpenTransferResponse.budget:type_name -> bugnet.router.v1.EdgeBudget
+	88,  // 21: bugnet.router.v1.GetSecretLinkResponse.sandbox_created_at:type_name -> google.protobuf.Timestamp
+	88,  // 22: bugnet.router.v1.GetSecretLinkResponse.expires_at:type_name -> google.protobuf.Timestamp
+	90,  // 23: bugnet.router.v1.GetSecretLinkResponse.suggested:type_name -> bugnet.router.v1.SecretSpec
+	91,  // 24: bugnet.router.v1.GetSecretLinkResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
+	90,  // 25: bugnet.router.v1.SubmitSecretLinkRequest.spec:type_name -> bugnet.router.v1.SecretSpec
+	92,  // 26: bugnet.router.v1.SubmitSecretLinkRequest.value:type_name -> bugnet.router.v1.SealedValue
+	93,  // 27: bugnet.router.v1.SubmitSecretLinkResponse.secret:type_name -> bugnet.router.v1.SecretInfo
+	91,  // 28: bugnet.router.v1.GetBridgeSealingKeyResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
+	90,  // 29: bugnet.router.v1.PutBridgeSecretRequest.spec:type_name -> bugnet.router.v1.SecretSpec
+	92,  // 30: bugnet.router.v1.PutBridgeSecretRequest.value:type_name -> bugnet.router.v1.SealedValue
+	93,  // 31: bugnet.router.v1.PutBridgeSecretResponse.secret:type_name -> bugnet.router.v1.SecretInfo
+	2,   // 32: bugnet.router.v1.DeliverHookRequest.headers:type_name -> bugnet.router.v1.HeaderValue
+	5,   // 33: bugnet.router.v1.ReportEdgeUsageRequest.usage:type_name -> bugnet.router.v1.PlacementUsage
+	77,  // 34: bugnet.router.v1.ReportEdgeUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportEdgeUsageResponse.BytesRemainingEntry
+	78,  // 35: bugnet.router.v1.ReportEdgeUsageResponse.bytes_per_second:type_name -> bugnet.router.v1.ReportEdgeUsageResponse.BytesPerSecondEntry
+	5,   // 36: bugnet.router.v1.ReportSshUsageRequest.usage:type_name -> bugnet.router.v1.PlacementUsage
+	79,  // 37: bugnet.router.v1.ReportSshUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportSshUsageResponse.BytesRemainingEntry
+	80,  // 38: bugnet.router.v1.ReportSshUsageResponse.bytes_per_second:type_name -> bugnet.router.v1.ReportSshUsageResponse.BytesPerSecondEntry
+	5,   // 39: bugnet.router.v1.ReportEgressUsageRequest.usage:type_name -> bugnet.router.v1.PlacementUsage
+	81,  // 40: bugnet.router.v1.ReportEgressUsageRequest.x402_unpaid:type_name -> bugnet.router.v1.ReportEgressUsageRequest.X402UnpaidEntry
+	82,  // 41: bugnet.router.v1.ReportEgressUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportEgressUsageResponse.BytesRemainingEntry
+	40,  // 42: bugnet.router.v1.CheckEdgeLeasesRequest.previews:type_name -> bugnet.router.v1.HeldPreview
+	88,  // 43: bugnet.router.v1.EdgeLease.deadline:type_name -> google.protobuf.Timestamp
+	83,  // 44: bugnet.router.v1.CheckEdgeLeasesResponse.leases:type_name -> bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry
+	88,  // 45: bugnet.router.v1.EgressLease.deadline:type_name -> google.protobuf.Timestamp
+	84,  // 46: bugnet.router.v1.CheckEgressLeasesResponse.leases:type_name -> bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry
+	13,  // 47: bugnet.router.v1.WatchEdgeEventsResponse.event:type_name -> bugnet.router.v1.EdgeEvent
+	13,  // 48: bugnet.router.v1.WatchSshEventsResponse.event:type_name -> bugnet.router.v1.EdgeEvent
+	13,  // 49: bugnet.router.v1.WatchEgressEventsResponse.event:type_name -> bugnet.router.v1.EdgeEvent
+	88,  // 50: bugnet.router.v1.AuthorizeSshKeyResponse.deadline:type_name -> google.protobuf.Timestamp
+	88,  // 51: bugnet.router.v1.AcquireSshConnectionResponse.lease_expires_at:type_name -> google.protobuf.Timestamp
+	4,   // 52: bugnet.router.v1.AcquireSshConnectionResponse.budget:type_name -> bugnet.router.v1.EdgeBudget
+	88,  // 53: bugnet.router.v1.RenewSshConnectionResponse.lease_expires_at:type_name -> google.protobuf.Timestamp
+	2,   // 54: bugnet.router.v1.WebSocketUpstream.headers:type_name -> bugnet.router.v1.HeaderValue
+	2,   // 55: bugnet.router.v1.WebSocketUpstream.cookies:type_name -> bugnet.router.v1.HeaderValue
+	62,  // 56: bugnet.router.v1.OpenSshUpstreamResponse.websocket:type_name -> bugnet.router.v1.WebSocketUpstream
+	63,  // 57: bugnet.router.v1.OpenSshUpstreamResponse.tcp:type_name -> bugnet.router.v1.TcpUpstream
+	88,  // 58: bugnet.router.v1.OpenSshUpstreamResponse.deadline:type_name -> google.protobuf.Timestamp
+	85,  // 59: bugnet.router.v1.CheckSshGrantsResponse.deadlines:type_name -> bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry
+	90,  // 60: bugnet.router.v1.EgressSecret.spec:type_name -> bugnet.router.v1.SecretSpec
+	92,  // 61: bugnet.router.v1.EgressSecret.value:type_name -> bugnet.router.v1.SealedValue
+	88,  // 62: bugnet.router.v1.ResolveTunnelResponse.deadline:type_name -> google.protobuf.Timestamp
+	68,  // 63: bugnet.router.v1.ResolveTunnelResponse.secrets:type_name -> bugnet.router.v1.EgressSecret
+	72,  // 64: bugnet.router.v1.ResolveTunnelResponse.x402:type_name -> bugnet.router.v1.X402Config
+	70,  // 65: bugnet.router.v1.X402Config.services:type_name -> bugnet.router.v1.X402Service
+	86,  // 66: bugnet.router.v1.X402Config.unpaid_used:type_name -> bugnet.router.v1.X402Config.UnpaidUsedEntry
+	87,  // 67: bugnet.router.v1.X402UnpaidByHost.hosts:type_name -> bugnet.router.v1.X402UnpaidByHost.HostsEntry
+	88,  // 68: bugnet.router.v1.X402Event.at:type_name -> google.protobuf.Timestamp
+	74,  // 69: bugnet.router.v1.AppendX402EventsRequest.events:type_name -> bugnet.router.v1.X402Event
+	73,  // 70: bugnet.router.v1.ReportEgressUsageRequest.X402UnpaidEntry.value:type_name -> bugnet.router.v1.X402UnpaidByHost
+	42,  // 71: bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry.value:type_name -> bugnet.router.v1.EdgeLease
+	45,  // 72: bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry.value:type_name -> bugnet.router.v1.EgressLease
+	88,  // 73: bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry.value:type_name -> google.protobuf.Timestamp
+	71,  // 74: bugnet.router.v1.X402Config.UnpaidUsedEntry.value:type_name -> bugnet.router.v1.X402Unpaid
+	71,  // 75: bugnet.router.v1.X402UnpaidByHost.HostsEntry.value:type_name -> bugnet.router.v1.X402Unpaid
+	14,  // 76: bugnet.router.v1.EdgeService.ResolvePreview:input_type -> bugnet.router.v1.ResolvePreviewRequest
+	16,  // 77: bugnet.router.v1.EdgeService.RepairPreview:input_type -> bugnet.router.v1.RepairPreviewRequest
+	18,  // 78: bugnet.router.v1.EdgeService.OpenTransfer:input_type -> bugnet.router.v1.OpenTransferRequest
+	20,  // 79: bugnet.router.v1.EdgeService.ReadTransfer:input_type -> bugnet.router.v1.ReadTransferRequest
+	22,  // 80: bugnet.router.v1.EdgeService.WriteTransfer:input_type -> bugnet.router.v1.WriteTransferRequest
+	32,  // 81: bugnet.router.v1.EdgeService.DeliverHook:input_type -> bugnet.router.v1.DeliverHookRequest
+	34,  // 82: bugnet.router.v1.EdgeService.ReportEdgeUsage:input_type -> bugnet.router.v1.ReportEdgeUsageRequest
+	41,  // 83: bugnet.router.v1.EdgeService.CheckEdgeLeases:input_type -> bugnet.router.v1.CheckEdgeLeasesRequest
+	47,  // 84: bugnet.router.v1.EdgeService.WatchEdgeEvents:input_type -> bugnet.router.v1.WatchEdgeEventsRequest
+	24,  // 85: bugnet.router.v1.SecretsRouteService.GetSecretLink:input_type -> bugnet.router.v1.GetSecretLinkRequest
+	26,  // 86: bugnet.router.v1.SecretsRouteService.SubmitSecretLink:input_type -> bugnet.router.v1.SubmitSecretLinkRequest
+	28,  // 87: bugnet.router.v1.SecretsRouteService.GetBridgeSealingKey:input_type -> bugnet.router.v1.GetBridgeSealingKeyRequest
+	30,  // 88: bugnet.router.v1.SecretsRouteService.PutBridgeSecret:input_type -> bugnet.router.v1.PutBridgeSecretRequest
+	53,  // 89: bugnet.router.v1.SshGatewayService.AuthorizeSshKey:input_type -> bugnet.router.v1.AuthorizeSshKeyRequest
+	55,  // 90: bugnet.router.v1.SshGatewayService.AcquireSshConnection:input_type -> bugnet.router.v1.AcquireSshConnectionRequest
+	57,  // 91: bugnet.router.v1.SshGatewayService.RenewSshConnection:input_type -> bugnet.router.v1.RenewSshConnectionRequest
+	59,  // 92: bugnet.router.v1.SshGatewayService.ReleaseSshConnection:input_type -> bugnet.router.v1.ReleaseSshConnectionRequest
+	61,  // 93: bugnet.router.v1.SshGatewayService.OpenSshUpstream:input_type -> bugnet.router.v1.OpenSshUpstreamRequest
+	65,  // 94: bugnet.router.v1.SshGatewayService.CheckSshGrants:input_type -> bugnet.router.v1.CheckSshGrantsRequest
+	36,  // 95: bugnet.router.v1.SshGatewayService.ReportSshUsage:input_type -> bugnet.router.v1.ReportSshUsageRequest
+	49,  // 96: bugnet.router.v1.SshGatewayService.WatchSshEvents:input_type -> bugnet.router.v1.WatchSshEventsRequest
+	67,  // 97: bugnet.router.v1.EgressService.ResolveTunnel:input_type -> bugnet.router.v1.ResolveTunnelRequest
+	38,  // 98: bugnet.router.v1.EgressService.ReportEgressUsage:input_type -> bugnet.router.v1.ReportEgressUsageRequest
+	44,  // 99: bugnet.router.v1.EgressService.CheckEgressLeases:input_type -> bugnet.router.v1.CheckEgressLeasesRequest
+	51,  // 100: bugnet.router.v1.EgressService.WatchEgressEvents:input_type -> bugnet.router.v1.WatchEgressEventsRequest
+	75,  // 101: bugnet.router.v1.EgressService.AppendX402Events:input_type -> bugnet.router.v1.AppendX402EventsRequest
+	15,  // 102: bugnet.router.v1.EdgeService.ResolvePreview:output_type -> bugnet.router.v1.ResolvePreviewResponse
+	17,  // 103: bugnet.router.v1.EdgeService.RepairPreview:output_type -> bugnet.router.v1.RepairPreviewResponse
+	19,  // 104: bugnet.router.v1.EdgeService.OpenTransfer:output_type -> bugnet.router.v1.OpenTransferResponse
+	21,  // 105: bugnet.router.v1.EdgeService.ReadTransfer:output_type -> bugnet.router.v1.ReadTransferResponse
+	23,  // 106: bugnet.router.v1.EdgeService.WriteTransfer:output_type -> bugnet.router.v1.WriteTransferResponse
+	33,  // 107: bugnet.router.v1.EdgeService.DeliverHook:output_type -> bugnet.router.v1.DeliverHookResponse
+	35,  // 108: bugnet.router.v1.EdgeService.ReportEdgeUsage:output_type -> bugnet.router.v1.ReportEdgeUsageResponse
+	43,  // 109: bugnet.router.v1.EdgeService.CheckEdgeLeases:output_type -> bugnet.router.v1.CheckEdgeLeasesResponse
+	48,  // 110: bugnet.router.v1.EdgeService.WatchEdgeEvents:output_type -> bugnet.router.v1.WatchEdgeEventsResponse
+	25,  // 111: bugnet.router.v1.SecretsRouteService.GetSecretLink:output_type -> bugnet.router.v1.GetSecretLinkResponse
+	27,  // 112: bugnet.router.v1.SecretsRouteService.SubmitSecretLink:output_type -> bugnet.router.v1.SubmitSecretLinkResponse
+	29,  // 113: bugnet.router.v1.SecretsRouteService.GetBridgeSealingKey:output_type -> bugnet.router.v1.GetBridgeSealingKeyResponse
+	31,  // 114: bugnet.router.v1.SecretsRouteService.PutBridgeSecret:output_type -> bugnet.router.v1.PutBridgeSecretResponse
+	54,  // 115: bugnet.router.v1.SshGatewayService.AuthorizeSshKey:output_type -> bugnet.router.v1.AuthorizeSshKeyResponse
+	56,  // 116: bugnet.router.v1.SshGatewayService.AcquireSshConnection:output_type -> bugnet.router.v1.AcquireSshConnectionResponse
+	58,  // 117: bugnet.router.v1.SshGatewayService.RenewSshConnection:output_type -> bugnet.router.v1.RenewSshConnectionResponse
+	60,  // 118: bugnet.router.v1.SshGatewayService.ReleaseSshConnection:output_type -> bugnet.router.v1.ReleaseSshConnectionResponse
+	64,  // 119: bugnet.router.v1.SshGatewayService.OpenSshUpstream:output_type -> bugnet.router.v1.OpenSshUpstreamResponse
+	66,  // 120: bugnet.router.v1.SshGatewayService.CheckSshGrants:output_type -> bugnet.router.v1.CheckSshGrantsResponse
+	37,  // 121: bugnet.router.v1.SshGatewayService.ReportSshUsage:output_type -> bugnet.router.v1.ReportSshUsageResponse
+	50,  // 122: bugnet.router.v1.SshGatewayService.WatchSshEvents:output_type -> bugnet.router.v1.WatchSshEventsResponse
+	69,  // 123: bugnet.router.v1.EgressService.ResolveTunnel:output_type -> bugnet.router.v1.ResolveTunnelResponse
+	39,  // 124: bugnet.router.v1.EgressService.ReportEgressUsage:output_type -> bugnet.router.v1.ReportEgressUsageResponse
+	46,  // 125: bugnet.router.v1.EgressService.CheckEgressLeases:output_type -> bugnet.router.v1.CheckEgressLeasesResponse
+	52,  // 126: bugnet.router.v1.EgressService.WatchEgressEvents:output_type -> bugnet.router.v1.WatchEgressEventsResponse
+	76,  // 127: bugnet.router.v1.EgressService.AppendX402Events:output_type -> bugnet.router.v1.AppendX402EventsResponse
+	102, // [102:128] is the sub-list for method output_type
+	76,  // [76:102] is the sub-list for method input_type
+	76,  // [76:76] is the sub-list for extension type_name
+	76,  // [76:76] is the sub-list for extension extendee
+	0,   // [0:76] is the sub-list for field type_name
 }
 
 func init() { file_bugnet_router_v1_edge_proto_init() }
@@ -4864,7 +5584,7 @@ func file_bugnet_router_v1_edge_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bugnet_router_v1_edge_proto_rawDesc), len(file_bugnet_router_v1_edge_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   76,
+			NumMessages:   86,
 			NumExtensions: 0,
 			NumServices:   4,
 		},

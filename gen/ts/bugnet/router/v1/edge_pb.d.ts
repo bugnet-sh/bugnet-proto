@@ -1090,6 +1090,13 @@ export declare type ReportEgressUsageRequest = Message<"bugnet.router.v1.ReportE
    * @generated from field: repeated bugnet.router.v1.PlacementUsage usage = 2;
    */
   usage: PlacementUsage[];
+
+  /**
+   * Unpaid x402 use since the last report by placement id, then by host
+   *
+   * @generated from field: map<string, bugnet.router.v1.X402UnpaidByHost> x402_unpaid = 3;
+   */
+  x402Unpaid: { [key: string]: X402UnpaidByHost };
 };
 
 /**
@@ -1841,6 +1848,13 @@ export declare type ResolveTunnelResponse = Message<"bugnet.router.v1.ResolveTun
    * @generated from field: uint32 requests_in_flight = 9;
    */
   requestsInFlight: number;
+
+  /**
+   * The placement's x402 services, caps and unpaid use
+   *
+   * @generated from field: bugnet.router.v1.X402Config x402 = 11;
+   */
+  x402?: X402Config | undefined;
 };
 
 /**
@@ -1848,6 +1862,329 @@ export declare type ResolveTunnelResponse = Message<"bugnet.router.v1.ResolveTun
  * Use `create(ResolveTunnelResponseSchema)` to create a new message.
  */
 export declare const ResolveTunnelResponseSchema: GenMessage<ResolveTunnelResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.X402Service
+ */
+export declare type X402Service = Message<"bugnet.router.v1.X402Service"> & {
+  /**
+   * @generated from field: string service_id = 1;
+   */
+  serviceId: string;
+
+  /**
+   * @generated from field: string host = 2;
+   */
+  host: string;
+
+  /**
+   * @generated from field: string prefix = 3;
+   */
+  prefix: string;
+
+  /**
+   * @generated from field: string method = 4;
+   */
+  method: string;
+
+  /**
+   * @generated from field: int64 max_price_micros = 5;
+   */
+  maxPriceMicros: bigint;
+
+  /**
+   * @generated from field: string pay_to = 6;
+   */
+  payTo: string;
+
+  /**
+   * The one paid path, empty when every path under the prefix is paid
+   *
+   * @generated from field: string paid_path = 7;
+   */
+  paidPath: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.X402Service.
+ * Use `create(X402ServiceSchema)` to create a new message.
+ */
+export declare const X402ServiceSchema: GenMessage<X402Service>;
+
+/**
+ * @generated from message bugnet.router.v1.X402Unpaid
+ */
+export declare type X402Unpaid = Message<"bugnet.router.v1.X402Unpaid"> & {
+  /**
+   * @generated from field: uint32 requests = 1;
+   */
+  requests: number;
+
+  /**
+   * @generated from field: uint64 bytes = 2;
+   */
+  bytes: bigint;
+};
+
+/**
+ * Describes the message bugnet.router.v1.X402Unpaid.
+ * Use `create(X402UnpaidSchema)` to create a new message.
+ */
+export declare const X402UnpaidSchema: GenMessage<X402Unpaid>;
+
+/**
+ * @generated from message bugnet.router.v1.X402Config
+ */
+export declare type X402Config = Message<"bugnet.router.v1.X402Config"> & {
+  /**
+   * False when the router's kill switch is off, so egress forwards and never pays
+   *
+   * @generated from field: bool enabled = 1;
+   */
+  enabled: boolean;
+
+  /**
+   * The placement's start order id, which names its allowance account in Payments
+   *
+   * @generated from field: string account_id = 2;
+   */
+  accountId: string;
+
+  /**
+   * Every applying, active or failed service, less blocked hosts
+   *
+   * @generated from field: repeated bugnet.router.v1.X402Service services = 3;
+   */
+  services: X402Service[];
+
+  /**
+   * @generated from field: uint32 unpaid_requests_per_host = 4;
+   */
+  unpaidRequestsPerHost: number;
+
+  /**
+   * @generated from field: uint64 unpaid_bytes_per_host = 5;
+   */
+  unpaidBytesPerHost: bigint;
+
+  /**
+   * Unpaid use reported so far by host, totals across egress processes
+   *
+   * @generated from field: map<string, bugnet.router.v1.X402Unpaid> unpaid_used = 6;
+   */
+  unpaidUsed: { [key: string]: X402Unpaid };
+};
+
+/**
+ * Describes the message bugnet.router.v1.X402Config.
+ * Use `create(X402ConfigSchema)` to create a new message.
+ */
+export declare const X402ConfigSchema: GenMessage<X402Config>;
+
+/**
+ * @generated from message bugnet.router.v1.X402UnpaidByHost
+ */
+export declare type X402UnpaidByHost = Message<"bugnet.router.v1.X402UnpaidByHost"> & {
+  /**
+   * @generated from field: map<string, bugnet.router.v1.X402Unpaid> hosts = 1;
+   */
+  hosts: { [key: string]: X402Unpaid };
+};
+
+/**
+ * Describes the message bugnet.router.v1.X402UnpaidByHost.
+ * Use `create(X402UnpaidByHostSchema)` to create a new message.
+ */
+export declare const X402UnpaidByHostSchema: GenMessage<X402UnpaidByHost>;
+
+/**
+ * @generated from message bugnet.router.v1.X402Event
+ */
+export declare type X402Event = Message<"bugnet.router.v1.X402Event"> & {
+  /**
+   * @generated from field: google.protobuf.Timestamp at = 1;
+   */
+  at?: Timestamp | undefined;
+
+  /**
+   * 16 random base32 characters made by egress, never shown
+   *
+   * @generated from field: string ref = 2;
+   */
+  ref: string;
+
+  /**
+   * At most 253 characters, a refused_host name cut to 63, empty only on the overflow row
+   *
+   * @generated from field: string host = 3;
+   */
+  host: string;
+
+  /**
+   * One to ten capital letters or OTHER, empty on refused_host
+   *
+   * @generated from field: string method = 4;
+   */
+  method: string;
+
+  /**
+   * Normalised without the query, cut to 80 characters on store, empty as x402 spec 8.1 lists
+   *
+   * @generated from field: string path = 5;
+   */
+  path: string;
+
+  /**
+   * A status of x402 spec 8.2
+   *
+   * @generated from field: string status = 6;
+   */
+  status: string;
+
+  /**
+   * A code of x402 spec 6.13, empty for the statuses x402 spec 8.1 names
+   *
+   * @generated from field: string reason = 7;
+   */
+  reason: string;
+
+  /**
+   * Set with fields 10 to 14 only when the 402 offered exact USDC on Solana
+   *
+   * @generated from field: int64 asked_micros = 8;
+   */
+  askedMicros: bigint;
+
+  /**
+   * Signed by Payments, 0 when nothing was signed
+   *
+   * @generated from field: int64 amount_micros = 9;
+   */
+  amountMicros: bigint;
+
+  /**
+   * @generated from field: string asset = 10;
+   */
+  asset: string;
+
+  /**
+   * @generated from field: string network = 11;
+   */
+  network: string;
+
+  /**
+   * @generated from field: string scheme = 12;
+   */
+  scheme: string;
+
+  /**
+   * @generated from field: uint32 x402_version = 13;
+   */
+  x402Version: number;
+
+  /**
+   * Set only when it also decodes to 32 bytes
+   *
+   * @generated from field: string pay_to = 14;
+   */
+  payTo: string;
+
+  /**
+   * @generated from field: uint32 http_status = 15;
+   */
+  httpStatus: number;
+
+  /**
+   * @generated from field: uint32 duration_ms = 16;
+   */
+  durationMs: number;
+
+  /**
+   * @generated from field: uint64 bytes_out = 17;
+   */
+  bytesOut: bigint;
+
+  /**
+   * @generated from field: uint64 bytes_in = 18;
+   */
+  bytesIn: bigint;
+
+  /**
+   * @generated from field: bool stream_cut = 19;
+   */
+  streamCut: boolean;
+
+  /**
+   * @generated from field: int64 allowance_left_micros = 20;
+   */
+  allowanceLeftMicros: bigint;
+
+  /**
+   * 1, or the calls in a folded row
+   *
+   * @generated from field: uint32 count = 21;
+   */
+  count: number;
+
+  /**
+   * The matched service, empty when none matched, for counters only and never served
+   *
+   * @generated from field: string service_id = 22;
+   */
+  serviceId: string;
+
+  /**
+   * Signed.payment_ref when a payload was attached, else empty
+   *
+   * @generated from field: string payment_ref = 23;
+   */
+  paymentRef: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.X402Event.
+ * Use `create(X402EventSchema)` to create a new message.
+ */
+export declare const X402EventSchema: GenMessage<X402Event>;
+
+/**
+ * @generated from message bugnet.router.v1.AppendX402EventsRequest
+ */
+export declare type AppendX402EventsRequest = Message<"bugnet.router.v1.AppendX402EventsRequest"> & {
+  /**
+   * @generated from field: string placement_id = 1;
+   */
+  placementId: string;
+
+  /**
+   * @generated from field: repeated bugnet.router.v1.X402Event events = 2;
+   */
+  events: X402Event[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.AppendX402EventsRequest.
+ * Use `create(AppendX402EventsRequestSchema)` to create a new message.
+ */
+export declare const AppendX402EventsRequestSchema: GenMessage<AppendX402EventsRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.AppendX402EventsResponse
+ */
+export declare type AppendX402EventsResponse = Message<"bugnet.router.v1.AppendX402EventsResponse"> & {
+  /**
+   * Indexes of the events dropped for a bad shape
+   *
+   * @generated from field: repeated uint32 rejected = 1;
+   */
+  rejected: number[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.AppendX402EventsResponse.
+ * Use `create(AppendX402EventsResponseSchema)` to create a new message.
+ */
+export declare const AppendX402EventsResponseSchema: GenMessage<AppendX402EventsResponse>;
 
 /**
  * @generated from enum bugnet.router.v1.EndReason
@@ -2160,6 +2497,16 @@ export declare const EgressService: GenService<{
     methodKind: "server_streaming";
     input: typeof WatchEgressEventsRequestSchema;
     output: typeof WatchEgressEventsResponseSchema;
+  },
+  /**
+   * At most 50 x402 rows a call, each stored once per placement and ref
+   *
+   * @generated from rpc bugnet.router.v1.EgressService.AppendX402Events
+   */
+  appendX402Events: {
+    methodKind: "unary";
+    input: typeof AppendX402EventsRequestSchema;
+    output: typeof AppendX402EventsResponseSchema;
   },
 }>;
 

@@ -46,6 +46,8 @@ service EgressService {
   rpc ReportEgressUsage(ReportEgressUsageRequest) returns (ReportEgressUsageResponse);
   rpc CheckEgressLeases(CheckEgressLeasesRequest) returns (CheckEgressLeasesResponse);
   rpc WatchEgressEvents(WatchEgressEventsRequest) returns (stream WatchEgressEventsResponse);
+  // At most 50 x402 rows a call, each stored once per placement and ref
+  rpc AppendX402Events(AppendX402EventsRequest) returns (AppendX402EventsResponse);
 }
 
 /* Shared */
@@ -351,6 +353,8 @@ message ReportSshUsageResponse {
 message ReportEgressUsageRequest {
   string reporter_id = 1;
   repeated PlacementUsage usage = 2;
+  // Unpaid x402 use since the last report by placement id, then by host
+  map<string, X402UnpaidByHost> x402_unpaid = 3;
 }
 
 message ReportEgressUsageResponse {
@@ -545,4 +549,89 @@ message ResolveTunnelResponse {
   // Each way, per placement
   uint64 bytes_per_second = 8;
   uint32 requests_in_flight = 9;
+  // The placement's x402 services, caps and unpaid use
+  X402Config x402 = 11;
+}
+
+/* x402 */
+
+message X402Service {
+  string service_id = 1;
+  string host = 2;
+  string prefix = 3;
+  string method = 4;
+  int64 max_price_micros = 5;
+  string pay_to = 6;
+  // The one paid path, empty when every path under the prefix is paid
+  string paid_path = 7;
+}
+
+message X402Unpaid {
+  uint32 requests = 1;
+  uint64 bytes = 2;
+}
+
+message X402Config {
+  // False when the router's kill switch is off, so egress forwards and never pays
+  bool enabled = 1;
+  // The placement's start order id, which names its allowance account in Payments
+  string account_id = 2;
+  // Every applying, active or failed service, less blocked hosts
+  repeated X402Service services = 3;
+  uint32 unpaid_requests_per_host = 4;
+  uint64 unpaid_bytes_per_host = 5;
+  // Unpaid use reported so far by host, totals across egress processes
+  map<string, X402Unpaid> unpaid_used = 6;
+}
+
+message X402UnpaidByHost {
+  map<string, X402Unpaid> hosts = 1;
+}
+
+message X402Event {
+  google.protobuf.Timestamp at = 1;
+  // 16 random base32 characters made by egress, never shown
+  string ref = 2;
+  // At most 253 characters, a refused_host name cut to 63, empty only on the overflow row
+  string host = 3;
+  // One to ten capital letters or OTHER, empty on refused_host
+  string method = 4;
+  // Normalised without the query, cut to 80 characters on store, empty as x402 spec 8.1 lists
+  string path = 5;
+  // A status of x402 spec 8.2
+  string status = 6;
+  // A code of x402 spec 6.13, empty for the statuses x402 spec 8.1 names
+  string reason = 7;
+  // Set with fields 10 to 14 only when the 402 offered exact USDC on Solana
+  int64 asked_micros = 8;
+  // Signed by Payments, 0 when nothing was signed
+  int64 amount_micros = 9;
+  string asset = 10;
+  string network = 11;
+  string scheme = 12;
+  uint32 x402_version = 13;
+  // Set only when it also decodes to 32 bytes
+  string pay_to = 14;
+  uint32 http_status = 15;
+  uint32 duration_ms = 16;
+  uint64 bytes_out = 17;
+  uint64 bytes_in = 18;
+  bool stream_cut = 19;
+  int64 allowance_left_micros = 20;
+  // 1, or the calls in a folded row
+  uint32 count = 21;
+  // The matched service, empty when none matched, for counters only and never served
+  string service_id = 22;
+  // Signed.payment_ref when a payload was attached, else empty
+  string payment_ref = 23;
+}
+
+message AppendX402EventsRequest {
+  string placement_id = 1;
+  repeated X402Event events = 2;
+}
+
+message AppendX402EventsResponse {
+  // Indexes of the events dropped for a bad shape
+  repeated uint32 rejected = 1;
 }

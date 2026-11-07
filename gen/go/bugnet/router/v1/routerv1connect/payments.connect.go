@@ -39,6 +39,15 @@ const (
 	// PaymentsServiceGetOrderProcedure is the fully-qualified name of the PaymentsService's GetOrder
 	// RPC.
 	PaymentsServiceGetOrderProcedure = "/bugnet.router.v1.PaymentsService/GetOrder"
+	// PaymentsServiceLookupPlacementProcedure is the fully-qualified name of the PaymentsService's
+	// LookupPlacement RPC.
+	PaymentsServiceLookupPlacementProcedure = "/bugnet.router.v1.PaymentsService/LookupPlacement"
+	// PaymentsServiceAppendAllowanceEventProcedure is the fully-qualified name of the PaymentsService's
+	// AppendAllowanceEvent RPC.
+	PaymentsServiceAppendAllowanceEventProcedure = "/bugnet.router.v1.PaymentsService/AppendAllowanceEvent"
+	// PaymentsServiceAppendX402ResolvedProcedure is the fully-qualified name of the PaymentsService's
+	// AppendX402Resolved RPC.
+	PaymentsServiceAppendX402ResolvedProcedure = "/bugnet.router.v1.PaymentsService/AppendX402Resolved"
 )
 
 // PaymentsServiceClient is a client for the bugnet.router.v1.PaymentsService service.
@@ -47,6 +56,12 @@ type PaymentsServiceClient interface {
 	CheckPayer(context.Context, *connect.Request[v1.CheckPayerRequest]) (*connect.Response[v1.CheckPayerResponse], error)
 	// Says what became of an order, so Payments can refund when no event reached it
 	GetOrder(context.Context, *connect.Request[v1.GetOrderRequest]) (*connect.Response[v1.GetOrderResponse], error)
+	// Which placement a handle hash or a start order names, so Payments finds the allowance account
+	LookupPlacement(context.Context, *connect.Request[v1.LookupPlacementRequest]) (*connect.Response[v1.LookupPlacementResponse], error)
+	// Stores an allowance event for the session page, idempotent on order_id and phase
+	AppendAllowanceEvent(context.Context, *connect.Request[v1.AppendAllowanceEventRequest]) (*connect.Response[v1.AppendAllowanceEventResponse], error)
+	// Payments' final word on one x402 call, idempotent on ref
+	AppendX402Resolved(context.Context, *connect.Request[v1.AppendX402ResolvedRequest]) (*connect.Response[v1.AppendX402ResolvedResponse], error)
 }
 
 // NewPaymentsServiceClient constructs a client for the bugnet.router.v1.PaymentsService service. By
@@ -72,13 +87,34 @@ func NewPaymentsServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(paymentsServiceMethods.ByName("GetOrder")),
 			connect.WithClientOptions(opts...),
 		),
+		lookupPlacement: connect.NewClient[v1.LookupPlacementRequest, v1.LookupPlacementResponse](
+			httpClient,
+			baseURL+PaymentsServiceLookupPlacementProcedure,
+			connect.WithSchema(paymentsServiceMethods.ByName("LookupPlacement")),
+			connect.WithClientOptions(opts...),
+		),
+		appendAllowanceEvent: connect.NewClient[v1.AppendAllowanceEventRequest, v1.AppendAllowanceEventResponse](
+			httpClient,
+			baseURL+PaymentsServiceAppendAllowanceEventProcedure,
+			connect.WithSchema(paymentsServiceMethods.ByName("AppendAllowanceEvent")),
+			connect.WithClientOptions(opts...),
+		),
+		appendX402Resolved: connect.NewClient[v1.AppendX402ResolvedRequest, v1.AppendX402ResolvedResponse](
+			httpClient,
+			baseURL+PaymentsServiceAppendX402ResolvedProcedure,
+			connect.WithSchema(paymentsServiceMethods.ByName("AppendX402Resolved")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // paymentsServiceClient implements PaymentsServiceClient.
 type paymentsServiceClient struct {
-	checkPayer *connect.Client[v1.CheckPayerRequest, v1.CheckPayerResponse]
-	getOrder   *connect.Client[v1.GetOrderRequest, v1.GetOrderResponse]
+	checkPayer           *connect.Client[v1.CheckPayerRequest, v1.CheckPayerResponse]
+	getOrder             *connect.Client[v1.GetOrderRequest, v1.GetOrderResponse]
+	lookupPlacement      *connect.Client[v1.LookupPlacementRequest, v1.LookupPlacementResponse]
+	appendAllowanceEvent *connect.Client[v1.AppendAllowanceEventRequest, v1.AppendAllowanceEventResponse]
+	appendX402Resolved   *connect.Client[v1.AppendX402ResolvedRequest, v1.AppendX402ResolvedResponse]
 }
 
 // CheckPayer calls bugnet.router.v1.PaymentsService.CheckPayer.
@@ -91,12 +127,33 @@ func (c *paymentsServiceClient) GetOrder(ctx context.Context, req *connect.Reque
 	return c.getOrder.CallUnary(ctx, req)
 }
 
+// LookupPlacement calls bugnet.router.v1.PaymentsService.LookupPlacement.
+func (c *paymentsServiceClient) LookupPlacement(ctx context.Context, req *connect.Request[v1.LookupPlacementRequest]) (*connect.Response[v1.LookupPlacementResponse], error) {
+	return c.lookupPlacement.CallUnary(ctx, req)
+}
+
+// AppendAllowanceEvent calls bugnet.router.v1.PaymentsService.AppendAllowanceEvent.
+func (c *paymentsServiceClient) AppendAllowanceEvent(ctx context.Context, req *connect.Request[v1.AppendAllowanceEventRequest]) (*connect.Response[v1.AppendAllowanceEventResponse], error) {
+	return c.appendAllowanceEvent.CallUnary(ctx, req)
+}
+
+// AppendX402Resolved calls bugnet.router.v1.PaymentsService.AppendX402Resolved.
+func (c *paymentsServiceClient) AppendX402Resolved(ctx context.Context, req *connect.Request[v1.AppendX402ResolvedRequest]) (*connect.Response[v1.AppendX402ResolvedResponse], error) {
+	return c.appendX402Resolved.CallUnary(ctx, req)
+}
+
 // PaymentsServiceHandler is an implementation of the bugnet.router.v1.PaymentsService service.
 type PaymentsServiceHandler interface {
 	// Says whether the router would refuse this payer's order now, and changes nothing
 	CheckPayer(context.Context, *connect.Request[v1.CheckPayerRequest]) (*connect.Response[v1.CheckPayerResponse], error)
 	// Says what became of an order, so Payments can refund when no event reached it
 	GetOrder(context.Context, *connect.Request[v1.GetOrderRequest]) (*connect.Response[v1.GetOrderResponse], error)
+	// Which placement a handle hash or a start order names, so Payments finds the allowance account
+	LookupPlacement(context.Context, *connect.Request[v1.LookupPlacementRequest]) (*connect.Response[v1.LookupPlacementResponse], error)
+	// Stores an allowance event for the session page, idempotent on order_id and phase
+	AppendAllowanceEvent(context.Context, *connect.Request[v1.AppendAllowanceEventRequest]) (*connect.Response[v1.AppendAllowanceEventResponse], error)
+	// Payments' final word on one x402 call, idempotent on ref
+	AppendX402Resolved(context.Context, *connect.Request[v1.AppendX402ResolvedRequest]) (*connect.Response[v1.AppendX402ResolvedResponse], error)
 }
 
 // NewPaymentsServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -118,12 +175,36 @@ func NewPaymentsServiceHandler(svc PaymentsServiceHandler, opts ...connect.Handl
 		connect.WithSchema(paymentsServiceMethods.ByName("GetOrder")),
 		connect.WithHandlerOptions(opts...),
 	)
+	paymentsServiceLookupPlacementHandler := connect.NewUnaryHandler(
+		PaymentsServiceLookupPlacementProcedure,
+		svc.LookupPlacement,
+		connect.WithSchema(paymentsServiceMethods.ByName("LookupPlacement")),
+		connect.WithHandlerOptions(opts...),
+	)
+	paymentsServiceAppendAllowanceEventHandler := connect.NewUnaryHandler(
+		PaymentsServiceAppendAllowanceEventProcedure,
+		svc.AppendAllowanceEvent,
+		connect.WithSchema(paymentsServiceMethods.ByName("AppendAllowanceEvent")),
+		connect.WithHandlerOptions(opts...),
+	)
+	paymentsServiceAppendX402ResolvedHandler := connect.NewUnaryHandler(
+		PaymentsServiceAppendX402ResolvedProcedure,
+		svc.AppendX402Resolved,
+		connect.WithSchema(paymentsServiceMethods.ByName("AppendX402Resolved")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/bugnet.router.v1.PaymentsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case PaymentsServiceCheckPayerProcedure:
 			paymentsServiceCheckPayerHandler.ServeHTTP(w, r)
 		case PaymentsServiceGetOrderProcedure:
 			paymentsServiceGetOrderHandler.ServeHTTP(w, r)
+		case PaymentsServiceLookupPlacementProcedure:
+			paymentsServiceLookupPlacementHandler.ServeHTTP(w, r)
+		case PaymentsServiceAppendAllowanceEventProcedure:
+			paymentsServiceAppendAllowanceEventHandler.ServeHTTP(w, r)
+		case PaymentsServiceAppendX402ResolvedProcedure:
+			paymentsServiceAppendX402ResolvedHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -139,4 +220,16 @@ func (UnimplementedPaymentsServiceHandler) CheckPayer(context.Context, *connect.
 
 func (UnimplementedPaymentsServiceHandler) GetOrder(context.Context, *connect.Request[v1.GetOrderRequest]) (*connect.Response[v1.GetOrderResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.PaymentsService.GetOrder is not implemented"))
+}
+
+func (UnimplementedPaymentsServiceHandler) LookupPlacement(context.Context, *connect.Request[v1.LookupPlacementRequest]) (*connect.Response[v1.LookupPlacementResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.PaymentsService.LookupPlacement is not implemented"))
+}
+
+func (UnimplementedPaymentsServiceHandler) AppendAllowanceEvent(context.Context, *connect.Request[v1.AppendAllowanceEventRequest]) (*connect.Response[v1.AppendAllowanceEventResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.PaymentsService.AppendAllowanceEvent is not implemented"))
+}
+
+func (UnimplementedPaymentsServiceHandler) AppendX402Resolved(context.Context, *connect.Request[v1.AppendX402ResolvedRequest]) (*connect.Response[v1.AppendX402ResolvedResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.PaymentsService.AppendX402Resolved is not implemented"))
 }

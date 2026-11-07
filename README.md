@@ -23,8 +23,30 @@ none of their services. Errors carry a `google.rpc.ErrorInfo` reason in domain `
 
 `BUGNET_PAYMENTS_ROUTER_TOKEN` has the same name and value in Payments' environment and the
 router's. It is not `BUGNET_PAYMENTS_TOKEN`, which the gateway sends to Payments.
-`PaymentsService` has two calls. `CheckPayer` says whether the router would refuse a payer's order
-now. `GetOrder` says what became of an order, so Payments can refund one no event reached it for.
+`PaymentsService` has five calls. `CheckPayer` says whether the router would refuse a payer's
+order now. `GetOrder` says what became of an order, so Payments can refund one no event reached it
+for. The other three serve x402, below.
+
+### x402 calls
+
+The x402 spec (section 6.2) adds seven calls across three services.
+
+| Service | Call | Does |
+| --- | --- | --- |
+| `SandboxRouterService` | `CheckX402` | Checks an x402 change without making it |
+| `SandboxRouterService` | `EnableX402` | Stores x402 services and applies them to the sandbox |
+| `SandboxRouterService` | `ListX402` | Lists the placement's x402 services, counts and refusals |
+| `EgressService` | `AppendX402Events` | Stores egress's x402 rows for the session page |
+| `PaymentsService` | `LookupPlacement` | Names the placement of a handle hash or a start order |
+| `PaymentsService` | `AppendAllowanceEvent` | Stores an allowance event for the session page |
+| `PaymentsService` | `AppendX402Resolved` | Stores Payments' final word on one x402 call |
+
+- A refusal of `CheckX402` or `EnableX402` for one service carries `ErrorInfo` metadata
+  `service_id` and `host`, which name the first failing `add` entry.
+- `AllowanceEvent` keeps the session page's numbers 1 to 5. The x402 spec adds `kept_micros` (6),
+  the `kept` phase and `AppendAllowanceEventRequest.start_order_id` (3).
+- `ResolveTunnelResponse.x402` (11) and `ReportEgressUsageRequest.x402_unpaid` (3) carry the caps
+  and the unpaid use between the router and egress.
 
 ## Generating
 

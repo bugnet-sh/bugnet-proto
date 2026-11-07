@@ -407,3 +407,287 @@ func TestSpecFieldNumbers(t *testing.T) {
 	eq(t, routerv1.BootstrapState(6).String(), "BOOTSTRAP_STATE_NEEDS_SECRET")
 	eq(t, routerv1.PayerVerdict(4).String(), "PAYER_VERDICT_RATE_LIMITED")
 }
+
+// fieldNumber finds a field of the package by its message and field name
+func fieldNumber(t *testing.T, name string) protoreflect.FieldNumber {
+	t.Helper()
+	d, err := protoregistry.GlobalFiles.FindDescriptorByName(
+		protoreflect.FullName("bugnet.router.v1." + name))
+	if err != nil {
+		t.Fatalf("find %s: %v", name, err)
+	}
+	return d.(protoreflect.FieldDescriptor).Number()
+}
+
+func TestX402FieldNumbers(t *testing.T) {
+	for name, want := range map[string]protoreflect.FieldNumber{
+		"ResolveTunnelResponse.x402":                 11,
+		"ReportEgressUsageRequest.x402_unpaid":       3,
+		"AppendAllowanceEventRequest.order_id":       1,
+		"AppendAllowanceEventRequest.event":          2,
+		"AppendAllowanceEventRequest.start_order_id": 3,
+		"X402Event.service_id":                       22,
+		"X402Event.payment_ref":                      23,
+		"EnableX402Request.wait_active":              5,
+		"AllowanceEvent.phase":                       1,
+		"AllowanceEvent.amount_micros":               2,
+		"AllowanceEvent.asset":                       3,
+		"AllowanceEvent.network":                     4,
+		"AllowanceEvent.tx":                          5,
+		"AllowanceEvent.kept_micros":                 6,
+		"X402ServiceSpec.host":                       1,
+		"X402ServiceSpec.prefix":                     2,
+		"X402ServiceSpec.method":                     3,
+		"X402ServiceSpec.max_price_micros":           4,
+		"X402ServiceSpec.pay_to":                     5,
+		"X402ServiceSpec.indexed":                    6,
+		"X402ServiceSpec.paid_path":                  7,
+		"X402ServiceInfo.service_id":                 1,
+		"X402ServiceInfo.spec":                       2,
+		"X402ServiceInfo.state":                      3,
+		"X402ServiceInfo.failure_reason":             4,
+		"X402ServiceInfo.requests":                   5,
+		"X402ServiceInfo.paid":                       6,
+		"X402ServiceInfo.uncertain":                  7,
+		"X402Refusal.reason":                         1,
+		"X402Refusal.count":                          2,
+		"X402Refusal.last_at":                        3,
+		"CheckX402Request.handle":                    1,
+		"CheckX402Request.add":                       2,
+		"CheckX402Request.disable":                   3,
+		"EnableX402Request.handle":                   1,
+		"EnableX402Request.add":                      2,
+		"EnableX402Request.disable":                  3,
+		"EnableX402Request.request_id":               4,
+		"EnableX402Response.services":                1,
+		"ListX402Request.handle":                     1,
+		"ListX402Response.enabled":                   1,
+		"ListX402Response.services":                  2,
+		"ListX402Response.refusals":                  3,
+		"X402Service.service_id":                     1,
+		"X402Service.host":                           2,
+		"X402Service.prefix":                         3,
+		"X402Service.method":                         4,
+		"X402Service.max_price_micros":               5,
+		"X402Service.pay_to":                         6,
+		"X402Service.paid_path":                      7,
+		"X402Unpaid.requests":                        1,
+		"X402Unpaid.bytes":                           2,
+		"X402Config.enabled":                         1,
+		"X402Config.account_id":                      2,
+		"X402Config.services":                        3,
+		"X402Config.unpaid_requests_per_host":        4,
+		"X402Config.unpaid_bytes_per_host":           5,
+		"X402Config.unpaid_used":                     6,
+		"X402UnpaidByHost.hosts":                     1,
+		"X402Event.at":                               1,
+		"X402Event.ref":                              2,
+		"X402Event.host":                             3,
+		"X402Event.method":                           4,
+		"X402Event.path":                             5,
+		"X402Event.status":                           6,
+		"X402Event.reason":                           7,
+		"X402Event.asked_micros":                     8,
+		"X402Event.amount_micros":                    9,
+		"X402Event.asset":                            10,
+		"X402Event.network":                          11,
+		"X402Event.scheme":                           12,
+		"X402Event.x402_version":                     13,
+		"X402Event.pay_to":                           14,
+		"X402Event.http_status":                      15,
+		"X402Event.duration_ms":                      16,
+		"X402Event.bytes_out":                        17,
+		"X402Event.bytes_in":                         18,
+		"X402Event.stream_cut":                       19,
+		"X402Event.allowance_left_micros":            20,
+		"X402Event.count":                            21,
+		"AppendX402EventsRequest.placement_id":       1,
+		"AppendX402EventsRequest.events":             2,
+		"AppendX402EventsResponse.rejected":          1,
+		"LookupPlacementRequest.handle_sha256":       1,
+		"LookupPlacementRequest.start_order_id":      2,
+		"LookupPlacementResponse.placement_id":       1,
+		"LookupPlacementResponse.start_order_id":     2,
+		"LookupPlacementResponse.state":              3,
+		"LookupPlacementResponse.deadline":           4,
+		"LookupPlacementResponse.ended_at":           5,
+		"LookupPlacementResponse.x402_capable":       6,
+		"LookupPlacementResponse.package_id":         7,
+		"AppendX402ResolvedRequest.start_order_id":   1,
+		"AppendX402ResolvedRequest.ref":              2,
+		"AppendX402ResolvedRequest.status":           3,
+		"AppendX402ResolvedRequest.amount_micros":    4,
+		"AppendX402ResolvedRequest.tx":               5,
+		"AppendX402ResolvedRequest.at":               6,
+		"AppendX402ResolvedRequest.host":             7,
+		"AppendX402ResolvedRequest.method":           8,
+		"AppendX402ResolvedRequest.path":             9,
+		"AppendX402ResolvedRequest.pay_to":           10,
+	} {
+		if got := fieldNumber(t, name); got != want {
+			t.Errorf("%s is field %d, want %d", name, got, want)
+		}
+	}
+	for msg, n := range map[proto.Message]int{
+		&routerv1.X402ServiceSpec{}: 7, &routerv1.X402ServiceInfo{}: 7,
+		&routerv1.X402Refusal{}: 3, &routerv1.CheckX402Request{}: 3,
+		&routerv1.CheckX402Response{}: 0, &routerv1.EnableX402Request{}: 5,
+		&routerv1.EnableX402Response{}: 1, &routerv1.ListX402Request{}: 1,
+		&routerv1.ListX402Response{}: 3, &routerv1.X402Service{}: 7, &routerv1.X402Unpaid{}: 2,
+		&routerv1.X402Config{}: 6, &routerv1.X402UnpaidByHost{}: 1, &routerv1.X402Event{}: 23,
+		&routerv1.AppendX402EventsRequest{}: 2, &routerv1.AppendX402EventsResponse{}: 1,
+		&routerv1.LookupPlacementRequest{}: 2, &routerv1.LookupPlacementResponse{}: 7,
+		&routerv1.AllowanceEvent{}: 6, &routerv1.AppendAllowanceEventRequest{}: 3,
+		&routerv1.AppendAllowanceEventResponse{}: 0, &routerv1.AppendX402ResolvedRequest{}: 10,
+		&routerv1.AppendX402ResolvedResponse{}: 0,
+	} {
+		if md := msg.ProtoReflect().Descriptor(); md.Fields().Len() != n {
+			t.Errorf("%s has %d fields, want %d", md.Name(), md.Fields().Len(), n)
+		}
+	}
+}
+
+func TestResolveTunnelKeepsTenAndHundredForTheirTasks(t *testing.T) {
+	fields := (&routerv1.ResolveTunnelResponse{}).ProtoReflect().Descriptor().Fields()
+	ten, hundred := fields.ByNumber(10), fields.ByNumber(100)
+	eq(t, ten == nil || ten.Name() == "source_check", true)
+	eq(t, hundred == nil || hundred.Name() == "order_traceparent", true)
+}
+
+// x402At is a fixed time the x402 round trips carry
+var x402At = timestamppb.New(time.Date(2026, 11, 7, 18, 2, 11, 204e6, time.UTC))
+
+func TestX402MessagesRoundTrip(t *testing.T) {
+	spec := &routerv1.X402ServiceSpec{
+		Host: "api.example.com", Prefix: "/search/", Method: "GET", MaxPriceMicros: 10000,
+		PayTo: "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin", PaidPath: "/search",
+	}
+	cfg := &routerv1.X402Config{
+		Enabled: true, AccountId: "order-1",
+		Services: []*routerv1.X402Service{{
+			ServiceId: "xs_vky43ltmauaj3w53", Host: "api.example.com", Prefix: "/search/",
+			Method: "GET", MaxPriceMicros: 10000, PayTo: spec.GetPayTo(), PaidPath: "/search",
+		}},
+		UnpaidRequestsPerHost: 300, UnpaidBytesPerHost: 64 << 20,
+		UnpaidUsed: map[string]*routerv1.X402Unpaid{
+			"api.example.com": {Requests: 3, Bytes: 4096},
+		},
+	}
+	msgs := []proto.Message{
+		cfg,
+		&routerv1.X402Event{
+			At: x402At, Ref: "k3m7q2x7a4b6c5d2", Host: "agent402.tools", Method: "POST",
+			Path: "/v1/auto/chat/completions", Status: "paid", Reason: "",
+			AskedMicros: 10000, AmountMicros: 10000,
+			Asset:   "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+			Network: "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp", Scheme: "exact",
+			X402Version: 2, PayTo: spec.GetPayTo(), HttpStatus: 200, DurationMs: 1840,
+			BytesOut: 512, BytesIn: 2048, StreamCut: true, AllowanceLeftMicros: 990000,
+			Count: 1, ServiceId: "xs_w5a4htopmpzmmhos", PaymentRef: "k3m7q2x7a4b6c5d2",
+		},
+		&routerv1.X402ServiceInfo{
+			ServiceId: "xs_vky43ltmauaj3w53", Spec: spec,
+			State:         routerv1.X402ServiceState_X402_SERVICE_STATE_FAILED,
+			FailureReason: "HOST_BLOCKED", Requests: 7, Paid: 3, Uncertain: 1,
+		},
+		&routerv1.LookupPlacementResponse{
+			PlacementId: "p-1", StartOrderId: "order-1", State: "ready", Deadline: x402At,
+			EndedAt: x402At, X402Capable: true, PackageId: "small-10m",
+		},
+		&routerv1.AppendX402ResolvedRequest{
+			StartOrderId: "order-1", Ref: "k3m7q2x7a4b6c5d2", Status: "paid",
+			AmountMicros: 10000, Tx: "5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpj" +
+				"KhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW",
+			At: x402At, Host: "agent402.tools", Method: "POST", Path: "/v1/auto/chat/completions",
+			PayTo: spec.GetPayTo(),
+		},
+		&routerv1.ResolveTunnelResponse{PlacementId: "p-1", X402: cfg},
+		&routerv1.ReportEgressUsageRequest{
+			ReporterId: "egress-1",
+			X402Unpaid: map[string]*routerv1.X402UnpaidByHost{"p-1": {
+				Hosts: map[string]*routerv1.X402Unpaid{"api.example.com": {Requests: 1, Bytes: 9}},
+			}},
+		},
+		&routerv1.CheckX402Request{
+			Handle: "sbx_a", Add: []*routerv1.X402ServiceSpec{spec}, Disable: []string{"xs_a"},
+		},
+		&routerv1.EnableX402Request{
+			Handle: "sbx_a", Add: []*routerv1.X402ServiceSpec{spec}, Disable: []string{"xs_a"},
+			RequestId: "req-1", WaitActive: true,
+		},
+		&routerv1.ListX402Response{
+			Enabled: true,
+			Services: []*routerv1.X402ServiceInfo{{ServiceId: "xs_a", Spec: spec,
+				State: routerv1.X402ServiceState_X402_SERVICE_STATE_ACTIVE}},
+			Refusals: []*routerv1.X402Refusal{{Reason: "refused_host", Count: 4, LastAt: x402At}},
+		},
+		&routerv1.AppendX402EventsRequest{
+			PlacementId: "p-1", Events: []*routerv1.X402Event{{Ref: "a", Count: 2}},
+		},
+		&routerv1.AppendX402EventsResponse{Rejected: []uint32{0, 3}},
+		&routerv1.AppendAllowanceEventRequest{
+			OrderId: "order-1", StartOrderId: "order-1",
+			Event: &routerv1.AllowanceEvent{Phase: "kept", KeptMicros: 4000},
+		},
+	}
+	for _, in := range msgs {
+		if out := roundTrip(t, in); !proto.Equal(in, out) {
+			t.Fatalf("round trip mismatch: %v != %v", in, out)
+		}
+	}
+}
+
+func TestX402Procedures(t *testing.T) {
+	eq(t, routerv1connect.SandboxRouterServiceCheckX402Procedure,
+		"/bugnet.router.v1.SandboxRouterService/CheckX402")
+	eq(t, routerv1connect.SandboxRouterServiceEnableX402Procedure,
+		"/bugnet.router.v1.SandboxRouterService/EnableX402")
+	eq(t, routerv1connect.SandboxRouterServiceListX402Procedure,
+		"/bugnet.router.v1.SandboxRouterService/ListX402")
+	eq(t, routerv1connect.EgressServiceAppendX402EventsProcedure,
+		"/bugnet.router.v1.EgressService/AppendX402Events")
+	eq(t, routerv1connect.PaymentsServiceLookupPlacementProcedure,
+		"/bugnet.router.v1.PaymentsService/LookupPlacement")
+	eq(t, routerv1connect.PaymentsServiceAppendAllowanceEventProcedure,
+		"/bugnet.router.v1.PaymentsService/AppendAllowanceEvent")
+	eq(t, routerv1connect.PaymentsServiceAppendX402ResolvedProcedure,
+		"/bugnet.router.v1.PaymentsService/AppendX402Resolved")
+}
+
+func TestX402ServiceStateValues(t *testing.T) {
+	for value, want := range map[routerv1.X402ServiceState]string{
+		0: "X402_SERVICE_STATE_UNSPECIFIED", 1: "X402_SERVICE_STATE_APPLYING",
+		2: "X402_SERVICE_STATE_ACTIVE", 3: "X402_SERVICE_STATE_FAILED",
+		4: "X402_SERVICE_STATE_DISABLED",
+	} {
+		eq(t, value.String(), want)
+	}
+	eq(t, routerv1.X402ServiceState_X402_SERVICE_STATE_DISABLED.Descriptor().Values().Len(), 5)
+}
+
+func TestLookupPlacementKeyIsOneOf(t *testing.T) {
+	m := (&routerv1.LookupPlacementRequest{}).ProtoReflect()
+	fields := m.Descriptor().Fields()
+	byHandle, byOrder := fields.ByName("handle_sha256"), fields.ByName("start_order_id")
+	eq(t, byHandle.ContainingOneof().Name(), protoreflect.Name("key"))
+	eq(t, byOrder.ContainingOneof() == byHandle.ContainingOneof(), true)
+	m.Set(byHandle, protoreflect.ValueOfString("ab"))
+	m.Set(byOrder, protoreflect.ValueOfString("order-1"))
+	eq(t, m.Has(byHandle), false)
+	req := m.Interface().(*routerv1.LookupPlacementRequest)
+	eq(t, req.GetStartOrderId(), "order-1")
+	eq(t, req.GetHandleSha256(), "")
+	eq(t, roundTrip(t, req).GetStartOrderId(), "order-1")
+}
+
+func TestX402RPCsLiveInTheirServices(t *testing.T) {
+	for svc, names := range map[string][]string{
+		"SandboxRouterService": {"CheckX402", "EnableX402", "ListX402"},
+		"EgressService":        {"AppendX402Events"},
+		"PaymentsService":      {"LookupPlacement", "AppendAllowanceEvent", "AppendX402Resolved"},
+	} {
+		for _, name := range names {
+			eq(t, service(t, svc).Methods().ByName(protoreflect.Name(name)) != nil, true)
+		}
+	}
+}

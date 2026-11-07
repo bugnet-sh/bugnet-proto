@@ -354,6 +354,528 @@ func (x *CheckPayerResponse) GetRetryAfter() *durationpb.Duration {
 	return nil
 }
 
+type LookupPlacementRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Key:
+	//
+	//	*LookupPlacementRequest_HandleSha256
+	//	*LookupPlacementRequest_StartOrderId
+	Key           isLookupPlacementRequest_Key `protobuf_oneof:"key"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LookupPlacementRequest) Reset() {
+	*x = LookupPlacementRequest{}
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LookupPlacementRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LookupPlacementRequest) ProtoMessage() {}
+
+func (x *LookupPlacementRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LookupPlacementRequest.ProtoReflect.Descriptor instead.
+func (*LookupPlacementRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *LookupPlacementRequest) GetKey() isLookupPlacementRequest_Key {
+	if x != nil {
+		return x.Key
+	}
+	return nil
+}
+
+func (x *LookupPlacementRequest) GetHandleSha256() string {
+	if x != nil {
+		if x, ok := x.Key.(*LookupPlacementRequest_HandleSha256); ok {
+			return x.HandleSha256
+		}
+	}
+	return ""
+}
+
+func (x *LookupPlacementRequest) GetStartOrderId() string {
+	if x != nil {
+		if x, ok := x.Key.(*LookupPlacementRequest_StartOrderId); ok {
+			return x.StartOrderId
+		}
+	}
+	return ""
+}
+
+type isLookupPlacementRequest_Key interface {
+	isLookupPlacementRequest_Key()
+}
+
+type LookupPlacementRequest_HandleSha256 struct {
+	// Lowercase hex SHA-256 of the handle
+	HandleSha256 string `protobuf:"bytes,1,opt,name=handle_sha256,json=handleSha256,proto3,oneof"`
+}
+
+type LookupPlacementRequest_StartOrderId struct {
+	// The placement's start order id, for an account with no handle hash yet
+	StartOrderId string `protobuf:"bytes,2,opt,name=start_order_id,json=startOrderId,proto3,oneof"`
+}
+
+func (*LookupPlacementRequest_HandleSha256) isLookupPlacementRequest_Key() {}
+
+func (*LookupPlacementRequest_StartOrderId) isLookupPlacementRequest_Key() {}
+
+type LookupPlacementResponse struct {
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	PlacementId  string                 `protobuf:"bytes,1,opt,name=placement_id,json=placementId,proto3" json:"placement_id,omitempty"`
+	StartOrderId string                 `protobuf:"bytes,2,opt,name=start_order_id,json=startOrderId,proto3" json:"start_order_id,omitempty"`
+	// placing, ready, terminating, terminated or failed, as GetOrderResponse.placement_state
+	State    string                 `protobuf:"bytes,3,opt,name=state,proto3" json:"state,omitempty"`
+	Deadline *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=deadline,proto3" json:"deadline,omitempty"`
+	EndedAt  *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	// While placing the order asked for secrets, from ready the provider has the Secrets capability
+	X402Capable bool `protobuf:"varint,6,opt,name=x402_capable,json=x402Capable,proto3" json:"x402_capable,omitempty"`
+	// The package the placement runs, for CheckPayer on allowance orders
+	PackageId     string `protobuf:"bytes,7,opt,name=package_id,json=packageId,proto3" json:"package_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LookupPlacementResponse) Reset() {
+	*x = LookupPlacementResponse{}
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LookupPlacementResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LookupPlacementResponse) ProtoMessage() {}
+
+func (x *LookupPlacementResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LookupPlacementResponse.ProtoReflect.Descriptor instead.
+func (*LookupPlacementResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *LookupPlacementResponse) GetPlacementId() string {
+	if x != nil {
+		return x.PlacementId
+	}
+	return ""
+}
+
+func (x *LookupPlacementResponse) GetStartOrderId() string {
+	if x != nil {
+		return x.StartOrderId
+	}
+	return ""
+}
+
+func (x *LookupPlacementResponse) GetState() string {
+	if x != nil {
+		return x.State
+	}
+	return ""
+}
+
+func (x *LookupPlacementResponse) GetDeadline() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Deadline
+	}
+	return nil
+}
+
+func (x *LookupPlacementResponse) GetEndedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndedAt
+	}
+	return nil
+}
+
+func (x *LookupPlacementResponse) GetX402Capable() bool {
+	if x != nil {
+		return x.X402Capable
+	}
+	return false
+}
+
+func (x *LookupPlacementResponse) GetPackageId() string {
+	if x != nil {
+		return x.PackageId
+	}
+	return ""
+}
+
+type AllowanceEvent struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// paid, refunded or kept
+	Phase        string `protobuf:"bytes,1,opt,name=phase,proto3" json:"phase,omitempty"`
+	AmountMicros int64  `protobuf:"varint,2,opt,name=amount_micros,json=amountMicros,proto3" json:"amount_micros,omitempty"`
+	// The mint, base58
+	Asset string `protobuf:"bytes,3,opt,name=asset,proto3" json:"asset,omitempty"`
+	// CAIP-2
+	Network string `protobuf:"bytes,4,opt,name=network,proto3" json:"network,omitempty"`
+	// Base58 of a 64-byte signature, empty for kept
+	Tx string `protobuf:"bytes,5,opt,name=tx,proto3" json:"tx,omitempty"`
+	// Under the refund minimum and kept by Bugnet, set only for kept
+	KeptMicros    int64 `protobuf:"varint,6,opt,name=kept_micros,json=keptMicros,proto3" json:"kept_micros,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AllowanceEvent) Reset() {
+	*x = AllowanceEvent{}
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AllowanceEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AllowanceEvent) ProtoMessage() {}
+
+func (x *AllowanceEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AllowanceEvent.ProtoReflect.Descriptor instead.
+func (*AllowanceEvent) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *AllowanceEvent) GetPhase() string {
+	if x != nil {
+		return x.Phase
+	}
+	return ""
+}
+
+func (x *AllowanceEvent) GetAmountMicros() int64 {
+	if x != nil {
+		return x.AmountMicros
+	}
+	return 0
+}
+
+func (x *AllowanceEvent) GetAsset() string {
+	if x != nil {
+		return x.Asset
+	}
+	return ""
+}
+
+func (x *AllowanceEvent) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *AllowanceEvent) GetTx() string {
+	if x != nil {
+		return x.Tx
+	}
+	return ""
+}
+
+func (x *AllowanceEvent) GetKeptMicros() int64 {
+	if x != nil {
+		return x.KeptMicros
+	}
+	return 0
+}
+
+type AppendAllowanceEventRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The order the event is about, a top-up or the start order, equal to start_order_id for kept
+	OrderId string          `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	Event   *AllowanceEvent `protobuf:"bytes,2,opt,name=event,proto3" json:"event,omitempty"`
+	// The placement's start order, which names the allowance account
+	StartOrderId  string `protobuf:"bytes,3,opt,name=start_order_id,json=startOrderId,proto3" json:"start_order_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppendAllowanceEventRequest) Reset() {
+	*x = AppendAllowanceEventRequest{}
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppendAllowanceEventRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppendAllowanceEventRequest) ProtoMessage() {}
+
+func (x *AppendAllowanceEventRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppendAllowanceEventRequest.ProtoReflect.Descriptor instead.
+func (*AppendAllowanceEventRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *AppendAllowanceEventRequest) GetOrderId() string {
+	if x != nil {
+		return x.OrderId
+	}
+	return ""
+}
+
+func (x *AppendAllowanceEventRequest) GetEvent() *AllowanceEvent {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *AppendAllowanceEventRequest) GetStartOrderId() string {
+	if x != nil {
+		return x.StartOrderId
+	}
+	return ""
+}
+
+type AppendAllowanceEventResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppendAllowanceEventResponse) Reset() {
+	*x = AppendAllowanceEventResponse{}
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppendAllowanceEventResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppendAllowanceEventResponse) ProtoMessage() {}
+
+func (x *AppendAllowanceEventResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppendAllowanceEventResponse.ProtoReflect.Descriptor instead.
+func (*AppendAllowanceEventResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{8}
+}
+
+type AppendX402ResolvedRequest struct {
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	StartOrderId string                 `protobuf:"bytes,1,opt,name=start_order_id,json=startOrderId,proto3" json:"start_order_id,omitempty"`
+	// The paying row's ref, which x402 rows carry as payment_ref
+	Ref string `protobuf:"bytes,2,opt,name=ref,proto3" json:"ref,omitempty"`
+	// paid or released
+	Status       string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	AmountMicros int64  `protobuf:"varint,4,opt,name=amount_micros,json=amountMicros,proto3" json:"amount_micros,omitempty"`
+	// Set when paid, confirmed on chain by Payments
+	Tx string `protobuf:"bytes,5,opt,name=tx,proto3" json:"tx,omitempty"`
+	// With host, method and path, enough to draw the call when egress's own row never arrived
+	At            *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=at,proto3" json:"at,omitempty"`
+	Host          string                 `protobuf:"bytes,7,opt,name=host,proto3" json:"host,omitempty"`
+	Method        string                 `protobuf:"bytes,8,opt,name=method,proto3" json:"method,omitempty"`
+	Path          string                 `protobuf:"bytes,9,opt,name=path,proto3" json:"path,omitempty"`
+	PayTo         string                 `protobuf:"bytes,10,opt,name=pay_to,json=payTo,proto3" json:"pay_to,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppendX402ResolvedRequest) Reset() {
+	*x = AppendX402ResolvedRequest{}
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppendX402ResolvedRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppendX402ResolvedRequest) ProtoMessage() {}
+
+func (x *AppendX402ResolvedRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppendX402ResolvedRequest.ProtoReflect.Descriptor instead.
+func (*AppendX402ResolvedRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *AppendX402ResolvedRequest) GetStartOrderId() string {
+	if x != nil {
+		return x.StartOrderId
+	}
+	return ""
+}
+
+func (x *AppendX402ResolvedRequest) GetRef() string {
+	if x != nil {
+		return x.Ref
+	}
+	return ""
+}
+
+func (x *AppendX402ResolvedRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *AppendX402ResolvedRequest) GetAmountMicros() int64 {
+	if x != nil {
+		return x.AmountMicros
+	}
+	return 0
+}
+
+func (x *AppendX402ResolvedRequest) GetTx() string {
+	if x != nil {
+		return x.Tx
+	}
+	return ""
+}
+
+func (x *AppendX402ResolvedRequest) GetAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.At
+	}
+	return nil
+}
+
+func (x *AppendX402ResolvedRequest) GetHost() string {
+	if x != nil {
+		return x.Host
+	}
+	return ""
+}
+
+func (x *AppendX402ResolvedRequest) GetMethod() string {
+	if x != nil {
+		return x.Method
+	}
+	return ""
+}
+
+func (x *AppendX402ResolvedRequest) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *AppendX402ResolvedRequest) GetPayTo() string {
+	if x != nil {
+		return x.PayTo
+	}
+	return ""
+}
+
+type AppendX402ResolvedResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppendX402ResolvedResponse) Reset() {
+	*x = AppendX402ResolvedResponse{}
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppendX402ResolvedResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppendX402ResolvedResponse) ProtoMessage() {}
+
+func (x *AppendX402ResolvedResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_payments_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppendX402ResolvedResponse.ProtoReflect.Descriptor instead.
+func (*AppendX402ResolvedResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_payments_proto_rawDescGZIP(), []int{10}
+}
+
 var File_bugnet_router_v1_payments_proto protoreflect.FileDescriptor
 
 const file_bugnet_router_v1_payments_proto_rawDesc = "" +
@@ -381,17 +903,59 @@ const file_bugnet_router_v1_payments_proto_rawDesc = "" +
 	"\averdict\x18\x01 \x01(\x0e2\x1e.bugnet.router.v1.PayerVerdictR\averdict\x12?\n" +
 	"\rblocked_until\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\fblockedUntil\x12:\n" +
 	"\vretry_after\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\n" +
-	"retryAfter*\x96\x01\n" +
+	"retryAfter\"n\n" +
+	"\x16LookupPlacementRequest\x12%\n" +
+	"\rhandle_sha256\x18\x01 \x01(\tH\x00R\fhandleSha256\x12&\n" +
+	"\x0estart_order_id\x18\x02 \x01(\tH\x00R\fstartOrderIdB\x05\n" +
+	"\x03key\"\xa9\x02\n" +
+	"\x17LookupPlacementResponse\x12!\n" +
+	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\x12$\n" +
+	"\x0estart_order_id\x18\x02 \x01(\tR\fstartOrderId\x12\x14\n" +
+	"\x05state\x18\x03 \x01(\tR\x05state\x126\n" +
+	"\bdeadline\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\bdeadline\x125\n" +
+	"\bended_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x12!\n" +
+	"\fx402_capable\x18\x06 \x01(\bR\vx402Capable\x12\x1d\n" +
+	"\n" +
+	"package_id\x18\a \x01(\tR\tpackageId\"\xac\x01\n" +
+	"\x0eAllowanceEvent\x12\x14\n" +
+	"\x05phase\x18\x01 \x01(\tR\x05phase\x12#\n" +
+	"\ramount_micros\x18\x02 \x01(\x03R\famountMicros\x12\x14\n" +
+	"\x05asset\x18\x03 \x01(\tR\x05asset\x12\x18\n" +
+	"\anetwork\x18\x04 \x01(\tR\anetwork\x12\x0e\n" +
+	"\x02tx\x18\x05 \x01(\tR\x02tx\x12\x1f\n" +
+	"\vkept_micros\x18\x06 \x01(\x03R\n" +
+	"keptMicros\"\x96\x01\n" +
+	"\x1bAppendAllowanceEventRequest\x12\x19\n" +
+	"\border_id\x18\x01 \x01(\tR\aorderId\x126\n" +
+	"\x05event\x18\x02 \x01(\v2 .bugnet.router.v1.AllowanceEventR\x05event\x12$\n" +
+	"\x0estart_order_id\x18\x03 \x01(\tR\fstartOrderId\"\x1e\n" +
+	"\x1cAppendAllowanceEventResponse\"\xa3\x02\n" +
+	"\x19AppendX402ResolvedRequest\x12$\n" +
+	"\x0estart_order_id\x18\x01 \x01(\tR\fstartOrderId\x12\x10\n" +
+	"\x03ref\x18\x02 \x01(\tR\x03ref\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status\x12#\n" +
+	"\ramount_micros\x18\x04 \x01(\x03R\famountMicros\x12\x0e\n" +
+	"\x02tx\x18\x05 \x01(\tR\x02tx\x12*\n" +
+	"\x02at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x02at\x12\x12\n" +
+	"\x04host\x18\a \x01(\tR\x04host\x12\x16\n" +
+	"\x06method\x18\b \x01(\tR\x06method\x12\x12\n" +
+	"\x04path\x18\t \x01(\tR\x04path\x12\x15\n" +
+	"\x06pay_to\x18\n" +
+	" \x01(\tR\x05payTo\"\x1c\n" +
+	"\x1aAppendX402ResolvedResponse*\x96\x01\n" +
 	"\fPayerVerdict\x12\x1d\n" +
 	"\x19PAYER_VERDICT_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10PAYER_VERDICT_OK\x10\x01\x12\x19\n" +
 	"\x15PAYER_VERDICT_BLOCKED\x10\x02\x12\x16\n" +
 	"\x12PAYER_VERDICT_BUSY\x10\x03\x12\x1e\n" +
-	"\x1aPAYER_VERDICT_RATE_LIMITED\x10\x042\xbd\x01\n" +
+	"\x1aPAYER_VERDICT_RATE_LIMITED\x10\x042\x8d\x04\n" +
 	"\x0fPaymentsService\x12W\n" +
 	"\n" +
 	"CheckPayer\x12#.bugnet.router.v1.CheckPayerRequest\x1a$.bugnet.router.v1.CheckPayerResponse\x12Q\n" +
-	"\bGetOrder\x12!.bugnet.router.v1.GetOrderRequest\x1a\".bugnet.router.v1.GetOrderResponseBBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"\bGetOrder\x12!.bugnet.router.v1.GetOrderRequest\x1a\".bugnet.router.v1.GetOrderResponse\x12f\n" +
+	"\x0fLookupPlacement\x12(.bugnet.router.v1.LookupPlacementRequest\x1a).bugnet.router.v1.LookupPlacementResponse\x12u\n" +
+	"\x14AppendAllowanceEvent\x12-.bugnet.router.v1.AppendAllowanceEventRequest\x1a..bugnet.router.v1.AppendAllowanceEventResponse\x12o\n" +
+	"\x12AppendX402Resolved\x12+.bugnet.router.v1.AppendX402ResolvedRequest\x1a,.bugnet.router.v1.AppendX402ResolvedResponseBBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_payments_proto_rawDescOnce sync.Once
@@ -406,30 +970,47 @@ func file_bugnet_router_v1_payments_proto_rawDescGZIP() []byte {
 }
 
 var file_bugnet_router_v1_payments_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_bugnet_router_v1_payments_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_bugnet_router_v1_payments_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_bugnet_router_v1_payments_proto_goTypes = []any{
-	(PayerVerdict)(0),             // 0: bugnet.router.v1.PayerVerdict
-	(*GetOrderRequest)(nil),       // 1: bugnet.router.v1.GetOrderRequest
-	(*GetOrderResponse)(nil),      // 2: bugnet.router.v1.GetOrderResponse
-	(*CheckPayerRequest)(nil),     // 3: bugnet.router.v1.CheckPayerRequest
-	(*CheckPayerResponse)(nil),    // 4: bugnet.router.v1.CheckPayerResponse
-	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),   // 6: google.protobuf.Duration
+	(PayerVerdict)(0),                    // 0: bugnet.router.v1.PayerVerdict
+	(*GetOrderRequest)(nil),              // 1: bugnet.router.v1.GetOrderRequest
+	(*GetOrderResponse)(nil),             // 2: bugnet.router.v1.GetOrderResponse
+	(*CheckPayerRequest)(nil),            // 3: bugnet.router.v1.CheckPayerRequest
+	(*CheckPayerResponse)(nil),           // 4: bugnet.router.v1.CheckPayerResponse
+	(*LookupPlacementRequest)(nil),       // 5: bugnet.router.v1.LookupPlacementRequest
+	(*LookupPlacementResponse)(nil),      // 6: bugnet.router.v1.LookupPlacementResponse
+	(*AllowanceEvent)(nil),               // 7: bugnet.router.v1.AllowanceEvent
+	(*AppendAllowanceEventRequest)(nil),  // 8: bugnet.router.v1.AppendAllowanceEventRequest
+	(*AppendAllowanceEventResponse)(nil), // 9: bugnet.router.v1.AppendAllowanceEventResponse
+	(*AppendX402ResolvedRequest)(nil),    // 10: bugnet.router.v1.AppendX402ResolvedRequest
+	(*AppendX402ResolvedResponse)(nil),   // 11: bugnet.router.v1.AppendX402ResolvedResponse
+	(*timestamppb.Timestamp)(nil),        // 12: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),          // 13: google.protobuf.Duration
 }
 var file_bugnet_router_v1_payments_proto_depIdxs = []int32{
-	5, // 0: bugnet.router.v1.GetOrderResponse.ended_at:type_name -> google.protobuf.Timestamp
-	0, // 1: bugnet.router.v1.CheckPayerResponse.verdict:type_name -> bugnet.router.v1.PayerVerdict
-	5, // 2: bugnet.router.v1.CheckPayerResponse.blocked_until:type_name -> google.protobuf.Timestamp
-	6, // 3: bugnet.router.v1.CheckPayerResponse.retry_after:type_name -> google.protobuf.Duration
-	3, // 4: bugnet.router.v1.PaymentsService.CheckPayer:input_type -> bugnet.router.v1.CheckPayerRequest
-	1, // 5: bugnet.router.v1.PaymentsService.GetOrder:input_type -> bugnet.router.v1.GetOrderRequest
-	4, // 6: bugnet.router.v1.PaymentsService.CheckPayer:output_type -> bugnet.router.v1.CheckPayerResponse
-	2, // 7: bugnet.router.v1.PaymentsService.GetOrder:output_type -> bugnet.router.v1.GetOrderResponse
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	12, // 0: bugnet.router.v1.GetOrderResponse.ended_at:type_name -> google.protobuf.Timestamp
+	0,  // 1: bugnet.router.v1.CheckPayerResponse.verdict:type_name -> bugnet.router.v1.PayerVerdict
+	12, // 2: bugnet.router.v1.CheckPayerResponse.blocked_until:type_name -> google.protobuf.Timestamp
+	13, // 3: bugnet.router.v1.CheckPayerResponse.retry_after:type_name -> google.protobuf.Duration
+	12, // 4: bugnet.router.v1.LookupPlacementResponse.deadline:type_name -> google.protobuf.Timestamp
+	12, // 5: bugnet.router.v1.LookupPlacementResponse.ended_at:type_name -> google.protobuf.Timestamp
+	7,  // 6: bugnet.router.v1.AppendAllowanceEventRequest.event:type_name -> bugnet.router.v1.AllowanceEvent
+	12, // 7: bugnet.router.v1.AppendX402ResolvedRequest.at:type_name -> google.protobuf.Timestamp
+	3,  // 8: bugnet.router.v1.PaymentsService.CheckPayer:input_type -> bugnet.router.v1.CheckPayerRequest
+	1,  // 9: bugnet.router.v1.PaymentsService.GetOrder:input_type -> bugnet.router.v1.GetOrderRequest
+	5,  // 10: bugnet.router.v1.PaymentsService.LookupPlacement:input_type -> bugnet.router.v1.LookupPlacementRequest
+	8,  // 11: bugnet.router.v1.PaymentsService.AppendAllowanceEvent:input_type -> bugnet.router.v1.AppendAllowanceEventRequest
+	10, // 12: bugnet.router.v1.PaymentsService.AppendX402Resolved:input_type -> bugnet.router.v1.AppendX402ResolvedRequest
+	4,  // 13: bugnet.router.v1.PaymentsService.CheckPayer:output_type -> bugnet.router.v1.CheckPayerResponse
+	2,  // 14: bugnet.router.v1.PaymentsService.GetOrder:output_type -> bugnet.router.v1.GetOrderResponse
+	6,  // 15: bugnet.router.v1.PaymentsService.LookupPlacement:output_type -> bugnet.router.v1.LookupPlacementResponse
+	9,  // 16: bugnet.router.v1.PaymentsService.AppendAllowanceEvent:output_type -> bugnet.router.v1.AppendAllowanceEventResponse
+	11, // 17: bugnet.router.v1.PaymentsService.AppendX402Resolved:output_type -> bugnet.router.v1.AppendX402ResolvedResponse
+	13, // [13:18] is the sub-list for method output_type
+	8,  // [8:13] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_bugnet_router_v1_payments_proto_init() }
@@ -437,13 +1018,17 @@ func file_bugnet_router_v1_payments_proto_init() {
 	if File_bugnet_router_v1_payments_proto != nil {
 		return
 	}
+	file_bugnet_router_v1_payments_proto_msgTypes[4].OneofWrappers = []any{
+		(*LookupPlacementRequest_HandleSha256)(nil),
+		(*LookupPlacementRequest_StartOrderId)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bugnet_router_v1_payments_proto_rawDesc), len(file_bugnet_router_v1_payments_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   4,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

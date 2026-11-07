@@ -2100,6 +2100,286 @@ export declare type FetchSourceResponse = Message<"bugnet.router.v1.FetchSourceR
 export declare const FetchSourceResponseSchema: GenMessage<FetchSourceResponse>;
 
 /**
+ * @generated from message bugnet.router.v1.X402ServiceSpec
+ */
+export declare type X402ServiceSpec = Message<"bugnet.router.v1.X402ServiceSpec"> & {
+  /**
+   * @generated from field: string host = 1;
+   */
+  host: string;
+
+  /**
+   * Starts and ends with a slash, at most 200 characters
+   *
+   * @generated from field: string prefix = 2;
+   */
+  prefix: string;
+
+  /**
+   * GET or POST
+   *
+   * @generated from field: string method = 3;
+   */
+  method: string;
+
+  /**
+   * @generated from field: int64 max_price_micros = 4;
+   */
+  maxPriceMicros: bigint;
+
+  /**
+   * Canonical base58 of 32 bytes
+   *
+   * @generated from field: string pay_to = 5;
+   */
+  payTo: string;
+
+  /**
+   * In Bugnet's index, so every path under the prefix is paid
+   *
+   * @generated from field: bool indexed = 6;
+   */
+  indexed: boolean;
+
+  /**
+   * The one paid path of a service that is not indexed, empty when indexed
+   *
+   * @generated from field: string paid_path = 7;
+   */
+  paidPath: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.X402ServiceSpec.
+ * Use `create(X402ServiceSpecSchema)` to create a new message.
+ */
+export declare const X402ServiceSpecSchema: GenMessage<X402ServiceSpec>;
+
+/**
+ * @generated from message bugnet.router.v1.X402ServiceInfo
+ */
+export declare type X402ServiceInfo = Message<"bugnet.router.v1.X402ServiceInfo"> & {
+  /**
+   * @generated from field: string service_id = 1;
+   */
+  serviceId: string;
+
+  /**
+   * @generated from field: bugnet.router.v1.X402ServiceSpec spec = 2;
+   */
+  spec?: X402ServiceSpec | undefined;
+
+  /**
+   * @generated from field: bugnet.router.v1.X402ServiceState state = 3;
+   */
+  state: X402ServiceState;
+
+  /**
+   * A code such as PORT_443_TAKEN, FEATURE_UNAVAILABLE or HOST_BLOCKED, empty unless failed
+   *
+   * @generated from field: string failure_reason = 4;
+   */
+  failureReason: string;
+
+  /**
+   * @generated from field: uint32 requests = 5;
+   */
+  requests: number;
+
+  /**
+   * @generated from field: uint32 paid = 6;
+   */
+  paid: number;
+
+  /**
+   * @generated from field: uint32 uncertain = 7;
+   */
+  uncertain: number;
+};
+
+/**
+ * Describes the message bugnet.router.v1.X402ServiceInfo.
+ * Use `create(X402ServiceInfoSchema)` to create a new message.
+ */
+export declare const X402ServiceInfoSchema: GenMessage<X402ServiceInfo>;
+
+/**
+ * @generated from message bugnet.router.v1.X402Refusal
+ */
+export declare type X402Refusal = Message<"bugnet.router.v1.X402Refusal"> & {
+  /**
+   * A refusal code of x402 spec 6.13, or refused_host
+   *
+   * @generated from field: string reason = 1;
+   */
+  reason: string;
+
+  /**
+   * @generated from field: uint32 count = 2;
+   */
+  count: number;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp last_at = 3;
+   */
+  lastAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.X402Refusal.
+ * Use `create(X402RefusalSchema)` to create a new message.
+ */
+export declare const X402RefusalSchema: GenMessage<X402Refusal>;
+
+/**
+ * With a handle and nothing to add or disable, checks the switch, the capability and the state
+ *
+ * @generated from message bugnet.router.v1.CheckX402Request
+ */
+export declare type CheckX402Request = Message<"bugnet.router.v1.CheckX402Request"> & {
+  /**
+   * Empty runs only the checks that need no placement, and then disable must be empty
+   *
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * @generated from field: repeated bugnet.router.v1.X402ServiceSpec add = 2;
+   */
+  add: X402ServiceSpec[];
+
+  /**
+   * Service ids
+   *
+   * @generated from field: repeated string disable = 3;
+   */
+  disable: string[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.CheckX402Request.
+ * Use `create(CheckX402RequestSchema)` to create a new message.
+ */
+export declare const CheckX402RequestSchema: GenMessage<CheckX402Request>;
+
+/**
+ * A per-service refusal names the first failing add entry in ErrorInfo metadata service_id and host
+ *
+ * @generated from message bugnet.router.v1.CheckX402Response
+ */
+export declare type CheckX402Response = Message<"bugnet.router.v1.CheckX402Response"> & {
+};
+
+/**
+ * Describes the message bugnet.router.v1.CheckX402Response.
+ * Use `create(CheckX402ResponseSchema)` to create a new message.
+ */
+export declare const CheckX402ResponseSchema: GenMessage<CheckX402Response>;
+
+/**
+ * @generated from message bugnet.router.v1.EnableX402Request
+ */
+export declare type EnableX402Request = Message<"bugnet.router.v1.EnableX402Request"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * @generated from field: repeated bugnet.router.v1.X402ServiceSpec add = 2;
+   */
+  add: X402ServiceSpec[];
+
+  /**
+   * Service ids
+   *
+   * @generated from field: repeated string disable = 3;
+   */
+  disable: string[];
+
+  /**
+   * 1 to 128 printable ASCII, logged and traced only
+   *
+   * @generated from field: string request_id = 4;
+   */
+  requestId: string;
+
+  /**
+   * On a ready placement, waits up to secrets.apply_wait for the added rows to leave APPLYING
+   *
+   * @generated from field: bool wait_active = 5;
+   */
+  waitActive: boolean;
+};
+
+/**
+ * Describes the message bugnet.router.v1.EnableX402Request.
+ * Use `create(EnableX402RequestSchema)` to create a new message.
+ */
+export declare const EnableX402RequestSchema: GenMessage<EnableX402Request>;
+
+/**
+ * @generated from message bugnet.router.v1.EnableX402Response
+ */
+export declare type EnableX402Response = Message<"bugnet.router.v1.EnableX402Response"> & {
+  /**
+   * @generated from field: repeated bugnet.router.v1.X402ServiceInfo services = 1;
+   */
+  services: X402ServiceInfo[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.EnableX402Response.
+ * Use `create(EnableX402ResponseSchema)` to create a new message.
+ */
+export declare const EnableX402ResponseSchema: GenMessage<EnableX402Response>;
+
+/**
+ * @generated from message bugnet.router.v1.ListX402Request
+ */
+export declare type ListX402Request = Message<"bugnet.router.v1.ListX402Request"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.ListX402Request.
+ * Use `create(ListX402RequestSchema)` to create a new message.
+ */
+export declare const ListX402RequestSchema: GenMessage<ListX402Request>;
+
+/**
+ * @generated from message bugnet.router.v1.ListX402Response
+ */
+export declare type ListX402Response = Message<"bugnet.router.v1.ListX402Response"> & {
+  /**
+   * @generated from field: bool enabled = 1;
+   */
+  enabled: boolean;
+
+  /**
+   * @generated from field: repeated bugnet.router.v1.X402ServiceInfo services = 2;
+   */
+  services: X402ServiceInfo[];
+
+  /**
+   * The placement's refusals by reason, with the last time each was seen
+   *
+   * @generated from field: repeated bugnet.router.v1.X402Refusal refusals = 3;
+   */
+  refusals: X402Refusal[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.ListX402Response.
+ * Use `create(ListX402ResponseSchema)` to create a new message.
+ */
+export declare const ListX402ResponseSchema: GenMessage<ListX402Response>;
+
+/**
  * What the package lacks against a floor
  *
  * @generated from enum bugnet.router.v1.Dimension
@@ -2703,6 +2983,41 @@ export enum BootstrapState {
 export declare const BootstrapStateSchema: GenEnum<BootstrapState>;
 
 /**
+ * @generated from enum bugnet.router.v1.X402ServiceState
+ */
+export enum X402ServiceState {
+  /**
+   * @generated from enum value: X402_SERVICE_STATE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: X402_SERVICE_STATE_APPLYING = 1;
+   */
+  APPLYING = 1,
+
+  /**
+   * @generated from enum value: X402_SERVICE_STATE_ACTIVE = 2;
+   */
+  ACTIVE = 2,
+
+  /**
+   * @generated from enum value: X402_SERVICE_STATE_FAILED = 3;
+   */
+  FAILED = 3,
+
+  /**
+   * @generated from enum value: X402_SERVICE_STATE_DISABLED = 4;
+   */
+  DISABLED = 4,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.X402ServiceState.
+ */
+export declare const X402ServiceStateSchema: GenEnum<X402ServiceState>;
+
+/**
  * ErrorInfo reasons include HANDLE_UNKNOWN, JOB_UNKNOWN, FILE_NOT_FOUND, PACKAGE_UNKNOWN and
  * NOT_START_PACKAGE
  *
@@ -2922,6 +3237,36 @@ export declare const SandboxRouterService: GenService<{
     methodKind: "unary";
     input: typeof FetchSourceRequestSchema;
     output: typeof FetchSourceResponseSchema;
+  },
+  /**
+   * Checks an x402 change without making it, and with no handle only what needs no placement
+   *
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.CheckX402
+   */
+  checkX402: {
+    methodKind: "unary";
+    input: typeof CheckX402RequestSchema;
+    output: typeof CheckX402ResponseSchema;
+  },
+  /**
+   * Stores x402 services and applies them to the sandbox, idempotent by content
+   *
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.EnableX402
+   */
+  enableX402: {
+    methodKind: "unary";
+    input: typeof EnableX402RequestSchema;
+    output: typeof EnableX402ResponseSchema;
+  },
+  /**
+   * Lists the placement's x402 services with their states and counts, and its refusals
+   *
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.ListX402
+   */
+  listX402: {
+    methodKind: "unary";
+    input: typeof ListX402RequestSchema;
+    output: typeof ListX402ResponseSchema;
   },
 }>;
 

@@ -113,6 +113,9 @@ const (
 	// EgressServiceWatchEgressEventsProcedure is the fully-qualified name of the EgressService's
 	// WatchEgressEvents RPC.
 	EgressServiceWatchEgressEventsProcedure = "/bugnet.router.v1.EgressService/WatchEgressEvents"
+	// EgressServiceAppendX402EventsProcedure is the fully-qualified name of the EgressService's
+	// AppendX402Events RPC.
+	EgressServiceAppendX402EventsProcedure = "/bugnet.router.v1.EgressService/AppendX402Events"
 )
 
 // EdgeServiceClient is a client for the bugnet.router.v1.EdgeService service.
@@ -800,6 +803,8 @@ type EgressServiceClient interface {
 	ReportEgressUsage(context.Context, *connect.Request[v1.ReportEgressUsageRequest]) (*connect.Response[v1.ReportEgressUsageResponse], error)
 	CheckEgressLeases(context.Context, *connect.Request[v1.CheckEgressLeasesRequest]) (*connect.Response[v1.CheckEgressLeasesResponse], error)
 	WatchEgressEvents(context.Context, *connect.Request[v1.WatchEgressEventsRequest]) (*connect.ServerStreamForClient[v1.WatchEgressEventsResponse], error)
+	// At most 50 x402 rows a call, each stored once per placement and ref
+	AppendX402Events(context.Context, *connect.Request[v1.AppendX402EventsRequest]) (*connect.Response[v1.AppendX402EventsResponse], error)
 }
 
 // NewEgressServiceClient constructs a client for the bugnet.router.v1.EgressService service. By
@@ -837,6 +842,12 @@ func NewEgressServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(egressServiceMethods.ByName("WatchEgressEvents")),
 			connect.WithClientOptions(opts...),
 		),
+		appendX402Events: connect.NewClient[v1.AppendX402EventsRequest, v1.AppendX402EventsResponse](
+			httpClient,
+			baseURL+EgressServiceAppendX402EventsProcedure,
+			connect.WithSchema(egressServiceMethods.ByName("AppendX402Events")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -846,6 +857,7 @@ type egressServiceClient struct {
 	reportEgressUsage *connect.Client[v1.ReportEgressUsageRequest, v1.ReportEgressUsageResponse]
 	checkEgressLeases *connect.Client[v1.CheckEgressLeasesRequest, v1.CheckEgressLeasesResponse]
 	watchEgressEvents *connect.Client[v1.WatchEgressEventsRequest, v1.WatchEgressEventsResponse]
+	appendX402Events  *connect.Client[v1.AppendX402EventsRequest, v1.AppendX402EventsResponse]
 }
 
 // ResolveTunnel calls bugnet.router.v1.EgressService.ResolveTunnel.
@@ -868,12 +880,19 @@ func (c *egressServiceClient) WatchEgressEvents(ctx context.Context, req *connec
 	return c.watchEgressEvents.CallServerStream(ctx, req)
 }
 
+// AppendX402Events calls bugnet.router.v1.EgressService.AppendX402Events.
+func (c *egressServiceClient) AppendX402Events(ctx context.Context, req *connect.Request[v1.AppendX402EventsRequest]) (*connect.Response[v1.AppendX402EventsResponse], error) {
+	return c.appendX402Events.CallUnary(ctx, req)
+}
+
 // EgressServiceHandler is an implementation of the bugnet.router.v1.EgressService service.
 type EgressServiceHandler interface {
 	ResolveTunnel(context.Context, *connect.Request[v1.ResolveTunnelRequest]) (*connect.Response[v1.ResolveTunnelResponse], error)
 	ReportEgressUsage(context.Context, *connect.Request[v1.ReportEgressUsageRequest]) (*connect.Response[v1.ReportEgressUsageResponse], error)
 	CheckEgressLeases(context.Context, *connect.Request[v1.CheckEgressLeasesRequest]) (*connect.Response[v1.CheckEgressLeasesResponse], error)
 	WatchEgressEvents(context.Context, *connect.Request[v1.WatchEgressEventsRequest], *connect.ServerStream[v1.WatchEgressEventsResponse]) error
+	// At most 50 x402 rows a call, each stored once per placement and ref
+	AppendX402Events(context.Context, *connect.Request[v1.AppendX402EventsRequest]) (*connect.Response[v1.AppendX402EventsResponse], error)
 }
 
 // NewEgressServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -907,6 +926,12 @@ func NewEgressServiceHandler(svc EgressServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(egressServiceMethods.ByName("WatchEgressEvents")),
 		connect.WithHandlerOptions(opts...),
 	)
+	egressServiceAppendX402EventsHandler := connect.NewUnaryHandler(
+		EgressServiceAppendX402EventsProcedure,
+		svc.AppendX402Events,
+		connect.WithSchema(egressServiceMethods.ByName("AppendX402Events")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/bugnet.router.v1.EgressService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case EgressServiceResolveTunnelProcedure:
@@ -917,6 +942,8 @@ func NewEgressServiceHandler(svc EgressServiceHandler, opts ...connect.HandlerOp
 			egressServiceCheckEgressLeasesHandler.ServeHTTP(w, r)
 		case EgressServiceWatchEgressEventsProcedure:
 			egressServiceWatchEgressEventsHandler.ServeHTTP(w, r)
+		case EgressServiceAppendX402EventsProcedure:
+			egressServiceAppendX402EventsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -940,4 +967,8 @@ func (UnimplementedEgressServiceHandler) CheckEgressLeases(context.Context, *con
 
 func (UnimplementedEgressServiceHandler) WatchEgressEvents(context.Context, *connect.Request[v1.WatchEgressEventsRequest], *connect.ServerStream[v1.WatchEgressEventsResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.EgressService.WatchEgressEvents is not implemented"))
+}
+
+func (UnimplementedEgressServiceHandler) AppendX402Events(context.Context, *connect.Request[v1.AppendX402EventsRequest]) (*connect.Response[v1.AppendX402EventsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.EgressService.AppendX402Events is not implemented"))
 }

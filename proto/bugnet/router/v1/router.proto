@@ -38,6 +38,12 @@ service SandboxRouterService {
   rpc DeleteSecret(DeleteSecretRequest) returns (DeleteSecretResponse);
   // Puts the placement's GitHub source in the sandbox, safe to call again
   rpc FetchSource(FetchSourceRequest) returns (FetchSourceResponse);
+  // Checks an x402 change without making it, and with no handle only what needs no placement
+  rpc CheckX402(CheckX402Request) returns (CheckX402Response);
+  // Stores x402 services and applies them to the sandbox, idempotent by content
+  rpc EnableX402(EnableX402Request) returns (EnableX402Response);
+  // Lists the placement's x402 services with their states and counts, and its refusals
+  rpc ListX402(ListX402Request) returns (ListX402Response);
 }
 
 /* Packages and estimates */
@@ -723,4 +729,85 @@ message FetchSourceRequest {
 
 message FetchSourceResponse {
   Bootstrap bootstrap = 1;
+}
+
+/* x402 */
+
+message X402ServiceSpec {
+  string host = 1;
+  // Starts and ends with a slash, at most 200 characters
+  string prefix = 2;
+  // GET or POST
+  string method = 3;
+  int64 max_price_micros = 4;
+  // Canonical base58 of 32 bytes
+  string pay_to = 5;
+  // In Bugnet's index, so every path under the prefix is paid
+  bool indexed = 6;
+  // The one paid path of a service that is not indexed, empty when indexed
+  string paid_path = 7;
+}
+
+enum X402ServiceState {
+  X402_SERVICE_STATE_UNSPECIFIED = 0;
+  X402_SERVICE_STATE_APPLYING = 1;
+  X402_SERVICE_STATE_ACTIVE = 2;
+  X402_SERVICE_STATE_FAILED = 3;
+  X402_SERVICE_STATE_DISABLED = 4;
+}
+
+message X402ServiceInfo {
+  string service_id = 1;
+  X402ServiceSpec spec = 2;
+  X402ServiceState state = 3;
+  // A code such as PORT_443_TAKEN, FEATURE_UNAVAILABLE or HOST_BLOCKED, empty unless failed
+  string failure_reason = 4;
+  uint32 requests = 5;
+  uint32 paid = 6;
+  uint32 uncertain = 7;
+}
+
+message X402Refusal {
+  // A refusal code of x402 spec 6.13, or refused_host
+  string reason = 1;
+  uint32 count = 2;
+  google.protobuf.Timestamp last_at = 3;
+}
+
+// With a handle and nothing to add or disable, checks the switch, the capability and the state
+message CheckX402Request {
+  // Empty runs only the checks that need no placement, and then disable must be empty
+  string handle = 1;
+  repeated X402ServiceSpec add = 2;
+  // Service ids
+  repeated string disable = 3;
+}
+
+// A per-service refusal names the first failing add entry in ErrorInfo metadata service_id and host
+message CheckX402Response {}
+
+message EnableX402Request {
+  string handle = 1;
+  repeated X402ServiceSpec add = 2;
+  // Service ids
+  repeated string disable = 3;
+  // 1 to 128 printable ASCII, logged and traced only
+  string request_id = 4;
+  // On a ready placement, waits up to secrets.apply_wait for the added rows to leave APPLYING
+  bool wait_active = 5;
+}
+
+message EnableX402Response {
+  repeated X402ServiceInfo services = 1;
+}
+
+message ListX402Request {
+  string handle = 1;
+}
+
+message ListX402Response {
+  bool enabled = 1;
+  repeated X402ServiceInfo services = 2;
+  // The placement's refusals by reason, with the last time each was seen
+  repeated X402Refusal refusals = 3;
 }
