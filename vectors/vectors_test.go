@@ -5,8 +5,10 @@ import (
 	"crypto/sha256"
 	"encoding/base32"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/fs"
+	"reflect"
 	"regexp"
 	"strings"
 	"testing"
@@ -54,23 +56,72 @@ var (
 	hostShape   = regexp.MustCompile(`^[a-z0-9-]+(\.[a-z0-9-]+)+$`)
 )
 
-// decode reads one vector file and refuses unknown fields, trailing data and bad UTF-8
+// decode reads one vector file and fails the test when strictDecode refuses it
 func decode(t *testing.T, name string, into any) {
 	t.Helper()
 	raw, err := vectors.X402.ReadFile("x402/" + name)
 	if err != nil {
 		t.Fatalf("read %s: %v", name, err)
 	}
+	if err := strictDecode(raw, into); err != nil {
+		t.Fatalf("decode %s: %v", name, err)
+	}
+}
+
+// strictDecode refuses bad UTF-8, unknown fields, trailing data and keys not spelled as the tags
+func strictDecode(raw []byte, into any) error {
 	if !utf8.Valid(raw) {
-		t.Fatalf("%s is not valid UTF-8", name)
+		return errors.New("not valid UTF-8")
 	}
 	dec := json.NewDecoder(bytes.NewReader(raw))
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(into); err != nil {
-		t.Fatalf("decode %s: %v", name, err)
+		return err
 	}
 	if _, err := dec.Token(); err != io.EOF {
-		t.Fatalf("%s holds data after its object", name)
+		return errors.New("data after the object")
+	}
+	// encoding/json matches keys in any case, so a round trip must give back the same tree
+	var asWritten, asTagged any
+	if err := json.Unmarshal(raw, &asWritten); err != nil {
+		return err
+	}
+	tagged, err := json.Marshal(into)
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(tagged, &asTagged); err != nil {
+		return err
+	}
+	if !reflect.DeepEqual(asWritten, asTagged) {
+		return errors.New("a key is missing or not spelled exactly as the contract")
+	}
+	return nil
+}
+
+func TestStrictDecodeRefusesKeysSpelledOtherwise(t *testing.T) {
+	good := `{"v":1,"paths":[{"path":"/search","ok":true}],"queries":[]}`
+	if err := strictDecode([]byte(good), new(pathsFile)); err != nil {
+		t.Fatalf("exact keys refused: %v", err)
+	}
+	for _, bad := range []string{
+		`{"v":1,"paths":[{"Path":"/search","OK":true}],"queries":[]}`,
+		`{"V":1,"paths":[],"queries":[]}`,
+		`{"v":1,"Paths":[],"queries":[]}`,
+		`{"v":1,"paths":[{"path":"/search"}],"queries":[]}`,
+		`{"v":1,"paths":[],"queries":[],"extra":1}`,
+		`{"v":1,"paths":[],"queries":[]} {}`,
+	} {
+		if strictDecode([]byte(bad), new(pathsFile)) == nil {
+			t.Errorf("%s was accepted", bad)
+		}
+	}
+	if strictDecode([]byte(`{"v":1,"cases":[{"Method":"GET","host":"a.b","prefix":"/a/",`+
+		`"id":"xs_aaaaaaaaaaaaaaaa"}]}`), new(serviceIDsFile)) == nil {
+		t.Error("a service case with Method was accepted")
+	}
+	if strictDecode([]byte(`{"v":1,"Suffixes":["a.b"]}`), new(suffixesFile)) == nil {
+		t.Error("a suffix file with Suffixes was accepted")
 	}
 }
 
