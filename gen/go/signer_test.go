@@ -12,50 +12,41 @@ import (
 )
 
 func TestSignerFieldNumbers(t *testing.T) {
-	for name, want := range map[string]protoreflect.FieldNumber{
-		"ReserveAndSignRequest.account_id":            1,
-		"ReserveAndSignRequest.placement_id":          2,
-		"ReserveAndSignRequest.ref":                   3,
-		"ReserveAndSignRequest.service_id":            4,
-		"ReserveAndSignRequest.method":                5,
-		"ReserveAndSignRequest.host":                  6,
-		"ReserveAndSignRequest.path":                  7,
-		"ReserveAndSignRequest.body_sha256":           8,
-		"ReserveAndSignRequest.payment_required":      9,
-		"ReserveAndSignRequest.target_sha256":         10,
-		"Signed.payment_id":                           1,
-		"Signed.payment_signature":                    2,
-		"Signed.amount_micros":                        3,
-		"Signed.pay_to":                               4,
-		"Signed.keep_until":                           5,
-		"Signed.allowance_left_micros":                6,
-		"Signed.resend":                               7,
-		"Signed.payment_ref":                          8,
-		"Refused.reason":                              1,
-		"Refused.asked_micros":                        2,
-		"Refused.max_micros":                          3,
-		"Refused.allowance_left_micros":               4,
-		"ReserveAndSignResponse.signed":               1,
-		"ReserveAndSignResponse.refused":              2,
-		"ReportOutcomeRequest.payment_id":             1,
-		"ReportOutcomeRequest.ref":                    2,
-		"ReportOutcomeRequest.http_status":            3,
-		"ReportOutcomeRequest.hint":                   4,
-		"ReportOutcomeRequest.hint_tx":                5,
-		"ReportOutcomeRequest.hint_error":             6,
-		"ReportOutcomeRequest.stream_cut":             7,
-		"ReportOutcomeRequest.resend":                 8,
-		"ReportOutcomeResponse.allowance_left_micros": 1,
-	} {
-		d, err := protoregistry.GlobalFiles.FindDescriptorByName(
-			protoreflect.FullName("bugnet.payments.v1." + name))
-		if err != nil {
-			t.Fatalf("find %s: %v", name, err)
-		}
-		if got := d.(protoreflect.FieldDescriptor).Number(); got != want {
-			t.Errorf("%s is field %d, want %d", name, got, want)
-		}
-	}
+	checkWire(t, "bugnet.payments.v1", map[string]wire{
+		"ReserveAndSignRequest.account_id":            {1, "string"},
+		"ReserveAndSignRequest.placement_id":          {2, "string"},
+		"ReserveAndSignRequest.ref":                   {3, "string"},
+		"ReserveAndSignRequest.service_id":            {4, "string"},
+		"ReserveAndSignRequest.method":                {5, "string"},
+		"ReserveAndSignRequest.host":                  {6, "string"},
+		"ReserveAndSignRequest.path":                  {7, "string"},
+		"ReserveAndSignRequest.body_sha256":           {8, "bytes"},
+		"ReserveAndSignRequest.payment_required":      {9, "string"},
+		"ReserveAndSignRequest.target_sha256":         {10, "bytes"},
+		"Signed.payment_id":                           {1, "string"},
+		"Signed.payment_signature":                    {2, "string"},
+		"Signed.amount_micros":                        {3, "int64"},
+		"Signed.pay_to":                               {4, "string"},
+		"Signed.keep_until":                           {5, "google.protobuf.Timestamp"},
+		"Signed.allowance_left_micros":                {6, "int64"},
+		"Signed.resend":                               {7, "bool"},
+		"Signed.payment_ref":                          {8, "string"},
+		"Refused.reason":                              {1, "string"},
+		"Refused.asked_micros":                        {2, "int64"},
+		"Refused.max_micros":                          {3, "int64"},
+		"Refused.allowance_left_micros":               {4, "int64"},
+		"ReserveAndSignResponse.signed":               {1, "Signed"},
+		"ReserveAndSignResponse.refused":              {2, "Refused"},
+		"ReportOutcomeRequest.payment_id":             {1, "string"},
+		"ReportOutcomeRequest.ref":                    {2, "string"},
+		"ReportOutcomeRequest.http_status":            {3, "uint32"},
+		"ReportOutcomeRequest.hint":                   {4, "SellerHint"},
+		"ReportOutcomeRequest.hint_tx":                {5, "string"},
+		"ReportOutcomeRequest.hint_error":             {6, "string"},
+		"ReportOutcomeRequest.stream_cut":             {7, "bool"},
+		"ReportOutcomeRequest.resend":                 {8, "bool"},
+		"ReportOutcomeResponse.allowance_left_micros": {1, "int64"},
+	})
 	for msg, n := range map[proto.Message]int{
 		&paymentsv1.ReserveAndSignRequest{}: 10, &paymentsv1.Signed{}: 8,
 		&paymentsv1.Refused{}: 4, &paymentsv1.ReserveAndSignResponse{}: 2,
