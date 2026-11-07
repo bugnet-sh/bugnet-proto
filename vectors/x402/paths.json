@@ -35,7 +35,12 @@
 		{"path": "/a%40b", "ok": true},
 		{"path": "/v1/auto/chat/completions", "ok": true},
 		{"path": "/search", "ok": true},
-		{"path": "/weather/Munich", "ok": true}
+		{"path": "/weather/Munich", "ok": true},
+		{"path": "/a/b.json", "ok": true},
+		{"path": "/.well-known/x", "ok": true},
+		{"path": "/a/...", "ok": true},
+		{"path": "/a%41b", "ok": true},
+		{"path": "/v1/auto/", "ok": true}
 	],
 	"queries": [
 		{"query": "q=weather in Paris", "ok": false},
