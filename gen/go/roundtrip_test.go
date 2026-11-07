@@ -147,6 +147,7 @@ func TestDownloadChecksumRoundTrips(t *testing.T) {
 	sum[0], sum[31] = 0xab, 0xcd
 	eq(t, roundTrip(t, &routerv1.CreateTransferResponse{Sha256: sum}).Sha256, sum)
 	eq(t, len(roundTrip(t, &routerv1.CreateTransferResponse{}).Sha256), 0)
+	eq(t, roundTrip(t, &routerv1.OpenTransferResponse{Sha256: sum}).Sha256, sum)
 }
 
 func TestTransferSizePresenceSurvives(t *testing.T) {
@@ -361,6 +362,7 @@ func TestSpecFieldNumbers(t *testing.T) {
 		"PricePackageResponse.option":              1,
 		"ResolvePreviewResponse.started_at":        9,
 		"OpenTransferResponse.budget":              10,
+		"OpenTransferResponse.sha256":              11,
 		"ResolveTunnelResponse.requests_in_flight": 9,
 		"GetEstimateResponse.catalog":              7,
 		"ProviderStatus.foreign_sandboxes":         13,

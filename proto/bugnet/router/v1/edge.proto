@@ -217,6 +217,8 @@ message OpenTransferResponse {
   // The paid deadline, for the placement's lease
   google.protobuf.Timestamp expires_at = 9;
   EdgeBudget budget = 10;
+  // A download's SHA-256 from mint when it set want_sha256, empty otherwise
+  bytes sha256 = 11;
 }
 
 message ReadTransferRequest {

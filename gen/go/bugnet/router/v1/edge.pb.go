@@ -1283,8 +1283,10 @@ type OpenTransferResponse struct {
 	// The earlier of the placement deadline and the maximum duration
 	HardStop *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=hard_stop,json=hardStop,proto3" json:"hard_stop,omitempty"`
 	// The paid deadline, for the placement's lease
-	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	Budget        *EdgeBudget            `protobuf:"bytes,10,opt,name=budget,proto3" json:"budget,omitempty"`
+	ExpiresAt *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	Budget    *EdgeBudget            `protobuf:"bytes,10,opt,name=budget,proto3" json:"budget,omitempty"`
+	// A download's SHA-256 from mint when it set want_sha256, empty otherwise
+	Sha256        []byte `protobuf:"bytes,11,opt,name=sha256,proto3" json:"sha256,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1385,6 +1387,13 @@ func (x *OpenTransferResponse) GetExpiresAt() *timestamppb.Timestamp {
 func (x *OpenTransferResponse) GetBudget() *EdgeBudget {
 	if x != nil {
 		return x.Budget
+	}
+	return nil
+}
+
+func (x *OpenTransferResponse) GetSha256() []byte {
+	if x != nil {
+		return x.Sha256
 	}
 	return nil
 }
@@ -4330,7 +4339,7 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12A\n" +
 	"\tdirection\x18\x02 \x01(\x0e2#.bugnet.router.v1.TransferDirectionR\tdirection\x12\x14\n" +
 	"\x05probe\x18\x03 \x01(\bR\x05probe\x12\x17\n" +
-	"\aedge_id\x18\x04 \x01(\tR\x06edgeId\"\x9c\x03\n" +
+	"\aedge_id\x18\x04 \x01(\tR\x06edgeId\"\xb4\x03\n" +
 	"\x14OpenTransferResponse\x12\x1f\n" +
 	"\vtransfer_id\x18\x01 \x01(\tR\n" +
 	"transferId\x12\x14\n" +
@@ -4345,7 +4354,8 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\n" +
 	"expires_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x124\n" +
 	"\x06budget\x18\n" +
-	" \x01(\v2\x1c.bugnet.router.v1.EdgeBudgetR\x06budget\"|\n" +
+	" \x01(\v2\x1c.bugnet.router.v1.EdgeBudgetR\x06budget\x12\x16\n" +
+	"\x06sha256\x18\v \x01(\fR\x06sha256\"|\n" +
 	"\x13ReadTransferRequest\x12\x1f\n" +
 	"\vtransfer_id\x18\x01 \x01(\tR\n" +
 	"transferId\x12\x14\n" +

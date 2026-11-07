@@ -586,6 +586,13 @@ export declare type OpenTransferResponse = Message<"bugnet.router.v1.OpenTransfe
    * @generated from field: bugnet.router.v1.EdgeBudget budget = 10;
    */
   budget?: EdgeBudget | undefined;
+
+  /**
+   * A download's SHA-256 from mint when it set want_sha256, empty otherwise
+   *
+   * @generated from field: bytes sha256 = 11;
+   */
+  sha256: Uint8Array;
 };
 
 /**
