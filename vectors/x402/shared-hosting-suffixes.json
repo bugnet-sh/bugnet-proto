@@ -1,0 +1,21 @@
+{
+	"v": 1,
+	"suffixes": [
+		"workers.dev",
+		"onrender.com",
+		"vercel.app",
+		"netlify.app",
+		"pages.dev",
+		"herokuapp.com",
+		"fly.dev",
+		"up.railway.app",
+		"replit.app",
+		"ngrok-free.app",
+		"ngrok.io",
+		"trycloudflare.com",
+		"github.io",
+		"glitch.me",
+		"deno.dev",
+		"web.app"
+	]
+}

@@ -36,13 +36,14 @@ generated files end in `.js`, which Node's ESM loader needs. Run `make test`, `m
 
 ## TypeScript
 
-The ESM-only package `@bugnet/proto` exports two paths, and needs `@bufbuild/protobuf` 2.16 or a
-later 2.x beside it.
+The ESM-only package `@bugnet/proto` exports three paths, and needs `@bufbuild/protobuf` 2.16 or
+a later 2.x beside it.
 
 | Path | Holds | For |
 | --- | --- | --- |
 | `@bugnet/proto/router/v1` | `router.proto`, with `SandboxRouterService` | The MCP gateway |
 | `@bugnet/proto/router/v1/payments` | `payments.proto`, with `PaymentsService` | Payments |
+| `@bugnet/proto/vectors/x402/<file>` | One x402 test vector file | The MCP gateway |
 
 `gen/ts` also holds `edge.proto` and `operator.proto`, since `buf generate` runs every plugin on
 every file. The package exports neither, because only Go programs call those services. Use the
@@ -71,3 +72,32 @@ const payments = createClient(PaymentsService, transport);
 Run `pnpm install` here once too. Node follows the link to this checkout, so the generated code
 loads its own `@bufbuild/protobuf` from this `node_modules`, unless Node runs with
 `--preserve-symlinks`.
+
+## Test vectors
+
+`vectors/x402` holds the x402 test cases that the router, `bugnet-egress` and the MCP gateway each
+run, so the three never drift. Go code reads them from `vectors.X402`, an `embed.FS` in package
+`github.com/oynozan/bugnet-proto/vectors`. TypeScript imports them as JSON.
+
+```ts
+import paths from "@bugnet/proto/vectors/x402/paths.json" with { type: "json" };
+```
+
+| File | Cases | Run by |
+| --- | --- | --- |
+| `paths.json` | `paths` of `{path, ok}`, `queries` of `{query, ok}` | Router, egress, gateway |
+| `service-ids.json` | `cases` of `{method, host, prefix, id}` | Router, gateway |
+| `shared-hosting-suffixes.json` | `suffixes`, a list of names | Router, gateway |
+
+- `paths.json` holds the path and query rules of x402 spec 6.7. `ok` says whether the rule passes
+  the case. Egress runs both lists. The router and the gateway run only `paths`, since a service
+  line has no query.
+- `service-ids.json` holds service ids of x402 spec 5.1. An id is `xs_` and the first 16
+  characters of lower-case base32 of SHA-256 of method, host and prefix, joined by a zero byte.
+- `shared-hosting-suffixes.json` holds the 16 shared-hosting suffixes of x402 spec 6.16, in its
+  order. The router's and the gateway's `shared_hosting_suffixes` defaults equal it.
+- Each file is one JSON object with `v` 1. No case appears twice.
+- The gateway team owns the content. A change needs both the gateway's and the router's owners.
+
+`go test ./vectors` checks each file: the shape, every id against a reference implementation,
+every path and query case against a reference of the 6.7 rule, and the suffix list.

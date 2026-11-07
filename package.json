@@ -10,10 +10,12 @@
     "./router/v1/payments": {
       "types": "./gen/ts/bugnet/router/v1/payments_pb.d.ts",
       "default": "./gen/ts/bugnet/router/v1/payments_pb.js"
-    }
+    },
+    "./vectors/x402/*": "./vectors/x402/*"
   },
   "files": [
-    "gen/ts"
+    "gen/ts",
+    "vectors"
   ],
   "peerDependencies": {
     "@bufbuild/protobuf": "^2.16.0"

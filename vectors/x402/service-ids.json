@@ -1,0 +1,23 @@
+{
+	"v": 1,
+	"cases": [
+		{
+			"method": "POST",
+			"host": "agent402.tools",
+			"prefix": "/v1/auto/",
+			"id": "xs_w5a4htopmpzmmhos"
+		},
+		{
+			"method": "GET",
+			"host": "agent402.tools",
+			"prefix": "/v1/auto/",
+			"id": "xs_b3mm6u5x36em5pdt"
+		},
+		{
+			"method": "GET",
+			"host": "api.example.com",
+			"prefix": "/search/",
+			"id": "xs_vky43ltmauaj3w53"
+		}
+	]
+}
