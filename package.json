@@ -11,6 +11,10 @@
       "types": "./gen/ts/bugnet/router/v1/payments_pb.d.ts",
       "default": "./gen/ts/bugnet/router/v1/payments_pb.js"
     },
+    "./payments/v1/x402": {
+      "types": "./gen/ts/bugnet/payments/v1/x402_pb.d.ts",
+      "default": "./gen/ts/bugnet/payments/v1/x402_pb.js"
+    },
     "./vectors/x402/*": "./vectors/x402/*"
   },
   "files": [

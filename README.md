@@ -4,9 +4,9 @@ Protobuf and Connect API definitions, and shared test vectors, used by the Bugne
 
 ## Services
 
-Every file is in package `bugnet.router.v1` under `proto/bugnet/router/v1`. Each service has one
-caller, which sends that service's own bearer token. The router refuses any other service's token,
-and admits no calls to a service whose token is empty.
+The router's files are in package `bugnet.router.v1` under `proto/bugnet/router/v1`. Each of
+their services has one caller, which sends that service's own bearer token. The router refuses any
+other service's token, and admits no calls to a service whose token is empty.
 
 | Service | File | Caller | Token variable |
 | --- | --- | --- | --- |
@@ -48,6 +48,18 @@ The x402 spec (section 6.2) adds seven calls across three services.
 - `ResolveTunnelResponse.x402` (11) and `ReportEgressUsageRequest.x402_unpaid` (3) carry the caps
   and the unpaid use between the router and egress.
 
+### The x402 signer
+
+`proto/bugnet/payments/v1/x402.proto`, in package `bugnet.payments.v1`, holds
+`X402SignerService`. Payments serves it on its mTLS listener, and `bugnet-egress` alone calls it,
+with its client certificate and no bearer token. Payments owns the file. The Go code is in
+`gen/go/bugnet/payments/v1` (package `paymentsv1`).
+
+| Call | Does |
+| --- | --- |
+| `ReserveAndSign` | Checks a seller's 402, reserves the amount and signs the transfer |
+| `ReportOutcome` | Reports the seller's answer to a paid attempt, as hints only |
+
 ## Generating
 
 `make generate` runs `buf generate`. It writes the Go packages to `gen/go` with `protoc-gen-go`
@@ -58,13 +70,14 @@ generated files end in `.js`, which Node's ESM loader needs. Run `make test`, `m
 
 ## TypeScript
 
-The ESM-only package `@bugnet/proto` exports three paths, and needs `@bufbuild/protobuf` 2.16 or
+The ESM-only package `@bugnet/proto` exports four paths, and needs `@bufbuild/protobuf` 2.16 or
 a later 2.x beside it.
 
 | Path | Holds | For |
 | --- | --- | --- |
 | `@bugnet/proto/router/v1` | `router.proto`, with `SandboxRouterService` | The MCP gateway |
 | `@bugnet/proto/router/v1/payments` | `payments.proto`, with `PaymentsService` | Payments |
+| `@bugnet/proto/payments/v1/x402` | `x402.proto`, with `X402SignerService` | Payments |
 | `@bugnet/proto/vectors/x402/<file>` | One x402 test vector file | The MCP gateway |
 
 `gen/ts` also holds `edge.proto` and `operator.proto`, since `buf generate` runs every plugin on
@@ -89,6 +102,10 @@ const router = createClient(SandboxRouterService, transport);
 import { PaymentsService } from "@bugnet/proto/router/v1/payments";
 
 const payments = createClient(PaymentsService, transport);
+```
+
+```ts
+import { X402SignerService } from "@bugnet/proto/payments/v1/x402";
 ```
 
 Run `pnpm install` here once too. Node follows the link to this checkout, so the generated code

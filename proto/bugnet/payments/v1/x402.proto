@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package bugnet.payments.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/oynozan/bugnet-proto/gen/go/bugnet/payments/v1;paymentsv1";
+
+// Called by bugnet-egress only, authenticated by its client certificate
+service X402SignerService {
+  // Checks one seller's 402 against the account, reserves the amount and signs the transfer
+  rpc ReserveAndSign(ReserveAndSignRequest) returns (ReserveAndSignResponse);
+  // The seller's answer to a paid attempt, hints only, never ledger truth
+  rpc ReportOutcome(ReportOutcomeRequest) returns (ReportOutcomeResponse);
+}
+
+message ReserveAndSignRequest {
+  // The placement's start order id, from ResolveTunnel
+  string account_id = 1;
+  string placement_id = 2;
+  // 16 random base32 characters, one per request, the idempotency key
+  string ref = 3;
+  string service_id = 4;
+  string method = 5;
+  string host = 6;
+  // Normalised path, query dropped
+  string path = 7;
+  bytes body_sha256 = 8;
+  // The PAYMENT-REQUIRED header value exactly as the seller sent it
+  string payment_required = 9;
+  // SHA-256 of the placement id, a zero byte and the full request target, query included
+  bytes target_sha256 = 10;
+}
+
+message Signed {
+  string payment_id = 1;
+  // The PAYMENT-SIGNATURE value, never logged by either side
+  string payment_signature = 2;
+  int64 amount_micros = 3;
+  string pay_to = 4;
+  // Egress may keep this payload in its cache until then
+  google.protobuf.Timestamp keep_until = 5;
+  int64 allowance_left_micros = 6;
+  // The same transaction as an earlier, unfinished attempt at this request
+  bool resend = 7;
+  // The ref of the row that holds this transaction, the earlier row's when resend is true
+  string payment_ref = 8;
+}
+
+message Refused {
+  // A code of x402 spec 6.13
+  string reason = 1;
+  int64 asked_micros = 2;
+  int64 max_micros = 3;
+  int64 allowance_left_micros = 4;
+}
+
+message ReserveAndSignResponse {
+  oneof result {
+    Signed signed = 1;
+    Refused refused = 2;
+  }
+}
+
+enum SellerHint {
+  SELLER_HINT_UNSPECIFIED = 0;
+  SELLER_HINT_SUCCESS = 1;
+  SELLER_HINT_FAILURE = 2;
+  SELLER_HINT_ABSENT = 3;
+  SELLER_HINT_REJECTED = 4;
+}
+
+message ReportOutcomeRequest {
+  string payment_id = 1;
+  // Signed.payment_ref, the ref of the row that holds the transaction
+  string ref = 2;
+  // The seller's status, 0 when the connection failed
+  uint32 http_status = 3;
+  SellerHint hint = 4;
+  // From PAYMENT-RESPONSE, seller text, base58 that decodes to 64 bytes or empty
+  string hint_tx = 5;
+  // From PAYMENT-RESPONSE errorReason, seller text, [a-z_]{1,64} or empty
+  string hint_error = 6;
+  bool stream_cut = 7;
+  // The answer to a resend of an earlier payload
+  bool resend = 8;
+}
+
+message ReportOutcomeResponse {
+  int64 allowance_left_micros = 1;
+}
