@@ -1,6 +1,6 @@
 # bugnet-proto
 
-Protobuf and Connect API definitions shared by the Bugnet services.
+Protobuf and Connect API definitions, and shared test vectors, used by the Bugnet services.
 
 ## Services
 
@@ -99,5 +99,6 @@ import paths from "@bugnet/proto/vectors/x402/paths.json" with { type: "json" };
 - Each file is one JSON object with `v` 1. No case appears twice.
 - The gateway team owns the content. A change needs both the gateway's and the router's owners.
 
-`go test ./vectors` checks each file: the shape, every id against a reference implementation,
-every path and query case against a reference of the 6.7 rule, and the suffix list.
+`go test ./vectors` checks each file: the shape, with every key spelled exactly as above, every id
+against a reference implementation, every path and query case against a reference of the 6.7
+rule, and the suffix list. Go's JSON decoder alone would accept `Path` for `path`.
