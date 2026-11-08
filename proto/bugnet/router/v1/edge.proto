@@ -50,6 +50,13 @@ service EgressService {
   rpc AppendX402Events(AppendX402EventsRequest) returns (AppendX402EventsResponse);
 }
 
+// Called by bugnet-edge --role sessions with BUGNET_SESSIONS_TOKEN, and by nothing else
+service SessionPageService {
+  rpc GetSessionRecord(GetSessionRecordRequest) returns (GetSessionRecordResponse);
+  rpc DeleteSessionRecord(DeleteSessionRecordRequest) returns (DeleteSessionRecordResponse);
+  rpc WatchSessionJob(WatchSessionJobRequest) returns (stream WatchSessionJobResponse);
+}
+
 /* Shared */
 
 message HeaderValue {
@@ -634,4 +641,62 @@ message AppendX402EventsRequest {
 message AppendX402EventsResponse {
   // Indexes of the events dropped for a bad shape
   repeated uint32 rejected = 1;
+}
+
+/* Session page */
+
+message GetSessionRecordRequest {
+  // 16 base32 characters
+  string id = 1;
+  // 43 base64url characters
+  string key = 2;
+}
+
+message GetSessionRecordResponse {
+  // running, ended or expired
+  string state = 1;
+  // The sanitised record as JSON, set only when state is ended
+  bytes record_json = 2;
+  // The live snapshot as JSON, set only while the placement runs
+  bytes live_json = 3;
+}
+
+message DeleteSessionRecordRequest {
+  string id = 1;
+  string key = 2;
+}
+
+message DeleteSessionRecordResponse {}
+
+message WatchSessionJobRequest {
+  string id = 1;
+  string key = 2;
+  // The job's sequence number within its record, never a job id
+  uint32 seq = 3;
+  string cursor = 4;
+}
+
+message SessionText {
+  OutputStream stream = 1;
+  // Cleaned and redacted
+  string text = 2;
+  // A carriage return, so the text replaces the last line
+  bool overwrite = 3;
+}
+
+message SessionEnd {
+  // exited, ended, closed or limit
+  string reason = 1;
+}
+
+message WatchSessionJobResponse {
+  // Empty while text is held back, so a resume never repeats or skips text
+  string cursor = 1;
+  oneof frame {
+    SessionText text = 2;
+    JobSkip skip = 3;
+    JobExit exit = 4;
+    bool heartbeat = 5;
+    SessionEnd end = 6;
+  }
 }

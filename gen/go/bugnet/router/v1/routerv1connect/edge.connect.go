@@ -29,6 +29,8 @@ const (
 	SshGatewayServiceName = "bugnet.router.v1.SshGatewayService"
 	// EgressServiceName is the fully-qualified name of the EgressService service.
 	EgressServiceName = "bugnet.router.v1.EgressService"
+	// SessionPageServiceName is the fully-qualified name of the SessionPageService service.
+	SessionPageServiceName = "bugnet.router.v1.SessionPageService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -116,6 +118,15 @@ const (
 	// EgressServiceAppendX402EventsProcedure is the fully-qualified name of the EgressService's
 	// AppendX402Events RPC.
 	EgressServiceAppendX402EventsProcedure = "/bugnet.router.v1.EgressService/AppendX402Events"
+	// SessionPageServiceGetSessionRecordProcedure is the fully-qualified name of the
+	// SessionPageService's GetSessionRecord RPC.
+	SessionPageServiceGetSessionRecordProcedure = "/bugnet.router.v1.SessionPageService/GetSessionRecord"
+	// SessionPageServiceDeleteSessionRecordProcedure is the fully-qualified name of the
+	// SessionPageService's DeleteSessionRecord RPC.
+	SessionPageServiceDeleteSessionRecordProcedure = "/bugnet.router.v1.SessionPageService/DeleteSessionRecord"
+	// SessionPageServiceWatchSessionJobProcedure is the fully-qualified name of the
+	// SessionPageService's WatchSessionJob RPC.
+	SessionPageServiceWatchSessionJobProcedure = "/bugnet.router.v1.SessionPageService/WatchSessionJob"
 )
 
 // EdgeServiceClient is a client for the bugnet.router.v1.EdgeService service.
@@ -971,4 +982,127 @@ func (UnimplementedEgressServiceHandler) WatchEgressEvents(context.Context, *con
 
 func (UnimplementedEgressServiceHandler) AppendX402Events(context.Context, *connect.Request[v1.AppendX402EventsRequest]) (*connect.Response[v1.AppendX402EventsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.EgressService.AppendX402Events is not implemented"))
+}
+
+// SessionPageServiceClient is a client for the bugnet.router.v1.SessionPageService service.
+type SessionPageServiceClient interface {
+	GetSessionRecord(context.Context, *connect.Request[v1.GetSessionRecordRequest]) (*connect.Response[v1.GetSessionRecordResponse], error)
+	DeleteSessionRecord(context.Context, *connect.Request[v1.DeleteSessionRecordRequest]) (*connect.Response[v1.DeleteSessionRecordResponse], error)
+	WatchSessionJob(context.Context, *connect.Request[v1.WatchSessionJobRequest]) (*connect.ServerStreamForClient[v1.WatchSessionJobResponse], error)
+}
+
+// NewSessionPageServiceClient constructs a client for the bugnet.router.v1.SessionPageService
+// service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
+// gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
+// the connect.WithGRPC() or connect.WithGRPCWeb() options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewSessionPageServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) SessionPageServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	sessionPageServiceMethods := v1.File_bugnet_router_v1_edge_proto.Services().ByName("SessionPageService").Methods()
+	return &sessionPageServiceClient{
+		getSessionRecord: connect.NewClient[v1.GetSessionRecordRequest, v1.GetSessionRecordResponse](
+			httpClient,
+			baseURL+SessionPageServiceGetSessionRecordProcedure,
+			connect.WithSchema(sessionPageServiceMethods.ByName("GetSessionRecord")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteSessionRecord: connect.NewClient[v1.DeleteSessionRecordRequest, v1.DeleteSessionRecordResponse](
+			httpClient,
+			baseURL+SessionPageServiceDeleteSessionRecordProcedure,
+			connect.WithSchema(sessionPageServiceMethods.ByName("DeleteSessionRecord")),
+			connect.WithClientOptions(opts...),
+		),
+		watchSessionJob: connect.NewClient[v1.WatchSessionJobRequest, v1.WatchSessionJobResponse](
+			httpClient,
+			baseURL+SessionPageServiceWatchSessionJobProcedure,
+			connect.WithSchema(sessionPageServiceMethods.ByName("WatchSessionJob")),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// sessionPageServiceClient implements SessionPageServiceClient.
+type sessionPageServiceClient struct {
+	getSessionRecord    *connect.Client[v1.GetSessionRecordRequest, v1.GetSessionRecordResponse]
+	deleteSessionRecord *connect.Client[v1.DeleteSessionRecordRequest, v1.DeleteSessionRecordResponse]
+	watchSessionJob     *connect.Client[v1.WatchSessionJobRequest, v1.WatchSessionJobResponse]
+}
+
+// GetSessionRecord calls bugnet.router.v1.SessionPageService.GetSessionRecord.
+func (c *sessionPageServiceClient) GetSessionRecord(ctx context.Context, req *connect.Request[v1.GetSessionRecordRequest]) (*connect.Response[v1.GetSessionRecordResponse], error) {
+	return c.getSessionRecord.CallUnary(ctx, req)
+}
+
+// DeleteSessionRecord calls bugnet.router.v1.SessionPageService.DeleteSessionRecord.
+func (c *sessionPageServiceClient) DeleteSessionRecord(ctx context.Context, req *connect.Request[v1.DeleteSessionRecordRequest]) (*connect.Response[v1.DeleteSessionRecordResponse], error) {
+	return c.deleteSessionRecord.CallUnary(ctx, req)
+}
+
+// WatchSessionJob calls bugnet.router.v1.SessionPageService.WatchSessionJob.
+func (c *sessionPageServiceClient) WatchSessionJob(ctx context.Context, req *connect.Request[v1.WatchSessionJobRequest]) (*connect.ServerStreamForClient[v1.WatchSessionJobResponse], error) {
+	return c.watchSessionJob.CallServerStream(ctx, req)
+}
+
+// SessionPageServiceHandler is an implementation of the bugnet.router.v1.SessionPageService
+// service.
+type SessionPageServiceHandler interface {
+	GetSessionRecord(context.Context, *connect.Request[v1.GetSessionRecordRequest]) (*connect.Response[v1.GetSessionRecordResponse], error)
+	DeleteSessionRecord(context.Context, *connect.Request[v1.DeleteSessionRecordRequest]) (*connect.Response[v1.DeleteSessionRecordResponse], error)
+	WatchSessionJob(context.Context, *connect.Request[v1.WatchSessionJobRequest], *connect.ServerStream[v1.WatchSessionJobResponse]) error
+}
+
+// NewSessionPageServiceHandler builds an HTTP handler from the service implementation. It returns
+// the path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewSessionPageServiceHandler(svc SessionPageServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	sessionPageServiceMethods := v1.File_bugnet_router_v1_edge_proto.Services().ByName("SessionPageService").Methods()
+	sessionPageServiceGetSessionRecordHandler := connect.NewUnaryHandler(
+		SessionPageServiceGetSessionRecordProcedure,
+		svc.GetSessionRecord,
+		connect.WithSchema(sessionPageServiceMethods.ByName("GetSessionRecord")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sessionPageServiceDeleteSessionRecordHandler := connect.NewUnaryHandler(
+		SessionPageServiceDeleteSessionRecordProcedure,
+		svc.DeleteSessionRecord,
+		connect.WithSchema(sessionPageServiceMethods.ByName("DeleteSessionRecord")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sessionPageServiceWatchSessionJobHandler := connect.NewServerStreamHandler(
+		SessionPageServiceWatchSessionJobProcedure,
+		svc.WatchSessionJob,
+		connect.WithSchema(sessionPageServiceMethods.ByName("WatchSessionJob")),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/bugnet.router.v1.SessionPageService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case SessionPageServiceGetSessionRecordProcedure:
+			sessionPageServiceGetSessionRecordHandler.ServeHTTP(w, r)
+		case SessionPageServiceDeleteSessionRecordProcedure:
+			sessionPageServiceDeleteSessionRecordHandler.ServeHTTP(w, r)
+		case SessionPageServiceWatchSessionJobProcedure:
+			sessionPageServiceWatchSessionJobHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedSessionPageServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedSessionPageServiceHandler struct{}
+
+func (UnimplementedSessionPageServiceHandler) GetSessionRecord(context.Context, *connect.Request[v1.GetSessionRecordRequest]) (*connect.Response[v1.GetSessionRecordResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SessionPageService.GetSessionRecord is not implemented"))
+}
+
+func (UnimplementedSessionPageServiceHandler) DeleteSessionRecord(context.Context, *connect.Request[v1.DeleteSessionRecordRequest]) (*connect.Response[v1.DeleteSessionRecordResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SessionPageService.DeleteSessionRecord is not implemented"))
+}
+
+func (UnimplementedSessionPageServiceHandler) WatchSessionJob(context.Context, *connect.Request[v1.WatchSessionJobRequest], *connect.ServerStream[v1.WatchSessionJobResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SessionPageService.WatchSessionJob is not implemented"))
 }

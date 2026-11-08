@@ -5,7 +5,7 @@
 import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import type { SealedValue, SealingKey, SecretInfo, SecretSpec, TransferDirection } from "./router_pb.js";
+import type { JobExit, JobSkip, OutputStream, SealedValue, SealingKey, SecretInfo, SecretSpec, TransferDirection } from "./router_pb.js";
 
 /**
  * Describes the file bugnet/router/v1/edge.proto.
@@ -2187,6 +2187,230 @@ export declare type AppendX402EventsResponse = Message<"bugnet.router.v1.AppendX
 export declare const AppendX402EventsResponseSchema: GenMessage<AppendX402EventsResponse>;
 
 /**
+ * @generated from message bugnet.router.v1.GetSessionRecordRequest
+ */
+export declare type GetSessionRecordRequest = Message<"bugnet.router.v1.GetSessionRecordRequest"> & {
+  /**
+   * 16 base32 characters
+   *
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * 43 base64url characters
+   *
+   * @generated from field: string key = 2;
+   */
+  key: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.GetSessionRecordRequest.
+ * Use `create(GetSessionRecordRequestSchema)` to create a new message.
+ */
+export declare const GetSessionRecordRequestSchema: GenMessage<GetSessionRecordRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.GetSessionRecordResponse
+ */
+export declare type GetSessionRecordResponse = Message<"bugnet.router.v1.GetSessionRecordResponse"> & {
+  /**
+   * running, ended or expired
+   *
+   * @generated from field: string state = 1;
+   */
+  state: string;
+
+  /**
+   * The sanitised record as JSON, set only when state is ended
+   *
+   * @generated from field: bytes record_json = 2;
+   */
+  recordJson: Uint8Array;
+
+  /**
+   * The live snapshot as JSON, set only while the placement runs
+   *
+   * @generated from field: bytes live_json = 3;
+   */
+  liveJson: Uint8Array;
+};
+
+/**
+ * Describes the message bugnet.router.v1.GetSessionRecordResponse.
+ * Use `create(GetSessionRecordResponseSchema)` to create a new message.
+ */
+export declare const GetSessionRecordResponseSchema: GenMessage<GetSessionRecordResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.DeleteSessionRecordRequest
+ */
+export declare type DeleteSessionRecordRequest = Message<"bugnet.router.v1.DeleteSessionRecordRequest"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string key = 2;
+   */
+  key: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.DeleteSessionRecordRequest.
+ * Use `create(DeleteSessionRecordRequestSchema)` to create a new message.
+ */
+export declare const DeleteSessionRecordRequestSchema: GenMessage<DeleteSessionRecordRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.DeleteSessionRecordResponse
+ */
+export declare type DeleteSessionRecordResponse = Message<"bugnet.router.v1.DeleteSessionRecordResponse"> & {
+};
+
+/**
+ * Describes the message bugnet.router.v1.DeleteSessionRecordResponse.
+ * Use `create(DeleteSessionRecordResponseSchema)` to create a new message.
+ */
+export declare const DeleteSessionRecordResponseSchema: GenMessage<DeleteSessionRecordResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.WatchSessionJobRequest
+ */
+export declare type WatchSessionJobRequest = Message<"bugnet.router.v1.WatchSessionJobRequest"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string key = 2;
+   */
+  key: string;
+
+  /**
+   * The job's sequence number within its record, never a job id
+   *
+   * @generated from field: uint32 seq = 3;
+   */
+  seq: number;
+
+  /**
+   * @generated from field: string cursor = 4;
+   */
+  cursor: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.WatchSessionJobRequest.
+ * Use `create(WatchSessionJobRequestSchema)` to create a new message.
+ */
+export declare const WatchSessionJobRequestSchema: GenMessage<WatchSessionJobRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.SessionText
+ */
+export declare type SessionText = Message<"bugnet.router.v1.SessionText"> & {
+  /**
+   * @generated from field: bugnet.router.v1.OutputStream stream = 1;
+   */
+  stream: OutputStream;
+
+  /**
+   * Cleaned and redacted
+   *
+   * @generated from field: string text = 2;
+   */
+  text: string;
+
+  /**
+   * A carriage return, so the text replaces the last line
+   *
+   * @generated from field: bool overwrite = 3;
+   */
+  overwrite: boolean;
+};
+
+/**
+ * Describes the message bugnet.router.v1.SessionText.
+ * Use `create(SessionTextSchema)` to create a new message.
+ */
+export declare const SessionTextSchema: GenMessage<SessionText>;
+
+/**
+ * @generated from message bugnet.router.v1.SessionEnd
+ */
+export declare type SessionEnd = Message<"bugnet.router.v1.SessionEnd"> & {
+  /**
+   * exited, ended, closed or limit
+   *
+   * @generated from field: string reason = 1;
+   */
+  reason: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.SessionEnd.
+ * Use `create(SessionEndSchema)` to create a new message.
+ */
+export declare const SessionEndSchema: GenMessage<SessionEnd>;
+
+/**
+ * @generated from message bugnet.router.v1.WatchSessionJobResponse
+ */
+export declare type WatchSessionJobResponse = Message<"bugnet.router.v1.WatchSessionJobResponse"> & {
+  /**
+   * Empty while text is held back, so a resume never repeats or skips text
+   *
+   * @generated from field: string cursor = 1;
+   */
+  cursor: string;
+
+  /**
+   * @generated from oneof bugnet.router.v1.WatchSessionJobResponse.frame
+   */
+  frame: {
+    /**
+     * @generated from field: bugnet.router.v1.SessionText text = 2;
+     */
+    value: SessionText;
+    case: "text";
+  } | {
+    /**
+     * @generated from field: bugnet.router.v1.JobSkip skip = 3;
+     */
+    value: JobSkip;
+    case: "skip";
+  } | {
+    /**
+     * @generated from field: bugnet.router.v1.JobExit exit = 4;
+     */
+    value: JobExit;
+    case: "exit";
+  } | {
+    /**
+     * @generated from field: bool heartbeat = 5;
+     */
+    value: boolean;
+    case: "heartbeat";
+  } | {
+    /**
+     * @generated from field: bugnet.router.v1.SessionEnd end = 6;
+     */
+    value: SessionEnd;
+    case: "end";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message bugnet.router.v1.WatchSessionJobResponse.
+ * Use `create(WatchSessionJobResponseSchema)` to create a new message.
+ */
+export declare const WatchSessionJobResponseSchema: GenMessage<WatchSessionJobResponse>;
+
+/**
  * @generated from enum bugnet.router.v1.EndReason
  */
 export enum EndReason {
@@ -2507,6 +2731,38 @@ export declare const EgressService: GenService<{
     methodKind: "unary";
     input: typeof AppendX402EventsRequestSchema;
     output: typeof AppendX402EventsResponseSchema;
+  },
+}>;
+
+/**
+ * Called by bugnet-edge --role sessions with BUGNET_SESSIONS_TOKEN, and by nothing else
+ *
+ * @generated from service bugnet.router.v1.SessionPageService
+ */
+export declare const SessionPageService: GenService<{
+  /**
+   * @generated from rpc bugnet.router.v1.SessionPageService.GetSessionRecord
+   */
+  getSessionRecord: {
+    methodKind: "unary";
+    input: typeof GetSessionRecordRequestSchema;
+    output: typeof GetSessionRecordResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SessionPageService.DeleteSessionRecord
+   */
+  deleteSessionRecord: {
+    methodKind: "unary";
+    input: typeof DeleteSessionRecordRequestSchema;
+    output: typeof DeleteSessionRecordResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.SessionPageService.WatchSessionJob
+   */
+  watchSessionJob: {
+    methodKind: "server_streaming";
+    input: typeof WatchSessionJobRequestSchema;
+    output: typeof WatchSessionJobResponseSchema;
   },
 }>;
 
