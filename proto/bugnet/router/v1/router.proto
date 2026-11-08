@@ -44,6 +44,10 @@ service SandboxRouterService {
   rpc EnableX402(EnableX402Request) returns (EnableX402Response);
   // Lists the placement's x402 services with their states and counts, and its refusals
   rpc ListX402(ListX402Request) returns (ListX402Response);
+  // Stores the gateway's tool calls for the session page, at most 50 a call
+  rpc AppendSessionEvents(AppendSessionEventsRequest) returns (AppendSessionEventsResponse);
+  // Ends the session link named in the request and answers the current one
+  rpc RotateSessionLink(RotateSessionLinkRequest) returns (RotateSessionLinkResponse);
 }
 
 /* Packages and estimates */
@@ -814,4 +818,36 @@ message ListX402Response {
   repeated X402ServiceInfo services = 2;
   // The placement's refusals by reason, with the last time each was seen
   repeated X402Refusal refusals = 3;
+}
+
+/* Session page */
+
+message McpEvent {
+  // The call's start
+  google.protobuf.Timestamp at = 1;
+  // One of the router's sessions.mcp_tools
+  string tool = 2;
+  // ok, or the gateway's error kind
+  string outcome = 3;
+  uint32 duration_ms = 4;
+}
+
+message AppendSessionEventsRequest {
+  string handle = 1;
+  repeated McpEvent events = 2;
+}
+
+message AppendSessionEventsResponse {
+  // Indexes of the events dropped for a bad shape
+  repeated uint32 rejected = 1;
+}
+
+message RotateSessionLinkRequest {
+  string handle = 1;
+  // The link the call ends
+  string session_url = 2;
+}
+
+message RotateSessionLinkResponse {
+  string session_url = 1;
 }

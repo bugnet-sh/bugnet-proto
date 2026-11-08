@@ -22,6 +22,8 @@ service OperatorService {
   rpc StartBench(StartBenchRequest) returns (StartBenchResponse);
   rpc ReportStarts(ReportStartsRequest) returns (ReportStartsResponse);
   rpc GetEstimate(GetEstimateRequest) returns (GetEstimateResponse);
+  // A held session record's page JSON, never served to the public link
+  rpc GetSessionHold(GetSessionHoldRequest) returns (GetSessionHoldResponse);
 }
 
 /* Placements */
@@ -347,4 +349,18 @@ message GetEstimateResponse {
   google.protobuf.Timestamp created_at = 6;
   // The catalog bytes the estimate saw, from the catalogs table
   bytes catalog = 7;
+}
+
+/* Session records */
+
+message GetSessionHoldRequest {
+  string placement_id = 1;
+}
+
+message GetSessionHoldResponse {
+  // The record as the page would show it
+  bytes record_json = 1;
+  // abuse or operator
+  string closed_by = 2;
+  google.protobuf.Timestamp hold_until = 3;
 }

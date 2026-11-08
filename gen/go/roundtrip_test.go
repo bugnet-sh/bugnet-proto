@@ -676,3 +676,70 @@ func TestX402RPCsLiveInTheirServices(t *testing.T) {
 		}
 	}
 }
+
+func TestSessionFieldNumbers(t *testing.T) {
+	num := func(m proto.Message, name string) protoreflect.FieldNumber {
+		f := m.ProtoReflect().Descriptor().Fields().ByName(protoreflect.Name(name))
+		if f == nil {
+			return 0
+		}
+		return f.Number()
+	}
+	eq(t, num(&routerv1.Placement{}, "session_url"), protoreflect.FieldNumber(14))
+	eq(t, num(&routerv1.GetSessionRecordResponse{}, "live_json"), protoreflect.FieldNumber(3))
+	ev := &routerv1.AllowanceEvent{}
+	for name, n := range map[string]protoreflect.FieldNumber{"phase": 1, "amount_micros": 2,
+		"asset": 3, "network": 4, "tx": 5} {
+		eq(t, num(ev, name), n)
+	}
+	req := &routerv1.AppendAllowanceEventRequest{}
+	eq(t, num(req, "order_id"), protoreflect.FieldNumber(1))
+	eq(t, num(req, "event"), protoreflect.FieldNumber(2))
+	mcp := &routerv1.McpEvent{}
+	for name, n := range map[string]protoreflect.FieldNumber{"at": 1, "tool": 2, "outcome": 3,
+		"duration_ms": 4} {
+		eq(t, num(mcp, name), n)
+	}
+	eq(t, num(&routerv1.AppendSessionEventsRequest{}, "events"), protoreflect.FieldNumber(2))
+	eq(t, num(&routerv1.AppendSessionEventsResponse{}, "rejected"), protoreflect.FieldNumber(1))
+	eq(t, num(&routerv1.RotateSessionLinkRequest{}, "session_url"), protoreflect.FieldNumber(2))
+	eq(t, num(&routerv1.RotateSessionLinkResponse{}, "session_url"), protoreflect.FieldNumber(1))
+	eq(t, num(&routerv1.GetSessionHoldRequest{}, "placement_id"), protoreflect.FieldNumber(1))
+	eq(t, num(&routerv1.GetSessionHoldResponse{}, "record_json"), protoreflect.FieldNumber(1))
+}
+
+func TestSessionProcedures(t *testing.T) {
+	eq(t, routerv1connect.SessionPageServiceGetSessionRecordProcedure,
+		"/bugnet.router.v1.SessionPageService/GetSessionRecord")
+	eq(t, routerv1connect.SessionPageServiceDeleteSessionRecordProcedure,
+		"/bugnet.router.v1.SessionPageService/DeleteSessionRecord")
+	eq(t, routerv1connect.SessionPageServiceWatchSessionJobProcedure,
+		"/bugnet.router.v1.SessionPageService/WatchSessionJob")
+	eq(t, routerv1connect.SandboxRouterServiceAppendSessionEventsProcedure,
+		"/bugnet.router.v1.SandboxRouterService/AppendSessionEvents")
+	eq(t, routerv1connect.SandboxRouterServiceRotateSessionLinkProcedure,
+		"/bugnet.router.v1.SandboxRouterService/RotateSessionLink")
+	eq(t, routerv1connect.OperatorServiceGetSessionHoldProcedure,
+		"/bugnet.router.v1.OperatorService/GetSessionHold")
+	eq(t, service(t, "SessionPageService").ParentFile().Path(), "bugnet/router/v1/edge.proto")
+	eq(t, service(t, "SessionPageService").Methods().Len(), 3)
+}
+
+func TestSessionMessagesRoundTrip(t *testing.T) {
+	msgs := []proto.Message{
+		&routerv1.AppendSessionEventsRequest{Handle: "sbx_a", Events: []*routerv1.McpEvent{{
+			At: timestamppb.New(time.Unix(1_700_000_000, 0)), Tool: "bugnet_exec",
+			Outcome: "ok", DurationMs: 120,
+		}}},
+		&routerv1.AppendSessionEventsResponse{Rejected: []uint32{0, 3}},
+		&routerv1.RotateSessionLinkRequest{Handle: "sbx_a", SessionUrl: "https://s/s/x#k=bnk_a"},
+		&routerv1.GetSessionHoldResponse{RecordJson: []byte(`{"v":1}`), ClosedBy: "abuse",
+			HoldUntil: timestamppb.New(time.Unix(1_700_000_000, 0))},
+		&routerv1.GetSessionRecordResponse{State: "running", LiveJson: []byte(`{"v":1}`)},
+	}
+	for _, in := range msgs {
+		if out := roundTrip(t, in); !proto.Equal(in, out) {
+			t.Fatalf("round trip mismatch: %v != %v", in, out)
+		}
+	}
+}

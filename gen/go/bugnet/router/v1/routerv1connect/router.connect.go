@@ -120,6 +120,12 @@ const (
 	// SandboxRouterServiceListX402Procedure is the fully-qualified name of the SandboxRouterService's
 	// ListX402 RPC.
 	SandboxRouterServiceListX402Procedure = "/bugnet.router.v1.SandboxRouterService/ListX402"
+	// SandboxRouterServiceAppendSessionEventsProcedure is the fully-qualified name of the
+	// SandboxRouterService's AppendSessionEvents RPC.
+	SandboxRouterServiceAppendSessionEventsProcedure = "/bugnet.router.v1.SandboxRouterService/AppendSessionEvents"
+	// SandboxRouterServiceRotateSessionLinkProcedure is the fully-qualified name of the
+	// SandboxRouterService's RotateSessionLink RPC.
+	SandboxRouterServiceRotateSessionLinkProcedure = "/bugnet.router.v1.SandboxRouterService/RotateSessionLink"
 )
 
 // SandboxRouterServiceClient is a client for the bugnet.router.v1.SandboxRouterService service.
@@ -159,6 +165,10 @@ type SandboxRouterServiceClient interface {
 	EnableX402(context.Context, *connect.Request[v1.EnableX402Request]) (*connect.Response[v1.EnableX402Response], error)
 	// Lists the placement's x402 services with their states and counts, and its refusals
 	ListX402(context.Context, *connect.Request[v1.ListX402Request]) (*connect.Response[v1.ListX402Response], error)
+	// Stores the gateway's tool calls for the session page, at most 50 a call
+	AppendSessionEvents(context.Context, *connect.Request[v1.AppendSessionEventsRequest]) (*connect.Response[v1.AppendSessionEventsResponse], error)
+	// Ends the session link named in the request and answers the current one
+	RotateSessionLink(context.Context, *connect.Request[v1.RotateSessionLinkRequest]) (*connect.Response[v1.RotateSessionLinkResponse], error)
 }
 
 // NewSandboxRouterServiceClient constructs a client for the bugnet.router.v1.SandboxRouterService
@@ -346,6 +356,18 @@ func NewSandboxRouterServiceClient(httpClient connect.HTTPClient, baseURL string
 			connect.WithSchema(sandboxRouterServiceMethods.ByName("ListX402")),
 			connect.WithClientOptions(opts...),
 		),
+		appendSessionEvents: connect.NewClient[v1.AppendSessionEventsRequest, v1.AppendSessionEventsResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceAppendSessionEventsProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("AppendSessionEvents")),
+			connect.WithClientOptions(opts...),
+		),
+		rotateSessionLink: connect.NewClient[v1.RotateSessionLinkRequest, v1.RotateSessionLinkResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceRotateSessionLinkProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("RotateSessionLink")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -380,6 +402,8 @@ type sandboxRouterServiceClient struct {
 	checkX402            *connect.Client[v1.CheckX402Request, v1.CheckX402Response]
 	enableX402           *connect.Client[v1.EnableX402Request, v1.EnableX402Response]
 	listX402             *connect.Client[v1.ListX402Request, v1.ListX402Response]
+	appendSessionEvents  *connect.Client[v1.AppendSessionEventsRequest, v1.AppendSessionEventsResponse]
+	rotateSessionLink    *connect.Client[v1.RotateSessionLinkRequest, v1.RotateSessionLinkResponse]
 }
 
 // Estimate calls bugnet.router.v1.SandboxRouterService.Estimate.
@@ -527,6 +551,16 @@ func (c *sandboxRouterServiceClient) ListX402(ctx context.Context, req *connect.
 	return c.listX402.CallUnary(ctx, req)
 }
 
+// AppendSessionEvents calls bugnet.router.v1.SandboxRouterService.AppendSessionEvents.
+func (c *sandboxRouterServiceClient) AppendSessionEvents(ctx context.Context, req *connect.Request[v1.AppendSessionEventsRequest]) (*connect.Response[v1.AppendSessionEventsResponse], error) {
+	return c.appendSessionEvents.CallUnary(ctx, req)
+}
+
+// RotateSessionLink calls bugnet.router.v1.SandboxRouterService.RotateSessionLink.
+func (c *sandboxRouterServiceClient) RotateSessionLink(ctx context.Context, req *connect.Request[v1.RotateSessionLinkRequest]) (*connect.Response[v1.RotateSessionLinkResponse], error) {
+	return c.rotateSessionLink.CallUnary(ctx, req)
+}
+
 // SandboxRouterServiceHandler is an implementation of the bugnet.router.v1.SandboxRouterService
 // service.
 type SandboxRouterServiceHandler interface {
@@ -565,6 +599,10 @@ type SandboxRouterServiceHandler interface {
 	EnableX402(context.Context, *connect.Request[v1.EnableX402Request]) (*connect.Response[v1.EnableX402Response], error)
 	// Lists the placement's x402 services with their states and counts, and its refusals
 	ListX402(context.Context, *connect.Request[v1.ListX402Request]) (*connect.Response[v1.ListX402Response], error)
+	// Stores the gateway's tool calls for the session page, at most 50 a call
+	AppendSessionEvents(context.Context, *connect.Request[v1.AppendSessionEventsRequest]) (*connect.Response[v1.AppendSessionEventsResponse], error)
+	// Ends the session link named in the request and answers the current one
+	RotateSessionLink(context.Context, *connect.Request[v1.RotateSessionLinkRequest]) (*connect.Response[v1.RotateSessionLinkResponse], error)
 }
 
 // NewSandboxRouterServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -748,6 +786,18 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 		connect.WithSchema(sandboxRouterServiceMethods.ByName("ListX402")),
 		connect.WithHandlerOptions(opts...),
 	)
+	sandboxRouterServiceAppendSessionEventsHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceAppendSessionEventsProcedure,
+		svc.AppendSessionEvents,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("AppendSessionEvents")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceRotateSessionLinkHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceRotateSessionLinkProcedure,
+		svc.RotateSessionLink,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("RotateSessionLink")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/bugnet.router.v1.SandboxRouterService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SandboxRouterServiceEstimateProcedure:
@@ -808,6 +858,10 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 			sandboxRouterServiceEnableX402Handler.ServeHTTP(w, r)
 		case SandboxRouterServiceListX402Procedure:
 			sandboxRouterServiceListX402Handler.ServeHTTP(w, r)
+		case SandboxRouterServiceAppendSessionEventsProcedure:
+			sandboxRouterServiceAppendSessionEventsHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceRotateSessionLinkProcedure:
+			sandboxRouterServiceRotateSessionLinkHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -931,4 +985,12 @@ func (UnimplementedSandboxRouterServiceHandler) EnableX402(context.Context, *con
 
 func (UnimplementedSandboxRouterServiceHandler) ListX402(context.Context, *connect.Request[v1.ListX402Request]) (*connect.Response[v1.ListX402Response], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.ListX402 is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) AppendSessionEvents(context.Context, *connect.Request[v1.AppendSessionEventsRequest]) (*connect.Response[v1.AppendSessionEventsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.AppendSessionEvents is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) RotateSessionLink(context.Context, *connect.Request[v1.RotateSessionLinkRequest]) (*connect.Response[v1.RotateSessionLinkResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.RotateSessionLink is not implemented"))
 }

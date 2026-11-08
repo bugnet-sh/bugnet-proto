@@ -2394,6 +2394,121 @@ export declare type ListX402Response = Message<"bugnet.router.v1.ListX402Respons
 export declare const ListX402ResponseSchema: GenMessage<ListX402Response>;
 
 /**
+ * @generated from message bugnet.router.v1.McpEvent
+ */
+export declare type McpEvent = Message<"bugnet.router.v1.McpEvent"> & {
+  /**
+   * The call's start
+   *
+   * @generated from field: google.protobuf.Timestamp at = 1;
+   */
+  at?: Timestamp | undefined;
+
+  /**
+   * One of the router's sessions.mcp_tools
+   *
+   * @generated from field: string tool = 2;
+   */
+  tool: string;
+
+  /**
+   * ok, or the gateway's error kind
+   *
+   * @generated from field: string outcome = 3;
+   */
+  outcome: string;
+
+  /**
+   * @generated from field: uint32 duration_ms = 4;
+   */
+  durationMs: number;
+};
+
+/**
+ * Describes the message bugnet.router.v1.McpEvent.
+ * Use `create(McpEventSchema)` to create a new message.
+ */
+export declare const McpEventSchema: GenMessage<McpEvent>;
+
+/**
+ * @generated from message bugnet.router.v1.AppendSessionEventsRequest
+ */
+export declare type AppendSessionEventsRequest = Message<"bugnet.router.v1.AppendSessionEventsRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * @generated from field: repeated bugnet.router.v1.McpEvent events = 2;
+   */
+  events: McpEvent[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.AppendSessionEventsRequest.
+ * Use `create(AppendSessionEventsRequestSchema)` to create a new message.
+ */
+export declare const AppendSessionEventsRequestSchema: GenMessage<AppendSessionEventsRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.AppendSessionEventsResponse
+ */
+export declare type AppendSessionEventsResponse = Message<"bugnet.router.v1.AppendSessionEventsResponse"> & {
+  /**
+   * Indexes of the events dropped for a bad shape
+   *
+   * @generated from field: repeated uint32 rejected = 1;
+   */
+  rejected: number[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.AppendSessionEventsResponse.
+ * Use `create(AppendSessionEventsResponseSchema)` to create a new message.
+ */
+export declare const AppendSessionEventsResponseSchema: GenMessage<AppendSessionEventsResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.RotateSessionLinkRequest
+ */
+export declare type RotateSessionLinkRequest = Message<"bugnet.router.v1.RotateSessionLinkRequest"> & {
+  /**
+   * @generated from field: string handle = 1;
+   */
+  handle: string;
+
+  /**
+   * The link the call ends
+   *
+   * @generated from field: string session_url = 2;
+   */
+  sessionUrl: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.RotateSessionLinkRequest.
+ * Use `create(RotateSessionLinkRequestSchema)` to create a new message.
+ */
+export declare const RotateSessionLinkRequestSchema: GenMessage<RotateSessionLinkRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.RotateSessionLinkResponse
+ */
+export declare type RotateSessionLinkResponse = Message<"bugnet.router.v1.RotateSessionLinkResponse"> & {
+  /**
+   * @generated from field: string session_url = 1;
+   */
+  sessionUrl: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.RotateSessionLinkResponse.
+ * Use `create(RotateSessionLinkResponseSchema)` to create a new message.
+ */
+export declare const RotateSessionLinkResponseSchema: GenMessage<RotateSessionLinkResponse>;
+
+/**
  * What the package lacks against a floor
  *
  * @generated from enum bugnet.router.v1.Dimension
@@ -3281,6 +3396,26 @@ export declare const SandboxRouterService: GenService<{
     methodKind: "unary";
     input: typeof ListX402RequestSchema;
     output: typeof ListX402ResponseSchema;
+  },
+  /**
+   * Stores the gateway's tool calls for the session page, at most 50 a call
+   *
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.AppendSessionEvents
+   */
+  appendSessionEvents: {
+    methodKind: "unary";
+    input: typeof AppendSessionEventsRequestSchema;
+    output: typeof AppendSessionEventsResponseSchema;
+  },
+  /**
+   * Ends the session link named in the request and answers the current one
+   *
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.RotateSessionLink
+   */
+  rotateSessionLink: {
+    methodKind: "unary";
+    input: typeof RotateSessionLinkRequestSchema;
+    output: typeof RotateSessionLinkResponseSchema;
   },
 }>;
 
