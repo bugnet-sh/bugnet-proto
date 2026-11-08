@@ -1831,7 +1831,11 @@ type Placement struct {
 	// The repository the router placed in the sandbox
 	Bootstrap *Bootstrap `protobuf:"bytes,11,opt,name=bootstrap,proto3" json:"bootstrap,omitempty"`
 	// When the placement became terminated or failed, unset before
-	EndedAt       *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	EndedAt *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	// The session page link, on every answer until its record expires
+	SessionUrl string `protobuf:"bytes,14,opt,name=session_url,json=sessionUrl,proto3" json:"session_url,omitempty"`
+	// Package micros of every order redeemed for the placement, the x402 allowance excluded
+	PaidMicros    int64 `protobuf:"varint,15,opt,name=paid_micros,json=paidMicros,proto3" json:"paid_micros,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1948,6 +1952,20 @@ func (x *Placement) GetEndedAt() *timestamppb.Timestamp {
 		return x.EndedAt
 	}
 	return nil
+}
+
+func (x *Placement) GetSessionUrl() string {
+	if x != nil {
+		return x.SessionUrl
+	}
+	return ""
+}
+
+func (x *Placement) GetPaidMicros() int64 {
+	if x != nil {
+		return x.PaidMicros
+	}
+	return 0
 }
 
 type CreatePlacementRequest struct {
@@ -6084,7 +6102,7 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"package_id\x18\x01 \x01(\tR\tpackageId\x12B\n" +
 	"\frequirements\x18\x02 \x01(\v2\x1e.bugnet.router.v1.RequirementsR\frequirements\"O\n" +
 	"\x14PricePackageResponse\x127\n" +
-	"\x06option\x18\x01 \x01(\v2\x1f.bugnet.router.v1.PackageOptionR\x06option\"\xb4\x04\n" +
+	"\x06option\x18\x01 \x01(\v2\x1f.bugnet.router.v1.PackageOptionR\x06option\"\xf6\x04\n" +
 	"\tPlacement\x12!\n" +
 	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\x126\n" +
 	"\x05state\x18\x02 \x01(\x0e2 .bugnet.router.v1.PlacementStateR\x05state\x12\x1d\n" +
@@ -6102,7 +6120,11 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"\x12termination_reason\x18\n" +
 	" \x01(\tR\x11terminationReason\x129\n" +
 	"\tbootstrap\x18\v \x01(\v2\x1b.bugnet.router.v1.BootstrapR\tbootstrap\x125\n" +
-	"\bended_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\x9e\x01\n" +
+	"\bended_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x12\x1f\n" +
+	"\vsession_url\x18\x0e \x01(\tR\n" +
+	"sessionUrl\x12\x1f\n" +
+	"\vpaid_micros\x18\x0f \x01(\x03R\n" +
+	"paidMicros\"\x9e\x01\n" +
 	"\x16CreatePlacementRequest\x12\x1f\n" +
 	"\vorder_token\x18\x01 \x01(\tR\n" +
 	"orderToken\x12B\n" +

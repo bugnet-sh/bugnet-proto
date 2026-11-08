@@ -531,6 +531,20 @@ export declare type Placement = Message<"bugnet.router.v1.Placement"> & {
    * @generated from field: google.protobuf.Timestamp ended_at = 13;
    */
   endedAt?: Timestamp | undefined;
+
+  /**
+   * The session page link, on every answer until its record expires
+   *
+   * @generated from field: string session_url = 14;
+   */
+  sessionUrl: string;
+
+  /**
+   * Package micros of every order redeemed for the placement, the x402 allowance excluded
+   *
+   * @generated from field: int64 paid_micros = 15;
+   */
+  paidMicros: bigint;
 };
 
 /**

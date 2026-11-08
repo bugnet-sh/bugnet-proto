@@ -287,6 +287,10 @@ message Placement {
 
   // When the placement became terminated or failed, unset before
   google.protobuf.Timestamp ended_at = 13;
+  // The session page link, on every answer until its record expires
+  string session_url = 14;
+  // Package micros of every order redeemed for the placement, the x402 allowance excluded
+  int64 paid_micros = 15;
 }
 
 message CreatePlacementRequest {
