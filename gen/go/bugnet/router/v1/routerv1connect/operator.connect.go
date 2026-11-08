@@ -69,6 +69,9 @@ const (
 	// OperatorServiceGetEstimateProcedure is the fully-qualified name of the OperatorService's
 	// GetEstimate RPC.
 	OperatorServiceGetEstimateProcedure = "/bugnet.router.v1.OperatorService/GetEstimate"
+	// OperatorServiceGetSessionHoldProcedure is the fully-qualified name of the OperatorService's
+	// GetSessionHold RPC.
+	OperatorServiceGetSessionHoldProcedure = "/bugnet.router.v1.OperatorService/GetSessionHold"
 )
 
 // OperatorServiceClient is a client for the bugnet.router.v1.OperatorService service.
@@ -86,6 +89,8 @@ type OperatorServiceClient interface {
 	StartBench(context.Context, *connect.Request[v1.StartBenchRequest]) (*connect.Response[v1.StartBenchResponse], error)
 	ReportStarts(context.Context, *connect.Request[v1.ReportStartsRequest]) (*connect.Response[v1.ReportStartsResponse], error)
 	GetEstimate(context.Context, *connect.Request[v1.GetEstimateRequest]) (*connect.Response[v1.GetEstimateResponse], error)
+	// A held session record's page JSON, never served to the public link
+	GetSessionHold(context.Context, *connect.Request[v1.GetSessionHoldRequest]) (*connect.Response[v1.GetSessionHoldResponse], error)
 }
 
 // NewOperatorServiceClient constructs a client for the bugnet.router.v1.OperatorService service. By
@@ -171,23 +176,30 @@ func NewOperatorServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(operatorServiceMethods.ByName("GetEstimate")),
 			connect.WithClientOptions(opts...),
 		),
+		getSessionHold: connect.NewClient[v1.GetSessionHoldRequest, v1.GetSessionHoldResponse](
+			httpClient,
+			baseURL+OperatorServiceGetSessionHoldProcedure,
+			connect.WithSchema(operatorServiceMethods.ByName("GetSessionHold")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // operatorServiceClient implements OperatorServiceClient.
 type operatorServiceClient struct {
-	blockWallet   *connect.Client[v1.BlockWalletRequest, v1.BlockWalletResponse]
-	unblockWallet *connect.Client[v1.UnblockWalletRequest, v1.UnblockWalletResponse]
-	getWallet     *connect.Client[v1.GetWalletRequest, v1.GetWalletResponse]
-	listWallets   *connect.Client[v1.ListWalletsRequest, v1.ListWalletsResponse]
-	findPlacement *connect.Client[v1.FindPlacementRequest, v1.FindPlacementResponse]
-	endPlacement  *connect.Client[v1.EndPlacementRequest, v1.EndPlacementResponse]
-	revokePreview *connect.Client[v1.RevokePreviewRequest, v1.RevokePreviewResponse]
-	listSignals   *connect.Client[v1.ListSignalsRequest, v1.ListSignalsResponse]
-	listProviders *connect.Client[v1.ListProvidersRequest, v1.ListProvidersResponse]
-	startBench    *connect.Client[v1.StartBenchRequest, v1.StartBenchResponse]
-	reportStarts  *connect.Client[v1.ReportStartsRequest, v1.ReportStartsResponse]
-	getEstimate   *connect.Client[v1.GetEstimateRequest, v1.GetEstimateResponse]
+	blockWallet    *connect.Client[v1.BlockWalletRequest, v1.BlockWalletResponse]
+	unblockWallet  *connect.Client[v1.UnblockWalletRequest, v1.UnblockWalletResponse]
+	getWallet      *connect.Client[v1.GetWalletRequest, v1.GetWalletResponse]
+	listWallets    *connect.Client[v1.ListWalletsRequest, v1.ListWalletsResponse]
+	findPlacement  *connect.Client[v1.FindPlacementRequest, v1.FindPlacementResponse]
+	endPlacement   *connect.Client[v1.EndPlacementRequest, v1.EndPlacementResponse]
+	revokePreview  *connect.Client[v1.RevokePreviewRequest, v1.RevokePreviewResponse]
+	listSignals    *connect.Client[v1.ListSignalsRequest, v1.ListSignalsResponse]
+	listProviders  *connect.Client[v1.ListProvidersRequest, v1.ListProvidersResponse]
+	startBench     *connect.Client[v1.StartBenchRequest, v1.StartBenchResponse]
+	reportStarts   *connect.Client[v1.ReportStartsRequest, v1.ReportStartsResponse]
+	getEstimate    *connect.Client[v1.GetEstimateRequest, v1.GetEstimateResponse]
+	getSessionHold *connect.Client[v1.GetSessionHoldRequest, v1.GetSessionHoldResponse]
 }
 
 // BlockWallet calls bugnet.router.v1.OperatorService.BlockWallet.
@@ -250,6 +262,11 @@ func (c *operatorServiceClient) GetEstimate(ctx context.Context, req *connect.Re
 	return c.getEstimate.CallUnary(ctx, req)
 }
 
+// GetSessionHold calls bugnet.router.v1.OperatorService.GetSessionHold.
+func (c *operatorServiceClient) GetSessionHold(ctx context.Context, req *connect.Request[v1.GetSessionHoldRequest]) (*connect.Response[v1.GetSessionHoldResponse], error) {
+	return c.getSessionHold.CallUnary(ctx, req)
+}
+
 // OperatorServiceHandler is an implementation of the bugnet.router.v1.OperatorService service.
 type OperatorServiceHandler interface {
 	BlockWallet(context.Context, *connect.Request[v1.BlockWalletRequest]) (*connect.Response[v1.BlockWalletResponse], error)
@@ -265,6 +282,8 @@ type OperatorServiceHandler interface {
 	StartBench(context.Context, *connect.Request[v1.StartBenchRequest]) (*connect.Response[v1.StartBenchResponse], error)
 	ReportStarts(context.Context, *connect.Request[v1.ReportStartsRequest]) (*connect.Response[v1.ReportStartsResponse], error)
 	GetEstimate(context.Context, *connect.Request[v1.GetEstimateRequest]) (*connect.Response[v1.GetEstimateResponse], error)
+	// A held session record's page JSON, never served to the public link
+	GetSessionHold(context.Context, *connect.Request[v1.GetSessionHoldRequest]) (*connect.Response[v1.GetSessionHoldResponse], error)
 }
 
 // NewOperatorServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -346,6 +365,12 @@ func NewOperatorServiceHandler(svc OperatorServiceHandler, opts ...connect.Handl
 		connect.WithSchema(operatorServiceMethods.ByName("GetEstimate")),
 		connect.WithHandlerOptions(opts...),
 	)
+	operatorServiceGetSessionHoldHandler := connect.NewUnaryHandler(
+		OperatorServiceGetSessionHoldProcedure,
+		svc.GetSessionHold,
+		connect.WithSchema(operatorServiceMethods.ByName("GetSessionHold")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/bugnet.router.v1.OperatorService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case OperatorServiceBlockWalletProcedure:
@@ -372,6 +397,8 @@ func NewOperatorServiceHandler(svc OperatorServiceHandler, opts ...connect.Handl
 			operatorServiceReportStartsHandler.ServeHTTP(w, r)
 		case OperatorServiceGetEstimateProcedure:
 			operatorServiceGetEstimateHandler.ServeHTTP(w, r)
+		case OperatorServiceGetSessionHoldProcedure:
+			operatorServiceGetSessionHoldHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -427,4 +454,8 @@ func (UnimplementedOperatorServiceHandler) ReportStarts(context.Context, *connec
 
 func (UnimplementedOperatorServiceHandler) GetEstimate(context.Context, *connect.Request[v1.GetEstimateRequest]) (*connect.Response[v1.GetEstimateResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.OperatorService.GetEstimate is not implemented"))
+}
+
+func (UnimplementedOperatorServiceHandler) GetSessionHold(context.Context, *connect.Request[v1.GetSessionHoldRequest]) (*connect.Response[v1.GetSessionHoldResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.OperatorService.GetSessionHold is not implemented"))
 }

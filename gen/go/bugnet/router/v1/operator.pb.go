@@ -2618,6 +2618,112 @@ func (x *GetEstimateResponse) GetCatalog() []byte {
 	return nil
 }
 
+type GetSessionHoldRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlacementId   string                 `protobuf:"bytes,1,opt,name=placement_id,json=placementId,proto3" json:"placement_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSessionHoldRequest) Reset() {
+	*x = GetSessionHoldRequest{}
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSessionHoldRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSessionHoldRequest) ProtoMessage() {}
+
+func (x *GetSessionHoldRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSessionHoldRequest.ProtoReflect.Descriptor instead.
+func (*GetSessionHoldRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *GetSessionHoldRequest) GetPlacementId() string {
+	if x != nil {
+		return x.PlacementId
+	}
+	return ""
+}
+
+type GetSessionHoldResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The record as the page would show it
+	RecordJson []byte `protobuf:"bytes,1,opt,name=record_json,json=recordJson,proto3" json:"record_json,omitempty"`
+	// abuse or operator
+	ClosedBy      string                 `protobuf:"bytes,2,opt,name=closed_by,json=closedBy,proto3" json:"closed_by,omitempty"`
+	HoldUntil     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=hold_until,json=holdUntil,proto3" json:"hold_until,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSessionHoldResponse) Reset() {
+	*x = GetSessionHoldResponse{}
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSessionHoldResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSessionHoldResponse) ProtoMessage() {}
+
+func (x *GetSessionHoldResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSessionHoldResponse.ProtoReflect.Descriptor instead.
+func (*GetSessionHoldResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *GetSessionHoldResponse) GetRecordJson() []byte {
+	if x != nil {
+		return x.RecordJson
+	}
+	return nil
+}
+
+func (x *GetSessionHoldResponse) GetClosedBy() string {
+	if x != nil {
+		return x.ClosedBy
+	}
+	return ""
+}
+
+func (x *GetSessionHoldResponse) GetHoldUntil() *timestamppb.Timestamp {
+	if x != nil {
+		return x.HoldUntil
+	}
+	return nil
+}
+
 var File_bugnet_router_v1_operator_proto protoreflect.FileDescriptor
 
 const file_bugnet_router_v1_operator_proto_rawDesc = "" +
@@ -2823,7 +2929,15 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\rinputs_sha256\x18\x05 \x01(\tR\finputsSha256\x129\n" +
 	"\n" +
 	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x18\n" +
-	"\acatalog\x18\a \x01(\fR\acatalog*y\n" +
+	"\acatalog\x18\a \x01(\fR\acatalog\":\n" +
+	"\x15GetSessionHoldRequest\x12!\n" +
+	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\"\x91\x01\n" +
+	"\x16GetSessionHoldResponse\x12\x1f\n" +
+	"\vrecord_json\x18\x01 \x01(\fR\n" +
+	"recordJson\x12\x1b\n" +
+	"\tclosed_by\x18\x02 \x01(\tR\bclosedBy\x129\n" +
+	"\n" +
+	"hold_until\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tholdUntil*y\n" +
 	"\x11OperatorEndReason\x12#\n" +
 	"\x1fOPERATOR_END_REASON_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19OPERATOR_END_REASON_ABUSE\x10\x01\x12 \n" +
@@ -2840,7 +2954,7 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\x17SAMPLE_KIND_UNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15SAMPLE_KIND_PLACEMENT\x10\x01\x12\x16\n" +
 	"\x12SAMPLE_KIND_CANARY\x10\x02\x12\x15\n" +
-	"\x11SAMPLE_KIND_BENCH\x10\x032\xf6\b\n" +
+	"\x11SAMPLE_KIND_BENCH\x10\x032\xdb\t\n" +
 	"\x0fOperatorService\x12Z\n" +
 	"\vBlockWallet\x12$.bugnet.router.v1.BlockWalletRequest\x1a%.bugnet.router.v1.BlockWalletResponse\x12`\n" +
 	"\rUnblockWallet\x12&.bugnet.router.v1.UnblockWalletRequest\x1a'.bugnet.router.v1.UnblockWalletResponse\x12T\n" +
@@ -2854,7 +2968,8 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\n" +
 	"StartBench\x12#.bugnet.router.v1.StartBenchRequest\x1a$.bugnet.router.v1.StartBenchResponse\x12]\n" +
 	"\fReportStarts\x12%.bugnet.router.v1.ReportStartsRequest\x1a&.bugnet.router.v1.ReportStartsResponse\x12Z\n" +
-	"\vGetEstimate\x12$.bugnet.router.v1.GetEstimateRequest\x1a%.bugnet.router.v1.GetEstimateResponseBDZBgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"\vGetEstimate\x12$.bugnet.router.v1.GetEstimateRequest\x1a%.bugnet.router.v1.GetEstimateResponse\x12c\n" +
+	"\x0eGetSessionHold\x12'.bugnet.router.v1.GetSessionHoldRequest\x1a(.bugnet.router.v1.GetSessionHoldResponseBDZBgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_operator_proto_rawDescOnce sync.Once
@@ -2869,64 +2984,66 @@ func file_bugnet_router_v1_operator_proto_rawDescGZIP() []byte {
 }
 
 var file_bugnet_router_v1_operator_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_bugnet_router_v1_operator_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
+var file_bugnet_router_v1_operator_proto_msgTypes = make([]protoimpl.MessageInfo, 36)
 var file_bugnet_router_v1_operator_proto_goTypes = []any{
-	(OperatorEndReason)(0),        // 0: bugnet.router.v1.OperatorEndReason
-	(SignalClass)(0),              // 1: bugnet.router.v1.SignalClass
-	(SampleKind)(0),               // 2: bugnet.router.v1.SampleKind
-	(*ProviderSandbox)(nil),       // 3: bugnet.router.v1.ProviderSandbox
-	(*PlacementTarget)(nil),       // 4: bugnet.router.v1.PlacementTarget
-	(*OperatorPlacement)(nil),     // 5: bugnet.router.v1.OperatorPlacement
-	(*FindPlacementRequest)(nil),  // 6: bugnet.router.v1.FindPlacementRequest
-	(*FindPlacementResponse)(nil), // 7: bugnet.router.v1.FindPlacementResponse
-	(*EndPlacementRequest)(nil),   // 8: bugnet.router.v1.EndPlacementRequest
-	(*EndPlacementResponse)(nil),  // 9: bugnet.router.v1.EndPlacementResponse
-	(*RevokePreviewRequest)(nil),  // 10: bugnet.router.v1.RevokePreviewRequest
-	(*RevokePreviewResponse)(nil), // 11: bugnet.router.v1.RevokePreviewResponse
-	(*Wallet)(nil),                // 12: bugnet.router.v1.Wallet
-	(*WalletEvent)(nil),           // 13: bugnet.router.v1.WalletEvent
-	(*BlockWalletRequest)(nil),    // 14: bugnet.router.v1.BlockWalletRequest
-	(*BlockWalletResponse)(nil),   // 15: bugnet.router.v1.BlockWalletResponse
-	(*UnblockWalletRequest)(nil),  // 16: bugnet.router.v1.UnblockWalletRequest
-	(*UnblockWalletResponse)(nil), // 17: bugnet.router.v1.UnblockWalletResponse
-	(*GetWalletRequest)(nil),      // 18: bugnet.router.v1.GetWalletRequest
-	(*GetWalletResponse)(nil),     // 19: bugnet.router.v1.GetWalletResponse
-	(*ListWalletsRequest)(nil),    // 20: bugnet.router.v1.ListWalletsRequest
-	(*ListWalletsResponse)(nil),   // 21: bugnet.router.v1.ListWalletsResponse
-	(*Signal)(nil),                // 22: bugnet.router.v1.Signal
-	(*ListSignalsRequest)(nil),    // 23: bugnet.router.v1.ListSignalsRequest
-	(*ListSignalsResponse)(nil),   // 24: bugnet.router.v1.ListSignalsResponse
-	(*ProviderStatus)(nil),        // 25: bugnet.router.v1.ProviderStatus
-	(*ListProvidersRequest)(nil),  // 26: bugnet.router.v1.ListProvidersRequest
-	(*ListProvidersResponse)(nil), // 27: bugnet.router.v1.ListProvidersResponse
-	(*StartBenchRequest)(nil),     // 28: bugnet.router.v1.StartBenchRequest
-	(*StartBenchResponse)(nil),    // 29: bugnet.router.v1.StartBenchResponse
-	(*StepStats)(nil),             // 30: bugnet.router.v1.StepStats
-	(*StartReport)(nil),           // 31: bugnet.router.v1.StartReport
-	(*ReportStartsRequest)(nil),   // 32: bugnet.router.v1.ReportStartsRequest
-	(*ReportStartsResponse)(nil),  // 33: bugnet.router.v1.ReportStartsResponse
-	(*GetEstimateRequest)(nil),    // 34: bugnet.router.v1.GetEstimateRequest
-	(*GetEstimateResponse)(nil),   // 35: bugnet.router.v1.GetEstimateResponse
-	nil,                           // 36: bugnet.router.v1.StartReport.ErrorsEntry
-	(PlacementState)(0),           // 37: bugnet.router.v1.PlacementState
-	(*timestamppb.Timestamp)(nil), // 38: google.protobuf.Timestamp
+	(OperatorEndReason)(0),         // 0: bugnet.router.v1.OperatorEndReason
+	(SignalClass)(0),               // 1: bugnet.router.v1.SignalClass
+	(SampleKind)(0),                // 2: bugnet.router.v1.SampleKind
+	(*ProviderSandbox)(nil),        // 3: bugnet.router.v1.ProviderSandbox
+	(*PlacementTarget)(nil),        // 4: bugnet.router.v1.PlacementTarget
+	(*OperatorPlacement)(nil),      // 5: bugnet.router.v1.OperatorPlacement
+	(*FindPlacementRequest)(nil),   // 6: bugnet.router.v1.FindPlacementRequest
+	(*FindPlacementResponse)(nil),  // 7: bugnet.router.v1.FindPlacementResponse
+	(*EndPlacementRequest)(nil),    // 8: bugnet.router.v1.EndPlacementRequest
+	(*EndPlacementResponse)(nil),   // 9: bugnet.router.v1.EndPlacementResponse
+	(*RevokePreviewRequest)(nil),   // 10: bugnet.router.v1.RevokePreviewRequest
+	(*RevokePreviewResponse)(nil),  // 11: bugnet.router.v1.RevokePreviewResponse
+	(*Wallet)(nil),                 // 12: bugnet.router.v1.Wallet
+	(*WalletEvent)(nil),            // 13: bugnet.router.v1.WalletEvent
+	(*BlockWalletRequest)(nil),     // 14: bugnet.router.v1.BlockWalletRequest
+	(*BlockWalletResponse)(nil),    // 15: bugnet.router.v1.BlockWalletResponse
+	(*UnblockWalletRequest)(nil),   // 16: bugnet.router.v1.UnblockWalletRequest
+	(*UnblockWalletResponse)(nil),  // 17: bugnet.router.v1.UnblockWalletResponse
+	(*GetWalletRequest)(nil),       // 18: bugnet.router.v1.GetWalletRequest
+	(*GetWalletResponse)(nil),      // 19: bugnet.router.v1.GetWalletResponse
+	(*ListWalletsRequest)(nil),     // 20: bugnet.router.v1.ListWalletsRequest
+	(*ListWalletsResponse)(nil),    // 21: bugnet.router.v1.ListWalletsResponse
+	(*Signal)(nil),                 // 22: bugnet.router.v1.Signal
+	(*ListSignalsRequest)(nil),     // 23: bugnet.router.v1.ListSignalsRequest
+	(*ListSignalsResponse)(nil),    // 24: bugnet.router.v1.ListSignalsResponse
+	(*ProviderStatus)(nil),         // 25: bugnet.router.v1.ProviderStatus
+	(*ListProvidersRequest)(nil),   // 26: bugnet.router.v1.ListProvidersRequest
+	(*ListProvidersResponse)(nil),  // 27: bugnet.router.v1.ListProvidersResponse
+	(*StartBenchRequest)(nil),      // 28: bugnet.router.v1.StartBenchRequest
+	(*StartBenchResponse)(nil),     // 29: bugnet.router.v1.StartBenchResponse
+	(*StepStats)(nil),              // 30: bugnet.router.v1.StepStats
+	(*StartReport)(nil),            // 31: bugnet.router.v1.StartReport
+	(*ReportStartsRequest)(nil),    // 32: bugnet.router.v1.ReportStartsRequest
+	(*ReportStartsResponse)(nil),   // 33: bugnet.router.v1.ReportStartsResponse
+	(*GetEstimateRequest)(nil),     // 34: bugnet.router.v1.GetEstimateRequest
+	(*GetEstimateResponse)(nil),    // 35: bugnet.router.v1.GetEstimateResponse
+	(*GetSessionHoldRequest)(nil),  // 36: bugnet.router.v1.GetSessionHoldRequest
+	(*GetSessionHoldResponse)(nil), // 37: bugnet.router.v1.GetSessionHoldResponse
+	nil,                            // 38: bugnet.router.v1.StartReport.ErrorsEntry
+	(PlacementState)(0),            // 39: bugnet.router.v1.PlacementState
+	(*timestamppb.Timestamp)(nil),  // 40: google.protobuf.Timestamp
 }
 var file_bugnet_router_v1_operator_proto_depIdxs = []int32{
 	3,  // 0: bugnet.router.v1.PlacementTarget.provider_sandbox:type_name -> bugnet.router.v1.ProviderSandbox
-	37, // 1: bugnet.router.v1.OperatorPlacement.state:type_name -> bugnet.router.v1.PlacementState
-	38, // 2: bugnet.router.v1.OperatorPlacement.created_at:type_name -> google.protobuf.Timestamp
-	38, // 3: bugnet.router.v1.OperatorPlacement.deadline:type_name -> google.protobuf.Timestamp
+	39, // 1: bugnet.router.v1.OperatorPlacement.state:type_name -> bugnet.router.v1.PlacementState
+	40, // 2: bugnet.router.v1.OperatorPlacement.created_at:type_name -> google.protobuf.Timestamp
+	40, // 3: bugnet.router.v1.OperatorPlacement.deadline:type_name -> google.protobuf.Timestamp
 	4,  // 4: bugnet.router.v1.FindPlacementRequest.target:type_name -> bugnet.router.v1.PlacementTarget
 	5,  // 5: bugnet.router.v1.FindPlacementResponse.placement:type_name -> bugnet.router.v1.OperatorPlacement
 	4,  // 6: bugnet.router.v1.EndPlacementRequest.target:type_name -> bugnet.router.v1.PlacementTarget
 	0,  // 7: bugnet.router.v1.EndPlacementRequest.reason:type_name -> bugnet.router.v1.OperatorEndReason
 	5,  // 8: bugnet.router.v1.EndPlacementResponse.placement:type_name -> bugnet.router.v1.OperatorPlacement
-	38, // 9: bugnet.router.v1.Wallet.first_seen:type_name -> google.protobuf.Timestamp
-	38, // 10: bugnet.router.v1.Wallet.last_seen:type_name -> google.protobuf.Timestamp
-	38, // 11: bugnet.router.v1.Wallet.blocked_at:type_name -> google.protobuf.Timestamp
-	38, // 12: bugnet.router.v1.Wallet.blocked_until:type_name -> google.protobuf.Timestamp
-	38, // 13: bugnet.router.v1.WalletEvent.created_at:type_name -> google.protobuf.Timestamp
-	38, // 14: bugnet.router.v1.BlockWalletRequest.until:type_name -> google.protobuf.Timestamp
+	40, // 9: bugnet.router.v1.Wallet.first_seen:type_name -> google.protobuf.Timestamp
+	40, // 10: bugnet.router.v1.Wallet.last_seen:type_name -> google.protobuf.Timestamp
+	40, // 11: bugnet.router.v1.Wallet.blocked_at:type_name -> google.protobuf.Timestamp
+	40, // 12: bugnet.router.v1.Wallet.blocked_until:type_name -> google.protobuf.Timestamp
+	40, // 13: bugnet.router.v1.WalletEvent.created_at:type_name -> google.protobuf.Timestamp
+	40, // 14: bugnet.router.v1.BlockWalletRequest.until:type_name -> google.protobuf.Timestamp
 	12, // 15: bugnet.router.v1.BlockWalletResponse.wallet:type_name -> bugnet.router.v1.Wallet
 	12, // 16: bugnet.router.v1.UnblockWalletResponse.wallet:type_name -> bugnet.router.v1.Wallet
 	12, // 17: bugnet.router.v1.GetWalletResponse.wallet:type_name -> bugnet.router.v1.Wallet
@@ -2934,12 +3051,12 @@ var file_bugnet_router_v1_operator_proto_depIdxs = []int32{
 	13, // 19: bugnet.router.v1.GetWalletResponse.events:type_name -> bugnet.router.v1.WalletEvent
 	12, // 20: bugnet.router.v1.ListWalletsResponse.wallets:type_name -> bugnet.router.v1.Wallet
 	1,  // 21: bugnet.router.v1.Signal.signal_class:type_name -> bugnet.router.v1.SignalClass
-	38, // 22: bugnet.router.v1.Signal.created_at:type_name -> google.protobuf.Timestamp
-	38, // 23: bugnet.router.v1.ListSignalsRequest.since:type_name -> google.protobuf.Timestamp
+	40, // 22: bugnet.router.v1.Signal.created_at:type_name -> google.protobuf.Timestamp
+	40, // 23: bugnet.router.v1.ListSignalsRequest.since:type_name -> google.protobuf.Timestamp
 	1,  // 24: bugnet.router.v1.ListSignalsRequest.signal_class:type_name -> bugnet.router.v1.SignalClass
 	22, // 25: bugnet.router.v1.ListSignalsResponse.signals:type_name -> bugnet.router.v1.Signal
-	38, // 26: bugnet.router.v1.ProviderStatus.state_since:type_name -> google.protobuf.Timestamp
-	38, // 27: bugnet.router.v1.ProviderStatus.polled_at:type_name -> google.protobuf.Timestamp
+	40, // 26: bugnet.router.v1.ProviderStatus.state_since:type_name -> google.protobuf.Timestamp
+	40, // 27: bugnet.router.v1.ProviderStatus.polled_at:type_name -> google.protobuf.Timestamp
 	25, // 28: bugnet.router.v1.ListProvidersResponse.providers:type_name -> bugnet.router.v1.ProviderStatus
 	2,  // 29: bugnet.router.v1.StartReport.kind:type_name -> bugnet.router.v1.SampleKind
 	30, // 30: bugnet.router.v1.StartReport.create:type_name -> bugnet.router.v1.StepStats
@@ -2950,40 +3067,43 @@ var file_bugnet_router_v1_operator_proto_depIdxs = []int32{
 	30, // 35: bugnet.router.v1.StartReport.warm_command:type_name -> bugnet.router.v1.StepStats
 	30, // 36: bugnet.router.v1.StartReport.destroy:type_name -> bugnet.router.v1.StepStats
 	30, // 37: bugnet.router.v1.StartReport.total:type_name -> bugnet.router.v1.StepStats
-	36, // 38: bugnet.router.v1.StartReport.errors:type_name -> bugnet.router.v1.StartReport.ErrorsEntry
-	38, // 39: bugnet.router.v1.ReportStartsRequest.since:type_name -> google.protobuf.Timestamp
+	38, // 38: bugnet.router.v1.StartReport.errors:type_name -> bugnet.router.v1.StartReport.ErrorsEntry
+	40, // 39: bugnet.router.v1.ReportStartsRequest.since:type_name -> google.protobuf.Timestamp
 	2,  // 40: bugnet.router.v1.ReportStartsRequest.kinds:type_name -> bugnet.router.v1.SampleKind
 	31, // 41: bugnet.router.v1.ReportStartsResponse.reports:type_name -> bugnet.router.v1.StartReport
-	38, // 42: bugnet.router.v1.GetEstimateResponse.created_at:type_name -> google.protobuf.Timestamp
-	14, // 43: bugnet.router.v1.OperatorService.BlockWallet:input_type -> bugnet.router.v1.BlockWalletRequest
-	16, // 44: bugnet.router.v1.OperatorService.UnblockWallet:input_type -> bugnet.router.v1.UnblockWalletRequest
-	18, // 45: bugnet.router.v1.OperatorService.GetWallet:input_type -> bugnet.router.v1.GetWalletRequest
-	20, // 46: bugnet.router.v1.OperatorService.ListWallets:input_type -> bugnet.router.v1.ListWalletsRequest
-	6,  // 47: bugnet.router.v1.OperatorService.FindPlacement:input_type -> bugnet.router.v1.FindPlacementRequest
-	8,  // 48: bugnet.router.v1.OperatorService.EndPlacement:input_type -> bugnet.router.v1.EndPlacementRequest
-	10, // 49: bugnet.router.v1.OperatorService.RevokePreview:input_type -> bugnet.router.v1.RevokePreviewRequest
-	23, // 50: bugnet.router.v1.OperatorService.ListSignals:input_type -> bugnet.router.v1.ListSignalsRequest
-	26, // 51: bugnet.router.v1.OperatorService.ListProviders:input_type -> bugnet.router.v1.ListProvidersRequest
-	28, // 52: bugnet.router.v1.OperatorService.StartBench:input_type -> bugnet.router.v1.StartBenchRequest
-	32, // 53: bugnet.router.v1.OperatorService.ReportStarts:input_type -> bugnet.router.v1.ReportStartsRequest
-	34, // 54: bugnet.router.v1.OperatorService.GetEstimate:input_type -> bugnet.router.v1.GetEstimateRequest
-	15, // 55: bugnet.router.v1.OperatorService.BlockWallet:output_type -> bugnet.router.v1.BlockWalletResponse
-	17, // 56: bugnet.router.v1.OperatorService.UnblockWallet:output_type -> bugnet.router.v1.UnblockWalletResponse
-	19, // 57: bugnet.router.v1.OperatorService.GetWallet:output_type -> bugnet.router.v1.GetWalletResponse
-	21, // 58: bugnet.router.v1.OperatorService.ListWallets:output_type -> bugnet.router.v1.ListWalletsResponse
-	7,  // 59: bugnet.router.v1.OperatorService.FindPlacement:output_type -> bugnet.router.v1.FindPlacementResponse
-	9,  // 60: bugnet.router.v1.OperatorService.EndPlacement:output_type -> bugnet.router.v1.EndPlacementResponse
-	11, // 61: bugnet.router.v1.OperatorService.RevokePreview:output_type -> bugnet.router.v1.RevokePreviewResponse
-	24, // 62: bugnet.router.v1.OperatorService.ListSignals:output_type -> bugnet.router.v1.ListSignalsResponse
-	27, // 63: bugnet.router.v1.OperatorService.ListProviders:output_type -> bugnet.router.v1.ListProvidersResponse
-	29, // 64: bugnet.router.v1.OperatorService.StartBench:output_type -> bugnet.router.v1.StartBenchResponse
-	33, // 65: bugnet.router.v1.OperatorService.ReportStarts:output_type -> bugnet.router.v1.ReportStartsResponse
-	35, // 66: bugnet.router.v1.OperatorService.GetEstimate:output_type -> bugnet.router.v1.GetEstimateResponse
-	55, // [55:67] is the sub-list for method output_type
-	43, // [43:55] is the sub-list for method input_type
-	43, // [43:43] is the sub-list for extension type_name
-	43, // [43:43] is the sub-list for extension extendee
-	0,  // [0:43] is the sub-list for field type_name
+	40, // 42: bugnet.router.v1.GetEstimateResponse.created_at:type_name -> google.protobuf.Timestamp
+	40, // 43: bugnet.router.v1.GetSessionHoldResponse.hold_until:type_name -> google.protobuf.Timestamp
+	14, // 44: bugnet.router.v1.OperatorService.BlockWallet:input_type -> bugnet.router.v1.BlockWalletRequest
+	16, // 45: bugnet.router.v1.OperatorService.UnblockWallet:input_type -> bugnet.router.v1.UnblockWalletRequest
+	18, // 46: bugnet.router.v1.OperatorService.GetWallet:input_type -> bugnet.router.v1.GetWalletRequest
+	20, // 47: bugnet.router.v1.OperatorService.ListWallets:input_type -> bugnet.router.v1.ListWalletsRequest
+	6,  // 48: bugnet.router.v1.OperatorService.FindPlacement:input_type -> bugnet.router.v1.FindPlacementRequest
+	8,  // 49: bugnet.router.v1.OperatorService.EndPlacement:input_type -> bugnet.router.v1.EndPlacementRequest
+	10, // 50: bugnet.router.v1.OperatorService.RevokePreview:input_type -> bugnet.router.v1.RevokePreviewRequest
+	23, // 51: bugnet.router.v1.OperatorService.ListSignals:input_type -> bugnet.router.v1.ListSignalsRequest
+	26, // 52: bugnet.router.v1.OperatorService.ListProviders:input_type -> bugnet.router.v1.ListProvidersRequest
+	28, // 53: bugnet.router.v1.OperatorService.StartBench:input_type -> bugnet.router.v1.StartBenchRequest
+	32, // 54: bugnet.router.v1.OperatorService.ReportStarts:input_type -> bugnet.router.v1.ReportStartsRequest
+	34, // 55: bugnet.router.v1.OperatorService.GetEstimate:input_type -> bugnet.router.v1.GetEstimateRequest
+	36, // 56: bugnet.router.v1.OperatorService.GetSessionHold:input_type -> bugnet.router.v1.GetSessionHoldRequest
+	15, // 57: bugnet.router.v1.OperatorService.BlockWallet:output_type -> bugnet.router.v1.BlockWalletResponse
+	17, // 58: bugnet.router.v1.OperatorService.UnblockWallet:output_type -> bugnet.router.v1.UnblockWalletResponse
+	19, // 59: bugnet.router.v1.OperatorService.GetWallet:output_type -> bugnet.router.v1.GetWalletResponse
+	21, // 60: bugnet.router.v1.OperatorService.ListWallets:output_type -> bugnet.router.v1.ListWalletsResponse
+	7,  // 61: bugnet.router.v1.OperatorService.FindPlacement:output_type -> bugnet.router.v1.FindPlacementResponse
+	9,  // 62: bugnet.router.v1.OperatorService.EndPlacement:output_type -> bugnet.router.v1.EndPlacementResponse
+	11, // 63: bugnet.router.v1.OperatorService.RevokePreview:output_type -> bugnet.router.v1.RevokePreviewResponse
+	24, // 64: bugnet.router.v1.OperatorService.ListSignals:output_type -> bugnet.router.v1.ListSignalsResponse
+	27, // 65: bugnet.router.v1.OperatorService.ListProviders:output_type -> bugnet.router.v1.ListProvidersResponse
+	29, // 66: bugnet.router.v1.OperatorService.StartBench:output_type -> bugnet.router.v1.StartBenchResponse
+	33, // 67: bugnet.router.v1.OperatorService.ReportStarts:output_type -> bugnet.router.v1.ReportStartsResponse
+	35, // 68: bugnet.router.v1.OperatorService.GetEstimate:output_type -> bugnet.router.v1.GetEstimateResponse
+	37, // 69: bugnet.router.v1.OperatorService.GetSessionHold:output_type -> bugnet.router.v1.GetSessionHoldResponse
+	57, // [57:70] is the sub-list for method output_type
+	44, // [44:57] is the sub-list for method input_type
+	44, // [44:44] is the sub-list for extension type_name
+	44, // [44:44] is the sub-list for extension extendee
+	0,  // [0:44] is the sub-list for field type_name
 }
 
 func init() { file_bugnet_router_v1_operator_proto_init() }
@@ -3008,7 +3128,7 @@ func file_bugnet_router_v1_operator_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bugnet_router_v1_operator_proto_rawDesc), len(file_bugnet_router_v1_operator_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   34,
+			NumMessages:   36,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

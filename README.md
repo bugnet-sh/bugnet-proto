@@ -17,6 +17,7 @@ other service's token, and admits no calls to a service whose token is empty.
 | `EgressService` | `edge.proto` | `bugnet-egress` | `BUGNET_EGRESS_TOKEN` |
 | `OperatorService` | `operator.proto` | `bugnet-dev`, operators only | `BUGNET_OPERATOR_TOKEN` |
 | `PaymentsService` | `payments.proto` | Payments | `BUGNET_PAYMENTS_ROUTER_TOKEN` |
+| `SessionPageService` | `edge.proto` | `bugnet-edge --role sessions` | `BUGNET_SESSIONS_TOKEN` |
 
 `router.proto` imports none of the other three files, so the gateway's generated client holds
 none of their services. Errors carry a `google.rpc.ErrorInfo` reason in domain `bugnet.router`.
@@ -47,6 +48,23 @@ The x402 spec (section 6.2) adds seven calls across three services.
   the `kept` phase and `AppendAllowanceEventRequest.start_order_id` (3).
 - `ResolveTunnelResponse.x402` (11) and `ReportEgressUsageRequest.x402_unpaid` (3) carry the caps
   and the unpaid use between the router and egress.
+
+### Session page calls
+
+The session page spec (section 7.3) adds six calls across four services.
+
+| Service | Call | Does |
+| --- | --- | --- |
+| `SessionPageService` | `GetSessionRecord` | Answers a record's state and page JSON for its key |
+| `SessionPageService` | `DeleteSessionRecord` | Deletes a record's public page for an id and key |
+| `SessionPageService` | `WatchSessionJob` | Streams one job's cleaned output while it runs |
+| `SandboxRouterService` | `AppendSessionEvents` | Stores the gateway's tool calls for the page |
+| `SandboxRouterService` | `RotateSessionLink` | Ends the named link and answers a new one |
+| `OperatorService` | `GetSessionHold` | Answers a held record's page JSON to an operator |
+
+- `Placement.session_url` (14) carries the page link on every answer until the record expires.
+- A wrong key and an unknown id both answer `NotFound` with reason `SESSION_UNKNOWN`.
+- `AllowanceEvent`, below, also feeds the page.
 
 ### The x402 signer
 

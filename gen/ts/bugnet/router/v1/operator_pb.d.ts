@@ -1194,6 +1194,52 @@ export declare type GetEstimateResponse = Message<"bugnet.router.v1.GetEstimateR
 export declare const GetEstimateResponseSchema: GenMessage<GetEstimateResponse>;
 
 /**
+ * @generated from message bugnet.router.v1.GetSessionHoldRequest
+ */
+export declare type GetSessionHoldRequest = Message<"bugnet.router.v1.GetSessionHoldRequest"> & {
+  /**
+   * @generated from field: string placement_id = 1;
+   */
+  placementId: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.GetSessionHoldRequest.
+ * Use `create(GetSessionHoldRequestSchema)` to create a new message.
+ */
+export declare const GetSessionHoldRequestSchema: GenMessage<GetSessionHoldRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.GetSessionHoldResponse
+ */
+export declare type GetSessionHoldResponse = Message<"bugnet.router.v1.GetSessionHoldResponse"> & {
+  /**
+   * The record as the page would show it
+   *
+   * @generated from field: bytes record_json = 1;
+   */
+  recordJson: Uint8Array;
+
+  /**
+   * abuse or operator
+   *
+   * @generated from field: string closed_by = 2;
+   */
+  closedBy: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp hold_until = 3;
+   */
+  holdUntil?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.GetSessionHoldResponse.
+ * Use `create(GetSessionHoldResponseSchema)` to create a new message.
+ */
+export declare const GetSessionHoldResponseSchema: GenMessage<GetSessionHoldResponse>;
+
+/**
  * @generated from enum bugnet.router.v1.OperatorEndReason
  */
 export enum OperatorEndReason {
@@ -1395,6 +1441,16 @@ export declare const OperatorService: GenService<{
     methodKind: "unary";
     input: typeof GetEstimateRequestSchema;
     output: typeof GetEstimateResponseSchema;
+  },
+  /**
+   * A held session record's page JSON, never served to the public link
+   *
+   * @generated from rpc bugnet.router.v1.OperatorService.GetSessionHold
+   */
+  getSessionHold: {
+    methodKind: "unary";
+    input: typeof GetSessionHoldRequestSchema;
+    output: typeof GetSessionHoldResponseSchema;
   },
 }>;
 
