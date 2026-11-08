@@ -955,7 +955,7 @@ const file_bugnet_router_v1_payments_proto_rawDesc = "" +
 	"\bGetOrder\x12!.bugnet.router.v1.GetOrderRequest\x1a\".bugnet.router.v1.GetOrderResponse\x12f\n" +
 	"\x0fLookupPlacement\x12(.bugnet.router.v1.LookupPlacementRequest\x1a).bugnet.router.v1.LookupPlacementResponse\x12u\n" +
 	"\x14AppendAllowanceEvent\x12-.bugnet.router.v1.AppendAllowanceEventRequest\x1a..bugnet.router.v1.AppendAllowanceEventResponse\x12o\n" +
-	"\x12AppendX402Resolved\x12+.bugnet.router.v1.AppendX402ResolvedRequest\x1a,.bugnet.router.v1.AppendX402ResolvedResponseBBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"\x12AppendX402Resolved\x12+.bugnet.router.v1.AppendX402ResolvedRequest\x1a,.bugnet.router.v1.AppendX402ResolvedResponseBDZBgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_payments_proto_rawDescOnce sync.Once

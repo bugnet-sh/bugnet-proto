@@ -5863,7 +5863,7 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x12SessionPageService\x12i\n" +
 	"\x10GetSessionRecord\x12).bugnet.router.v1.GetSessionRecordRequest\x1a*.bugnet.router.v1.GetSessionRecordResponse\x12r\n" +
 	"\x13DeleteSessionRecord\x12,.bugnet.router.v1.DeleteSessionRecordRequest\x1a-.bugnet.router.v1.DeleteSessionRecordResponse\x12h\n" +
-	"\x0fWatchSessionJob\x12(.bugnet.router.v1.WatchSessionJobRequest\x1a).bugnet.router.v1.WatchSessionJobResponse0\x01BBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"\x0fWatchSessionJob\x12(.bugnet.router.v1.WatchSessionJobRequest\x1a).bugnet.router.v1.WatchSessionJobResponse0\x01BDZBgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_edge_proto_rawDescOnce sync.Once

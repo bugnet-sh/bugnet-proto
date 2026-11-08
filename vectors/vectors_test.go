@@ -14,7 +14,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/oynozan/bugnet-proto/vectors"
+	"github.com/bugnet-sh/bugnet-proto/vectors"
 )
 
 type pathsFile struct {

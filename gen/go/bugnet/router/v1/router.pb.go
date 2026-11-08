@@ -6560,7 +6560,7 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"\tCheckX402\x12\".bugnet.router.v1.CheckX402Request\x1a#.bugnet.router.v1.CheckX402Response\x12W\n" +
 	"\n" +
 	"EnableX402\x12#.bugnet.router.v1.EnableX402Request\x1a$.bugnet.router.v1.EnableX402Response\x12Q\n" +
-	"\bListX402\x12!.bugnet.router.v1.ListX402Request\x1a\".bugnet.router.v1.ListX402ResponseBBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"\bListX402\x12!.bugnet.router.v1.ListX402Request\x1a\".bugnet.router.v1.ListX402ResponseBDZBgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_router_proto_rawDescOnce sync.Once

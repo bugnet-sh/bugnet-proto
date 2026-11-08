@@ -668,7 +668,7 @@ const file_bugnet_payments_v1_x402_proto_rawDesc = "" +
 	"\x14SELLER_HINT_REJECTED\x10\x042\xe2\x01\n" +
 	"\x11X402SignerService\x12g\n" +
 	"\x0eReserveAndSign\x12).bugnet.payments.v1.ReserveAndSignRequest\x1a*.bugnet.payments.v1.ReserveAndSignResponse\x12d\n" +
-	"\rReportOutcome\x12(.bugnet.payments.v1.ReportOutcomeRequest\x1a).bugnet.payments.v1.ReportOutcomeResponseBFZDgithub.com/oynozan/bugnet-proto/gen/go/bugnet/payments/v1;paymentsv1b\x06proto3"
+	"\rReportOutcome\x12(.bugnet.payments.v1.ReportOutcomeRequest\x1a).bugnet.payments.v1.ReportOutcomeResponseBHZFgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/payments/v1;paymentsv1b\x06proto3"
 
 var (
 	file_bugnet_payments_v1_x402_proto_rawDescOnce sync.Once

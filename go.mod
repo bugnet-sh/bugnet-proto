@@ -1,4 +1,4 @@
-module github.com/oynozan/bugnet-proto
+module github.com/bugnet-sh/bugnet-proto
 
 go 1.27
 

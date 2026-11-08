@@ -7,8 +7,8 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 
-	paymentsv1 "github.com/oynozan/bugnet-proto/gen/go/bugnet/payments/v1"
-	"github.com/oynozan/bugnet-proto/gen/go/bugnet/payments/v1/paymentsv1connect"
+	paymentsv1 "github.com/bugnet-sh/bugnet-proto/gen/go/bugnet/payments/v1"
+	"github.com/bugnet-sh/bugnet-proto/gen/go/bugnet/payments/v1/paymentsv1connect"
 )
 
 func TestSignerFieldNumbers(t *testing.T) {

@@ -4,7 +4,7 @@ package bugnet.router.v1;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
+option go_package = "github.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
 
 // ErrorInfo reasons include HANDLE_UNKNOWN, JOB_UNKNOWN, FILE_NOT_FOUND, PACKAGE_UNKNOWN and
 // NOT_START_PACKAGE

@@ -116,7 +116,7 @@ loads its own `@bufbuild/protobuf` from this `node_modules`, unless Node runs wi
 
 `vectors/x402` holds the x402 test cases that the router, `bugnet-egress` and the MCP gateway each
 run, so the three never drift. Go code reads them from `vectors.X402`, an `embed.FS` in package
-`github.com/oynozan/bugnet-proto/vectors`. TypeScript imports them as JSON.
+`github.com/bugnet-sh/bugnet-proto/vectors`. TypeScript imports them as JSON.
 
 ```ts
 import paths from "@bugnet/proto/vectors/x402/paths.json" with { type: "json" };

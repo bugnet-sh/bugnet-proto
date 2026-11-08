@@ -5,7 +5,7 @@ package bugnet.router.v1;
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
+option go_package = "github.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
 
 // Called by Payments with BUGNET_PAYMENTS_ROUTER_TOKEN, never by the gateway or the edges
 service PaymentsService {

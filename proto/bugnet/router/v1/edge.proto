@@ -5,7 +5,7 @@ package bugnet.router.v1;
 import "bugnet/router/v1/router.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
+option go_package = "github.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1";
 
 // Called by bugnet-edge with BUGNET_EDGE_TOKEN
 service EdgeService {

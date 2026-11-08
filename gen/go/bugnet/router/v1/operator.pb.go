@@ -2854,7 +2854,7 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\n" +
 	"StartBench\x12#.bugnet.router.v1.StartBenchRequest\x1a$.bugnet.router.v1.StartBenchResponse\x12]\n" +
 	"\fReportStarts\x12%.bugnet.router.v1.ReportStartsRequest\x1a&.bugnet.router.v1.ReportStartsResponse\x12Z\n" +
-	"\vGetEstimate\x12$.bugnet.router.v1.GetEstimateRequest\x1a%.bugnet.router.v1.GetEstimateResponseBBZ@github.com/oynozan/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"\vGetEstimate\x12$.bugnet.router.v1.GetEstimateRequest\x1a%.bugnet.router.v1.GetEstimateResponseBDZBgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_operator_proto_rawDescOnce sync.Once

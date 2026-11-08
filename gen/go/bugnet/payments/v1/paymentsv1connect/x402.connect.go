@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	v1 "github.com/oynozan/bugnet-proto/gen/go/bugnet/payments/v1"
+	v1 "github.com/bugnet-sh/bugnet-proto/gen/go/bugnet/payments/v1"
 	http "net/http"
 	strings "strings"
 )
