@@ -743,3 +743,15 @@ func TestSessionMessagesRoundTrip(t *testing.T) {
 		}
 	}
 }
+
+func TestTunnelSourceCheckRoundTrips(t *testing.T) {
+	in := &routerv1.ResolveTunnelResponse{SourceCheck: &routerv1.TunnelSourceCheck{
+		Mode:            routerv1.SourceCheckMode_SOURCE_CHECK_MODE_ENFORCE,
+		AllowedPrefixes: []string{"2001:db8::5/128"},
+	}}
+	eq(t, proto.Equal(roundTrip(t, in), in), true)
+	eq(t, roundTrip(t, &routerv1.ResolveTunnelRequest{SourceIp: "2001:db8::5"}).SourceIp,
+		"2001:db8::5")
+	eq(t, roundTrip(t, &routerv1.ResolveTunnelResponse{}).SourceCheck.GetMode(),
+		routerv1.SourceCheckMode_SOURCE_CHECK_MODE_UNSPECIFIED)
+}
