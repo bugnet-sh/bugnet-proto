@@ -55,6 +55,20 @@ jobs:
           version: v2.14.0
           working-directory: bugnet-proto
 
+      # Temporary: fails on purpose so the report step runs on known failures
+      - name: Fail on purpose
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          mkdir -p synth/a synth/b synth/c
+          cd synth
+          printf 'module example.com/synth\n\ngo 1.24\n' > go.mod
+          printf 'package a\n\nimport "testing"\n\nfunc TestPlain(t *testing.T) { t.Fatal("100%% sure: a,b") }\n\nfunc TestSub(t *testing.T) {\n\tt.Run("one", func(t *testing.T) { t.Error("sub") })\n}\n' > a/a_test.go
+          printf 'package b\n\nimport "testing"\n\nfunc TestPanics(t *testing.T) {\n\tvar s []int\n\t_ = s[0]\n}\n' > b/b_test.go
+          printf 'package c\n\nimport "testing"\n\nfunc TestBuild(t *testing.T) { missing() }\n' > c/c_test.go
+          go test -short ./... 2>&1 | tee "$RUNNER_TEMP/go-test.log" || true
+          exit 1
+
       - name: go test
         run: |
           set -euo pipefail
