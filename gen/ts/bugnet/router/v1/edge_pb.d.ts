@@ -1751,6 +1751,13 @@ export declare type ResolveTunnelRequest = Message<"bugnet.router.v1.ResolveTunn
     value: string;
     case: "fetchPlacementId";
   } | { case: undefined; value?: undefined };
+
+  /**
+   * The tunnel's source IP from HAProxy's PROXY v2 header, no port, empty when it had none
+   *
+   * @generated from field: string source_ip = 3;
+   */
+  sourceIp: string;
 };
 
 /**
@@ -1758,6 +1765,31 @@ export declare type ResolveTunnelRequest = Message<"bugnet.router.v1.ResolveTunn
  * Use `create(ResolveTunnelRequestSchema)` to create a new message.
  */
 export declare const ResolveTunnelRequestSchema: GenMessage<ResolveTunnelRequest>;
+
+/**
+ * Where one placement's tunnels may come from, as its provider reports the sandbox's address
+ *
+ * @generated from message bugnet.router.v1.TunnelSourceCheck
+ */
+export declare type TunnelSourceCheck = Message<"bugnet.router.v1.TunnelSourceCheck"> & {
+  /**
+   * @generated from field: bugnet.router.v1.SourceCheckMode mode = 1;
+   */
+  mode: SourceCheckMode;
+
+  /**
+   * Masked CIDR prefixes, a /128 or a /32, at most one in version 1, empty admits none
+   *
+   * @generated from field: repeated string allowed_prefixes = 2;
+   */
+  allowedPrefixes: string[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.TunnelSourceCheck.
+ * Use `create(TunnelSourceCheckSchema)` to create a new message.
+ */
+export declare const TunnelSourceCheckSchema: GenMessage<TunnelSourceCheck>;
 
 /**
  * @generated from message bugnet.router.v1.EgressSecret
@@ -1831,7 +1863,7 @@ export declare type ResolveTunnelResponse = Message<"bugnet.router.v1.ResolveTun
   maxTunnels: number;
 
   /**
-   * Moves whenever the placement's secrets change
+   * Moves whenever the placement's secrets or its allowed source change
    *
    * @generated from field: uint64 secrets_version = 7;
    */
@@ -1848,6 +1880,11 @@ export declare type ResolveTunnelResponse = Message<"bugnet.router.v1.ResolveTun
    * @generated from field: uint32 requests_in_flight = 9;
    */
   requestsInFlight: number;
+
+  /**
+   * @generated from field: bugnet.router.v1.TunnelSourceCheck source_check = 10;
+   */
+  sourceCheck?: TunnelSourceCheck | undefined;
 
   /**
    * The placement's x402 services, caps and unpaid use
@@ -2491,6 +2528,37 @@ export enum BudgetKind {
  * Describes the enum bugnet.router.v1.BudgetKind.
  */
 export declare const BudgetKindSchema: GenEnum<BudgetKind>;
+
+/**
+ * @generated from enum bugnet.router.v1.SourceCheckMode
+ */
+export enum SourceCheckMode {
+  /**
+   * No check, as the provider reports no address, the setting is off, or the caller is the fetcher
+   *
+   * @generated from enum value: SOURCE_CHECK_MODE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * A source outside allowed_prefixes is logged and counted, and the tunnel is served
+   *
+   * @generated from enum value: SOURCE_CHECK_MODE_REPORT = 1;
+   */
+  REPORT = 1,
+
+  /**
+   * A source outside allowed_prefixes gets 403
+   *
+   * @generated from enum value: SOURCE_CHECK_MODE_ENFORCE = 2;
+   */
+  ENFORCE = 2,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.SourceCheckMode.
+ */
+export declare const SourceCheckModeSchema: GenEnum<SourceCheckMode>;
 
 /**
  * Called by bugnet-edge with BUGNET_EDGE_TOKEN

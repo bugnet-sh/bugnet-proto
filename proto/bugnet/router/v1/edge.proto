@@ -532,6 +532,24 @@ message ResolveTunnelRequest {
     // The router's repository fetcher, acting for this placement
     string fetch_placement_id = 2;
   }
+  // The tunnel's source IP from HAProxy's PROXY v2 header, no port, empty when it had none
+  string source_ip = 3;
+}
+
+enum SourceCheckMode {
+  // No check, as the provider reports no address, the setting is off, or the caller is the fetcher
+  SOURCE_CHECK_MODE_UNSPECIFIED = 0;
+  // A source outside allowed_prefixes is logged and counted, and the tunnel is served
+  SOURCE_CHECK_MODE_REPORT = 1;
+  // A source outside allowed_prefixes gets 403
+  SOURCE_CHECK_MODE_ENFORCE = 2;
+}
+
+// Where one placement's tunnels may come from, as its provider reports the sandbox's address
+message TunnelSourceCheck {
+  SourceCheckMode mode = 1;
+  // Masked CIDR prefixes, a /128 or a /32, at most one in version 1, empty admits none
+  repeated string allowed_prefixes = 2;
 }
 
 message EgressSecret {
@@ -551,11 +569,12 @@ message ResolveTunnelResponse {
   repeated EgressSecret secrets = 4;
   uint64 bytes_remaining = 5;
   uint32 max_tunnels = 6;
-  // Moves whenever the placement's secrets change
+  // Moves whenever the placement's secrets or its allowed source change
   uint64 secrets_version = 7;
   // Each way, per placement
   uint64 bytes_per_second = 8;
   uint32 requests_in_flight = 9;
+  TunnelSourceCheck source_check = 10;
   // The placement's x402 services, caps and unpaid use
   X402Config x402 = 11;
 }
