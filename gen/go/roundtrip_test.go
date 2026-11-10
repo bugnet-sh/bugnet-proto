@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	routerv1 "github.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1"
@@ -754,4 +755,39 @@ func TestTunnelSourceCheckRoundTrips(t *testing.T) {
 		"2001:db8::5")
 	eq(t, roundTrip(t, &routerv1.ResolveTunnelResponse{}).SourceCheck.GetMode(),
 		routerv1.SourceCheckMode_SOURCE_CHECK_MODE_UNSPECIFIED)
+}
+
+func TestReserveRoundTrips(t *testing.T) {
+	in := &routerv1.ReserveResponse{Outcome: routerv1.ReserveOutcome_RESERVE_OUTCOME_SKIPPED,
+		Skip: routerv1.ReserveSkip_RESERVE_SKIP_BRAKED}
+	eq(t, proto.Equal(roundTrip(t, in), in), true)
+	eq(t, roundTrip(t, &routerv1.CreatePlacementRequest{QuoteId: "q2.x"}).QuoteId, "q2.x")
+}
+
+func TestReserveProcedures(t *testing.T) {
+	eq(t, routerv1connect.SandboxRouterServiceReserveProcedure,
+		"/bugnet.router.v1.SandboxRouterService/Reserve")
+	eq(t, routerv1connect.SandboxRouterServiceReleaseReservationProcedure,
+		"/bugnet.router.v1.SandboxRouterService/ReleaseReservation")
+	eq(t, routerv1connect.OperatorServiceListPoolsProcedure,
+		"/bugnet.router.v1.OperatorService/ListPools")
+	eq(t, routerv1connect.OperatorServiceDrainPoolProcedure,
+		"/bugnet.router.v1.OperatorService/DrainPool")
+}
+
+func TestStartReportPathFields(t *testing.T) {
+	eq(t, roundTrip(t, &routerv1.StartReport{StartPath: "pooled"}).StartPath, "pooled")
+	eq(t, int32(routerv1.SampleKind_SAMPLE_KIND_RESERVE), int32(5))
+	eq(t, roundTrip(t, &routerv1.OperatorPlacement{Hedged: true}).Hedged, true)
+}
+
+func TestPoolStatusRoundTrips(t *testing.T) {
+	in := &routerv1.ListPoolsResponse{Pools: []*routerv1.PoolStatus{{
+		Provider: "boxd", Size: "medium", KeptBy: "router", Warm: 2, PausedReason: "drained",
+		PausedUntil: timestamppb.New(time.Unix(1700000000, 0)),
+	}}}
+	eq(t, proto.Equal(roundTrip(t, in), in), true)
+	drain := &routerv1.DrainPoolRequest{Provider: "boxd", Size: "medium", Actor: "op",
+		PauseFor: durationpb.New(time.Hour)}
+	eq(t, proto.Equal(roundTrip(t, drain), drain), true)
 }

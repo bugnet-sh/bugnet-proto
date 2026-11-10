@@ -573,6 +573,13 @@ export declare type CreatePlacementRequest = Message<"bugnet.router.v1.CreatePla
    * @generated from field: string estimate_id = 3;
    */
   estimateId: string;
+
+  /**
+   * The quote Reserve was called with, which binds its reservation when the order matches
+   *
+   * @generated from field: string quote_id = 4;
+   */
+  quoteId: string;
 };
 
 /**
@@ -2509,6 +2516,101 @@ export declare type RotateSessionLinkResponse = Message<"bugnet.router.v1.Rotate
 export declare const RotateSessionLinkResponseSchema: GenMessage<RotateSessionLinkResponse>;
 
 /**
+ * @generated from message bugnet.router.v1.ReserveRequest
+ */
+export declare type ReserveRequest = Message<"bugnet.router.v1.ReserveRequest"> & {
+  /**
+   * The gateway's quote id, 1 to 128 printable ASCII bytes, the one CreatePlacement sends
+   *
+   * @generated from field: string quote_id = 1;
+   */
+  quoteId: string;
+
+  /**
+   * @generated from field: string package_id = 2;
+   */
+  packageId: string;
+
+  /**
+   * Must equal the requirements the order's CreatePlacement sends
+   *
+   * @generated from field: bugnet.router.v1.Requirements requirements = 3;
+   */
+  requirements?: Requirements | undefined;
+
+  /**
+   * The agent client's address as the gateway saw it, empty when unknown
+   *
+   * @generated from field: string client_ip = 4;
+   */
+  clientIp: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.ReserveRequest.
+ * Use `create(ReserveRequestSchema)` to create a new message.
+ */
+export declare const ReserveRequestSchema: GenMessage<ReserveRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.ReserveResponse
+ */
+export declare type ReserveResponse = Message<"bugnet.router.v1.ReserveResponse"> & {
+  /**
+   * @generated from field: bugnet.router.v1.ReserveOutcome outcome = 1;
+   */
+  outcome: ReserveOutcome;
+
+  /**
+   * Set when the outcome is SKIPPED
+   *
+   * @generated from field: bugnet.router.v1.ReserveSkip skip = 2;
+   */
+  skip: ReserveSkip;
+
+  /**
+   * When the hold ends unless another Reserve for the quote renews it
+   *
+   * @generated from field: google.protobuf.Timestamp expires_at = 3;
+   */
+  expiresAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.ReserveResponse.
+ * Use `create(ReserveResponseSchema)` to create a new message.
+ */
+export declare const ReserveResponseSchema: GenMessage<ReserveResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.ReleaseReservationRequest
+ */
+export declare type ReleaseReservationRequest = Message<"bugnet.router.v1.ReleaseReservationRequest"> & {
+  /**
+   * @generated from field: string quote_id = 1;
+   */
+  quoteId: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.ReleaseReservationRequest.
+ * Use `create(ReleaseReservationRequestSchema)` to create a new message.
+ */
+export declare const ReleaseReservationRequestSchema: GenMessage<ReleaseReservationRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.ReleaseReservationResponse
+ */
+export declare type ReleaseReservationResponse = Message<"bugnet.router.v1.ReleaseReservationResponse"> & {
+};
+
+/**
+ * Describes the message bugnet.router.v1.ReleaseReservationResponse.
+ * Use `create(ReleaseReservationResponseSchema)` to create a new message.
+ */
+export declare const ReleaseReservationResponseSchema: GenMessage<ReleaseReservationResponse>;
+
+/**
  * What the package lacks against a floor
  *
  * @generated from enum bugnet.router.v1.Dimension
@@ -3147,6 +3249,94 @@ export enum X402ServiceState {
 export declare const X402ServiceStateSchema: GenEnum<X402ServiceState>;
 
 /**
+ * @generated from enum bugnet.router.v1.ReserveOutcome
+ */
+export enum ReserveOutcome {
+  /**
+   * @generated from enum value: RESERVE_OUTCOME_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * A sandbox is being prepared or waits ready for the quote's order
+   *
+   * @generated from enum value: RESERVE_OUTCOME_HELD = 1;
+   */
+  HELD = 1,
+
+  /**
+   * Nothing is held and the order starts as it would without Reserve
+   *
+   * @generated from enum value: RESERVE_OUTCOME_SKIPPED = 2;
+   */
+  SKIPPED = 2,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.ReserveOutcome.
+ */
+export declare const ReserveOutcomeSchema: GenEnum<ReserveOutcome>;
+
+/**
+ * Why Reserve held nothing, never naming a provider
+ *
+ * @generated from enum bugnet.router.v1.ReserveSkip
+ */
+export enum ReserveSkip {
+  /**
+   * @generated from enum value: RESERVE_SKIP_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * Reservations are off on this router
+   *
+   * @generated from enum value: RESERVE_SKIP_DISABLED = 1;
+   */
+  DISABLED = 1,
+
+  /**
+   * No pool member and no start before payment fits the package now
+   *
+   * @generated from enum value: RESERVE_SKIP_NO_WARM = 2;
+   */
+  NO_WARM = 2,
+
+  /**
+   * A router-wide, per-address or open-reservation cap is reached
+   *
+   * @generated from enum value: RESERVE_SKIP_BUSY = 3;
+   */
+  BUSY = 3,
+
+  /**
+   * Reservations pause, as too many went unpaid or pool waste reached its daily cap
+   *
+   * @generated from enum value: RESERVE_SKIP_BRAKED = 4;
+   */
+  BRAKED = 4,
+
+  /**
+   * The quote already had its reservations
+   *
+   * @generated from enum value: RESERVE_SKIP_QUOTE_SPENT = 5;
+   */
+  QUOTE_SPENT = 5,
+
+  /**
+   * The package can come neither from a pool nor from a start before payment
+   *
+   * @generated from enum value: RESERVE_SKIP_NOT_POOLABLE = 6;
+   */
+  NOT_POOLABLE = 6,
+}
+
+/**
+ * Describes the enum bugnet.router.v1.ReserveSkip.
+ */
+export declare const ReserveSkipSchema: GenEnum<ReserveSkip>;
+
+/**
  * ErrorInfo reasons include HANDLE_UNKNOWN, JOB_UNKNOWN, FILE_NOT_FOUND, PACKAGE_UNKNOWN and
  * NOT_START_PACKAGE
  *
@@ -3416,6 +3606,26 @@ export declare const SandboxRouterService: GenService<{
     methodKind: "unary";
     input: typeof RotateSessionLinkRequestSchema;
     output: typeof RotateSessionLinkResponseSchema;
+  },
+  /**
+   * Holds a prepared sandbox for a quote while its order is paid, never needed for a start
+   *
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.Reserve
+   */
+  reserve: {
+    methodKind: "unary";
+    input: typeof ReserveRequestSchema;
+    output: typeof ReserveResponseSchema;
+  },
+  /**
+   * Gives back a quote's open reservation, safe to call for a quote that has none
+   *
+   * @generated from rpc bugnet.router.v1.SandboxRouterService.ReleaseReservation
+   */
+  releaseReservation: {
+    methodKind: "unary";
+    input: typeof ReleaseReservationRequestSchema;
+    output: typeof ReleaseReservationResponseSchema;
   },
 }>;
 

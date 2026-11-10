@@ -48,6 +48,10 @@ service SandboxRouterService {
   rpc AppendSessionEvents(AppendSessionEventsRequest) returns (AppendSessionEventsResponse);
   // Ends the session link named in the request and answers the current one
   rpc RotateSessionLink(RotateSessionLinkRequest) returns (RotateSessionLinkResponse);
+  // Holds a prepared sandbox for a quote while its order is paid, never needed for a start
+  rpc Reserve(ReserveRequest) returns (ReserveResponse);
+  // Gives back a quote's open reservation, safe to call for a quote that has none
+  rpc ReleaseReservation(ReleaseReservationRequest) returns (ReleaseReservationResponse);
 }
 
 /* Packages and estimates */
@@ -302,6 +306,8 @@ message CreatePlacementRequest {
   Requirements requirements = 2;
   // Ties the run to its source, always a canonical 36-character UUID that fits 16 bytes
   string estimate_id = 3;
+  // The quote Reserve was called with, which binds its reservation when the order matches
+  string quote_id = 4;
 }
 
 message CreatePlacementResponse {
@@ -851,3 +857,54 @@ message RotateSessionLinkRequest {
 message RotateSessionLinkResponse {
   string session_url = 1;
 }
+
+/* Reservations */
+
+enum ReserveOutcome {
+  RESERVE_OUTCOME_UNSPECIFIED = 0;
+  // A sandbox is being prepared or waits ready for the quote's order
+  RESERVE_OUTCOME_HELD = 1;
+  // Nothing is held and the order starts as it would without Reserve
+  RESERVE_OUTCOME_SKIPPED = 2;
+}
+
+// Why Reserve held nothing, never naming a provider
+enum ReserveSkip {
+  RESERVE_SKIP_UNSPECIFIED = 0;
+  // Reservations are off on this router
+  RESERVE_SKIP_DISABLED = 1;
+  // No pool member and no start before payment fits the package now
+  RESERVE_SKIP_NO_WARM = 2;
+  // A router-wide, per-address or open-reservation cap is reached
+  RESERVE_SKIP_BUSY = 3;
+  // Reservations pause, as too many went unpaid or pool waste reached its daily cap
+  RESERVE_SKIP_BRAKED = 4;
+  // The quote already had its reservations
+  RESERVE_SKIP_QUOTE_SPENT = 5;
+  // The package can come neither from a pool nor from a start before payment
+  RESERVE_SKIP_NOT_POOLABLE = 6;
+}
+
+message ReserveRequest {
+  // The gateway's quote id, 1 to 128 printable ASCII bytes, the one CreatePlacement sends
+  string quote_id = 1;
+  string package_id = 2;
+  // Must equal the requirements the order's CreatePlacement sends
+  Requirements requirements = 3;
+  // The agent client's address as the gateway saw it, empty when unknown
+  string client_ip = 4;
+}
+
+message ReserveResponse {
+  ReserveOutcome outcome = 1;
+  // Set when the outcome is SKIPPED
+  ReserveSkip skip = 2;
+  // When the hold ends unless another Reserve for the quote renews it
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+message ReleaseReservationRequest {
+  string quote_id = 1;
+}
+
+message ReleaseReservationResponse {}

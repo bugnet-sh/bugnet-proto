@@ -126,6 +126,12 @@ const (
 	// SandboxRouterServiceRotateSessionLinkProcedure is the fully-qualified name of the
 	// SandboxRouterService's RotateSessionLink RPC.
 	SandboxRouterServiceRotateSessionLinkProcedure = "/bugnet.router.v1.SandboxRouterService/RotateSessionLink"
+	// SandboxRouterServiceReserveProcedure is the fully-qualified name of the SandboxRouterService's
+	// Reserve RPC.
+	SandboxRouterServiceReserveProcedure = "/bugnet.router.v1.SandboxRouterService/Reserve"
+	// SandboxRouterServiceReleaseReservationProcedure is the fully-qualified name of the
+	// SandboxRouterService's ReleaseReservation RPC.
+	SandboxRouterServiceReleaseReservationProcedure = "/bugnet.router.v1.SandboxRouterService/ReleaseReservation"
 )
 
 // SandboxRouterServiceClient is a client for the bugnet.router.v1.SandboxRouterService service.
@@ -169,6 +175,10 @@ type SandboxRouterServiceClient interface {
 	AppendSessionEvents(context.Context, *connect.Request[v1.AppendSessionEventsRequest]) (*connect.Response[v1.AppendSessionEventsResponse], error)
 	// Ends the session link named in the request and answers the current one
 	RotateSessionLink(context.Context, *connect.Request[v1.RotateSessionLinkRequest]) (*connect.Response[v1.RotateSessionLinkResponse], error)
+	// Holds a prepared sandbox for a quote while its order is paid, never needed for a start
+	Reserve(context.Context, *connect.Request[v1.ReserveRequest]) (*connect.Response[v1.ReserveResponse], error)
+	// Gives back a quote's open reservation, safe to call for a quote that has none
+	ReleaseReservation(context.Context, *connect.Request[v1.ReleaseReservationRequest]) (*connect.Response[v1.ReleaseReservationResponse], error)
 }
 
 // NewSandboxRouterServiceClient constructs a client for the bugnet.router.v1.SandboxRouterService
@@ -368,6 +378,18 @@ func NewSandboxRouterServiceClient(httpClient connect.HTTPClient, baseURL string
 			connect.WithSchema(sandboxRouterServiceMethods.ByName("RotateSessionLink")),
 			connect.WithClientOptions(opts...),
 		),
+		reserve: connect.NewClient[v1.ReserveRequest, v1.ReserveResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceReserveProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("Reserve")),
+			connect.WithClientOptions(opts...),
+		),
+		releaseReservation: connect.NewClient[v1.ReleaseReservationRequest, v1.ReleaseReservationResponse](
+			httpClient,
+			baseURL+SandboxRouterServiceReleaseReservationProcedure,
+			connect.WithSchema(sandboxRouterServiceMethods.ByName("ReleaseReservation")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -404,6 +426,8 @@ type sandboxRouterServiceClient struct {
 	listX402             *connect.Client[v1.ListX402Request, v1.ListX402Response]
 	appendSessionEvents  *connect.Client[v1.AppendSessionEventsRequest, v1.AppendSessionEventsResponse]
 	rotateSessionLink    *connect.Client[v1.RotateSessionLinkRequest, v1.RotateSessionLinkResponse]
+	reserve              *connect.Client[v1.ReserveRequest, v1.ReserveResponse]
+	releaseReservation   *connect.Client[v1.ReleaseReservationRequest, v1.ReleaseReservationResponse]
 }
 
 // Estimate calls bugnet.router.v1.SandboxRouterService.Estimate.
@@ -561,6 +585,16 @@ func (c *sandboxRouterServiceClient) RotateSessionLink(ctx context.Context, req 
 	return c.rotateSessionLink.CallUnary(ctx, req)
 }
 
+// Reserve calls bugnet.router.v1.SandboxRouterService.Reserve.
+func (c *sandboxRouterServiceClient) Reserve(ctx context.Context, req *connect.Request[v1.ReserveRequest]) (*connect.Response[v1.ReserveResponse], error) {
+	return c.reserve.CallUnary(ctx, req)
+}
+
+// ReleaseReservation calls bugnet.router.v1.SandboxRouterService.ReleaseReservation.
+func (c *sandboxRouterServiceClient) ReleaseReservation(ctx context.Context, req *connect.Request[v1.ReleaseReservationRequest]) (*connect.Response[v1.ReleaseReservationResponse], error) {
+	return c.releaseReservation.CallUnary(ctx, req)
+}
+
 // SandboxRouterServiceHandler is an implementation of the bugnet.router.v1.SandboxRouterService
 // service.
 type SandboxRouterServiceHandler interface {
@@ -603,6 +637,10 @@ type SandboxRouterServiceHandler interface {
 	AppendSessionEvents(context.Context, *connect.Request[v1.AppendSessionEventsRequest]) (*connect.Response[v1.AppendSessionEventsResponse], error)
 	// Ends the session link named in the request and answers the current one
 	RotateSessionLink(context.Context, *connect.Request[v1.RotateSessionLinkRequest]) (*connect.Response[v1.RotateSessionLinkResponse], error)
+	// Holds a prepared sandbox for a quote while its order is paid, never needed for a start
+	Reserve(context.Context, *connect.Request[v1.ReserveRequest]) (*connect.Response[v1.ReserveResponse], error)
+	// Gives back a quote's open reservation, safe to call for a quote that has none
+	ReleaseReservation(context.Context, *connect.Request[v1.ReleaseReservationRequest]) (*connect.Response[v1.ReleaseReservationResponse], error)
 }
 
 // NewSandboxRouterServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -798,6 +836,18 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 		connect.WithSchema(sandboxRouterServiceMethods.ByName("RotateSessionLink")),
 		connect.WithHandlerOptions(opts...),
 	)
+	sandboxRouterServiceReserveHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceReserveProcedure,
+		svc.Reserve,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("Reserve")),
+		connect.WithHandlerOptions(opts...),
+	)
+	sandboxRouterServiceReleaseReservationHandler := connect.NewUnaryHandler(
+		SandboxRouterServiceReleaseReservationProcedure,
+		svc.ReleaseReservation,
+		connect.WithSchema(sandboxRouterServiceMethods.ByName("ReleaseReservation")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/bugnet.router.v1.SandboxRouterService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SandboxRouterServiceEstimateProcedure:
@@ -862,6 +912,10 @@ func NewSandboxRouterServiceHandler(svc SandboxRouterServiceHandler, opts ...con
 			sandboxRouterServiceAppendSessionEventsHandler.ServeHTTP(w, r)
 		case SandboxRouterServiceRotateSessionLinkProcedure:
 			sandboxRouterServiceRotateSessionLinkHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceReserveProcedure:
+			sandboxRouterServiceReserveHandler.ServeHTTP(w, r)
+		case SandboxRouterServiceReleaseReservationProcedure:
+			sandboxRouterServiceReleaseReservationHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -993,4 +1047,12 @@ func (UnimplementedSandboxRouterServiceHandler) AppendSessionEvents(context.Cont
 
 func (UnimplementedSandboxRouterServiceHandler) RotateSessionLink(context.Context, *connect.Request[v1.RotateSessionLinkRequest]) (*connect.Response[v1.RotateSessionLinkResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.RotateSessionLink is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) Reserve(context.Context, *connect.Request[v1.ReserveRequest]) (*connect.Response[v1.ReserveResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.Reserve is not implemented"))
+}
+
+func (UnimplementedSandboxRouterServiceHandler) ReleaseReservation(context.Context, *connect.Request[v1.ReleaseReservationRequest]) (*connect.Response[v1.ReleaseReservationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.SandboxRouterService.ReleaseReservation is not implemented"))
 }
