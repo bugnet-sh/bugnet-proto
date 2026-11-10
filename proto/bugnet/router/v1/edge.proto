@@ -14,6 +14,7 @@ service EdgeService {
   rpc OpenTransfer(OpenTransferRequest) returns (OpenTransferResponse);
   rpc ReadTransfer(ReadTransferRequest) returns (stream ReadTransferResponse);
   rpc WriteTransfer(stream WriteTransferRequest) returns (WriteTransferResponse);
+  rpc EndTransfer(EndTransferRequest) returns (EndTransferResponse);
   rpc DeliverHook(DeliverHookRequest) returns (DeliverHookResponse);
   rpc ReportEdgeUsage(ReportEdgeUsageRequest) returns (ReportEdgeUsageResponse);
   rpc CheckEdgeLeases(CheckEdgeLeasesRequest) returns (CheckEdgeLeasesResponse);
@@ -236,6 +237,8 @@ message ReadTransferRequest {
   uint64 offset = 3;
   // 0 reads to the size at open
   uint64 length = 4;
+  // The router keeps the claim after a read that reaches the end, until EndTransfer
+  bool hold_end = 5;
 }
 
 message ReadTransferResponse {
@@ -259,6 +262,15 @@ message WriteTransferResponse {
   uint64 size = 2;
   bytes sha256 = 3;
 }
+
+message EndTransferRequest {
+  string transfer_id = 1;
+  string lease = 2;
+  // The edge flushed every byte to the client
+  bool delivered = 3;
+}
+
+message EndTransferResponse {}
 
 /* Secrets */
 

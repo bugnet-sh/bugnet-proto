@@ -56,6 +56,8 @@ const (
 	// EdgeServiceWriteTransferProcedure is the fully-qualified name of the EdgeService's WriteTransfer
 	// RPC.
 	EdgeServiceWriteTransferProcedure = "/bugnet.router.v1.EdgeService/WriteTransfer"
+	// EdgeServiceEndTransferProcedure is the fully-qualified name of the EdgeService's EndTransfer RPC.
+	EdgeServiceEndTransferProcedure = "/bugnet.router.v1.EdgeService/EndTransfer"
 	// EdgeServiceDeliverHookProcedure is the fully-qualified name of the EdgeService's DeliverHook RPC.
 	EdgeServiceDeliverHookProcedure = "/bugnet.router.v1.EdgeService/DeliverHook"
 	// EdgeServiceReportEdgeUsageProcedure is the fully-qualified name of the EdgeService's
@@ -136,6 +138,7 @@ type EdgeServiceClient interface {
 	OpenTransfer(context.Context, *connect.Request[v1.OpenTransferRequest]) (*connect.Response[v1.OpenTransferResponse], error)
 	ReadTransfer(context.Context, *connect.Request[v1.ReadTransferRequest]) (*connect.ServerStreamForClient[v1.ReadTransferResponse], error)
 	WriteTransfer(context.Context) *connect.ClientStreamForClient[v1.WriteTransferRequest, v1.WriteTransferResponse]
+	EndTransfer(context.Context, *connect.Request[v1.EndTransferRequest]) (*connect.Response[v1.EndTransferResponse], error)
 	DeliverHook(context.Context, *connect.Request[v1.DeliverHookRequest]) (*connect.Response[v1.DeliverHookResponse], error)
 	ReportEdgeUsage(context.Context, *connect.Request[v1.ReportEdgeUsageRequest]) (*connect.Response[v1.ReportEdgeUsageResponse], error)
 	CheckEdgeLeases(context.Context, *connect.Request[v1.CheckEdgeLeasesRequest]) (*connect.Response[v1.CheckEdgeLeasesResponse], error)
@@ -183,6 +186,12 @@ func NewEdgeServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(edgeServiceMethods.ByName("WriteTransfer")),
 			connect.WithClientOptions(opts...),
 		),
+		endTransfer: connect.NewClient[v1.EndTransferRequest, v1.EndTransferResponse](
+			httpClient,
+			baseURL+EdgeServiceEndTransferProcedure,
+			connect.WithSchema(edgeServiceMethods.ByName("EndTransfer")),
+			connect.WithClientOptions(opts...),
+		),
 		deliverHook: connect.NewClient[v1.DeliverHookRequest, v1.DeliverHookResponse](
 			httpClient,
 			baseURL+EdgeServiceDeliverHookProcedure,
@@ -217,6 +226,7 @@ type edgeServiceClient struct {
 	openTransfer    *connect.Client[v1.OpenTransferRequest, v1.OpenTransferResponse]
 	readTransfer    *connect.Client[v1.ReadTransferRequest, v1.ReadTransferResponse]
 	writeTransfer   *connect.Client[v1.WriteTransferRequest, v1.WriteTransferResponse]
+	endTransfer     *connect.Client[v1.EndTransferRequest, v1.EndTransferResponse]
 	deliverHook     *connect.Client[v1.DeliverHookRequest, v1.DeliverHookResponse]
 	reportEdgeUsage *connect.Client[v1.ReportEdgeUsageRequest, v1.ReportEdgeUsageResponse]
 	checkEdgeLeases *connect.Client[v1.CheckEdgeLeasesRequest, v1.CheckEdgeLeasesResponse]
@@ -248,6 +258,11 @@ func (c *edgeServiceClient) WriteTransfer(ctx context.Context) *connect.ClientSt
 	return c.writeTransfer.CallClientStream(ctx)
 }
 
+// EndTransfer calls bugnet.router.v1.EdgeService.EndTransfer.
+func (c *edgeServiceClient) EndTransfer(ctx context.Context, req *connect.Request[v1.EndTransferRequest]) (*connect.Response[v1.EndTransferResponse], error) {
+	return c.endTransfer.CallUnary(ctx, req)
+}
+
 // DeliverHook calls bugnet.router.v1.EdgeService.DeliverHook.
 func (c *edgeServiceClient) DeliverHook(ctx context.Context, req *connect.Request[v1.DeliverHookRequest]) (*connect.Response[v1.DeliverHookResponse], error) {
 	return c.deliverHook.CallUnary(ctx, req)
@@ -275,6 +290,7 @@ type EdgeServiceHandler interface {
 	OpenTransfer(context.Context, *connect.Request[v1.OpenTransferRequest]) (*connect.Response[v1.OpenTransferResponse], error)
 	ReadTransfer(context.Context, *connect.Request[v1.ReadTransferRequest], *connect.ServerStream[v1.ReadTransferResponse]) error
 	WriteTransfer(context.Context, *connect.ClientStream[v1.WriteTransferRequest]) (*connect.Response[v1.WriteTransferResponse], error)
+	EndTransfer(context.Context, *connect.Request[v1.EndTransferRequest]) (*connect.Response[v1.EndTransferResponse], error)
 	DeliverHook(context.Context, *connect.Request[v1.DeliverHookRequest]) (*connect.Response[v1.DeliverHookResponse], error)
 	ReportEdgeUsage(context.Context, *connect.Request[v1.ReportEdgeUsageRequest]) (*connect.Response[v1.ReportEdgeUsageResponse], error)
 	CheckEdgeLeases(context.Context, *connect.Request[v1.CheckEdgeLeasesRequest]) (*connect.Response[v1.CheckEdgeLeasesResponse], error)
@@ -318,6 +334,12 @@ func NewEdgeServiceHandler(svc EdgeServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(edgeServiceMethods.ByName("WriteTransfer")),
 		connect.WithHandlerOptions(opts...),
 	)
+	edgeServiceEndTransferHandler := connect.NewUnaryHandler(
+		EdgeServiceEndTransferProcedure,
+		svc.EndTransfer,
+		connect.WithSchema(edgeServiceMethods.ByName("EndTransfer")),
+		connect.WithHandlerOptions(opts...),
+	)
 	edgeServiceDeliverHookHandler := connect.NewUnaryHandler(
 		EdgeServiceDeliverHookProcedure,
 		svc.DeliverHook,
@@ -354,6 +376,8 @@ func NewEdgeServiceHandler(svc EdgeServiceHandler, opts ...connect.HandlerOption
 			edgeServiceReadTransferHandler.ServeHTTP(w, r)
 		case EdgeServiceWriteTransferProcedure:
 			edgeServiceWriteTransferHandler.ServeHTTP(w, r)
+		case EdgeServiceEndTransferProcedure:
+			edgeServiceEndTransferHandler.ServeHTTP(w, r)
 		case EdgeServiceDeliverHookProcedure:
 			edgeServiceDeliverHookHandler.ServeHTTP(w, r)
 		case EdgeServiceReportEdgeUsageProcedure:
@@ -389,6 +413,10 @@ func (UnimplementedEdgeServiceHandler) ReadTransfer(context.Context, *connect.Re
 
 func (UnimplementedEdgeServiceHandler) WriteTransfer(context.Context, *connect.ClientStream[v1.WriteTransferRequest]) (*connect.Response[v1.WriteTransferResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.EdgeService.WriteTransfer is not implemented"))
+}
+
+func (UnimplementedEdgeServiceHandler) EndTransfer(context.Context, *connect.Request[v1.EndTransferRequest]) (*connect.Response[v1.EndTransferResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.EdgeService.EndTransfer is not implemented"))
 }
 
 func (UnimplementedEdgeServiceHandler) DeliverHook(context.Context, *connect.Request[v1.DeliverHookRequest]) (*connect.Response[v1.DeliverHookResponse], error) {
