@@ -810,3 +810,15 @@ func TestListImageUseProcedure(t *testing.T) {
 		LastReadyAt: timestamppb.New(time.Unix(1700000000, 0))}}}
 	eq(t, proto.Equal(roundTrip(t, in), in), true)
 }
+
+func TestOrderTraceparentFieldsAre100(t *testing.T) {
+	for _, m := range []proto.Message{&routerv1.ResolvePreviewResponse{},
+		&routerv1.OpenTransferResponse{}, &routerv1.AuthorizeSshKeyResponse{},
+		&routerv1.ResolveTunnelResponse{}} {
+		f := m.ProtoReflect().Descriptor().Fields().ByName("order_traceparent")
+		eq(t, f != nil && f.Number() == 100, true)
+	}
+	f := (&routerv1.OperatorPlacement{}).ProtoReflect().Descriptor().Fields().
+		ByName("order_trace_id")
+	eq(t, f != nil && f.Number() == 100, true)
+}

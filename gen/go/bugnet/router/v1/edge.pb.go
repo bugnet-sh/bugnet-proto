@@ -1053,10 +1053,12 @@ type ResolvePreviewResponse struct {
 	// Whether browsers see the warning page first
 	Interstitial bool `protobuf:"varint,7,opt,name=interstitial,proto3" json:"interstitial,omitempty"`
 	// The repository or model the sandbox runs, when known
-	SourceLabel   string                 `protobuf:"bytes,8,opt,name=source_label,json=sourceLabel,proto3" json:"source_label,omitempty"`
-	StartedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	SourceLabel string                 `protobuf:"bytes,8,opt,name=source_label,json=sourceLabel,proto3" json:"source_label,omitempty"`
+	StartedAt   *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	// W3C traceparent of the router's span for this call, in the order's trace, empty when off
+	OrderTraceparent string `protobuf:"bytes,100,opt,name=order_traceparent,json=orderTraceparent,proto3" json:"order_traceparent,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ResolvePreviewResponse) Reset() {
@@ -1150,6 +1152,13 @@ func (x *ResolvePreviewResponse) GetStartedAt() *timestamppb.Timestamp {
 		return x.StartedAt
 	}
 	return nil
+}
+
+func (x *ResolvePreviewResponse) GetOrderTraceparent() string {
+	if x != nil {
+		return x.OrderTraceparent
+	}
+	return ""
 }
 
 type RepairPreviewRequest struct {
@@ -1338,9 +1347,11 @@ type OpenTransferResponse struct {
 	ExpiresAt *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	Budget    *EdgeBudget            `protobuf:"bytes,10,opt,name=budget,proto3" json:"budget,omitempty"`
 	// A download's SHA-256 from mint when it set want_sha256, empty otherwise
-	Sha256        []byte `protobuf:"bytes,11,opt,name=sha256,proto3" json:"sha256,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Sha256 []byte `protobuf:"bytes,11,opt,name=sha256,proto3" json:"sha256,omitempty"`
+	// W3C traceparent of the router's span for this call, in the order's trace, empty when off
+	OrderTraceparent string `protobuf:"bytes,100,opt,name=order_traceparent,json=orderTraceparent,proto3" json:"order_traceparent,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *OpenTransferResponse) Reset() {
@@ -1448,6 +1459,13 @@ func (x *OpenTransferResponse) GetSha256() []byte {
 		return x.Sha256
 	}
 	return nil
+}
+
+func (x *OpenTransferResponse) GetOrderTraceparent() string {
+	if x != nil {
+		return x.OrderTraceparent
+	}
+	return ""
 }
 
 type ReadTransferRequest struct {
@@ -3428,13 +3446,15 @@ func (x *AuthorizeSshKeyRequest) GetClientIp() string {
 type AuthorizeSshKeyResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Opaque, names the placement and the key
-	GrantId       string                 `protobuf:"bytes,1,opt,name=grant_id,json=grantId,proto3" json:"grant_id,omitempty"`
-	PlacementId   string                 `protobuf:"bytes,2,opt,name=placement_id,json=placementId,proto3" json:"placement_id,omitempty"`
-	Deadline      *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=deadline,proto3" json:"deadline,omitempty"`
-	MaxSessions   uint32                 `protobuf:"varint,4,opt,name=max_sessions,json=maxSessions,proto3" json:"max_sessions,omitempty"`
-	MaxForwards   uint32                 `protobuf:"varint,5,opt,name=max_forwards,json=maxForwards,proto3" json:"max_forwards,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	GrantId     string                 `protobuf:"bytes,1,opt,name=grant_id,json=grantId,proto3" json:"grant_id,omitempty"`
+	PlacementId string                 `protobuf:"bytes,2,opt,name=placement_id,json=placementId,proto3" json:"placement_id,omitempty"`
+	Deadline    *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=deadline,proto3" json:"deadline,omitempty"`
+	MaxSessions uint32                 `protobuf:"varint,4,opt,name=max_sessions,json=maxSessions,proto3" json:"max_sessions,omitempty"`
+	MaxForwards uint32                 `protobuf:"varint,5,opt,name=max_forwards,json=maxForwards,proto3" json:"max_forwards,omitempty"`
+	// W3C traceparent of the router's span for this call, in the order's trace, empty when off
+	OrderTraceparent string `protobuf:"bytes,100,opt,name=order_traceparent,json=orderTraceparent,proto3" json:"order_traceparent,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *AuthorizeSshKeyResponse) Reset() {
@@ -3500,6 +3520,13 @@ func (x *AuthorizeSshKeyResponse) GetMaxForwards() uint32 {
 		return x.MaxForwards
 	}
 	return 0
+}
+
+func (x *AuthorizeSshKeyResponse) GetOrderTraceparent() string {
+	if x != nil {
+		return x.OrderTraceparent
+	}
+	return ""
 }
 
 type AcquireSshConnectionRequest struct {
@@ -4389,9 +4416,11 @@ type ResolveTunnelResponse struct {
 	RequestsInFlight uint32             `protobuf:"varint,9,opt,name=requests_in_flight,json=requestsInFlight,proto3" json:"requests_in_flight,omitempty"`
 	SourceCheck      *TunnelSourceCheck `protobuf:"bytes,10,opt,name=source_check,json=sourceCheck,proto3" json:"source_check,omitempty"`
 	// The placement's x402 services, caps and unpaid use
-	X402          *X402Config `protobuf:"bytes,11,opt,name=x402,proto3" json:"x402,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	X402 *X402Config `protobuf:"bytes,11,opt,name=x402,proto3" json:"x402,omitempty"`
+	// W3C traceparent of the router's span for this call, in the order's trace, empty when off
+	OrderTraceparent string `protobuf:"bytes,100,opt,name=order_traceparent,json=orderTraceparent,proto3" json:"order_traceparent,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ResolveTunnelResponse) Reset() {
@@ -4499,6 +4528,13 @@ func (x *ResolveTunnelResponse) GetX402() *X402Config {
 		return x.X402
 	}
 	return nil
+}
+
+func (x *ResolveTunnelResponse) GetOrderTraceparent() string {
+	if x != nil {
+		return x.OrderTraceparent
+	}
+	return ""
 }
 
 type X402Service struct {
@@ -5687,7 +5723,7 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x15ResolvePreviewRequest\x12\x1d\n" +
 	"\n" +
 	"preview_id\x18\x01 \x01(\tR\tpreviewId\x12\x14\n" +
-	"\x05token\x18\x02 \x01(\tR\x05token\"\x9e\x03\n" +
+	"\x05token\x18\x02 \x01(\tR\x05token\"\xcb\x03\n" +
 	"\x16ResolvePreviewResponse\x12!\n" +
 	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\x12\x12\n" +
 	"\x04port\x18\x02 \x01(\rR\x04port\x12:\n" +
@@ -5701,7 +5737,8 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\finterstitial\x18\a \x01(\bR\finterstitial\x12!\n" +
 	"\fsource_label\x18\b \x01(\tR\vsourceLabel\x129\n" +
 	"\n" +
-	"started_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\"K\n" +
+	"started_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x12+\n" +
+	"\x11order_traceparent\x18d \x01(\tR\x10orderTraceparent\"K\n" +
 	"\x14RepairPreviewRequest\x12\x1d\n" +
 	"\n" +
 	"preview_id\x18\x01 \x01(\tR\tpreviewId\x12\x14\n" +
@@ -5712,7 +5749,7 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12A\n" +
 	"\tdirection\x18\x02 \x01(\x0e2#.bugnet.router.v1.TransferDirectionR\tdirection\x12\x14\n" +
 	"\x05probe\x18\x03 \x01(\bR\x05probe\x12\x17\n" +
-	"\aedge_id\x18\x04 \x01(\tR\x06edgeId\"\xb4\x03\n" +
+	"\aedge_id\x18\x04 \x01(\tR\x06edgeId\"\xe1\x03\n" +
 	"\x14OpenTransferResponse\x12\x1f\n" +
 	"\vtransfer_id\x18\x01 \x01(\tR\n" +
 	"transferId\x12\x14\n" +
@@ -5728,7 +5765,8 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"expires_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x124\n" +
 	"\x06budget\x18\n" +
 	" \x01(\v2\x1c.bugnet.router.v1.EdgeBudgetR\x06budget\x12\x16\n" +
-	"\x06sha256\x18\v \x01(\fR\x06sha256\"\x97\x01\n" +
+	"\x06sha256\x18\v \x01(\fR\x06sha256\x12+\n" +
+	"\x11order_traceparent\x18d \x01(\tR\x10orderTraceparent\"\x97\x01\n" +
 	"\x13ReadTransferRequest\x12\x1f\n" +
 	"\vtransfer_id\x18\x01 \x01(\tR\n" +
 	"transferId\x12\x14\n" +
@@ -5883,13 +5921,14 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x05alias\x18\x01 \x01(\tR\x05alias\x12\x1d\n" +
 	"\n" +
 	"public_key\x18\x02 \x01(\fR\tpublicKey\x12\x1b\n" +
-	"\tclient_ip\x18\x03 \x01(\tR\bclientIp\"\xd5\x01\n" +
+	"\tclient_ip\x18\x03 \x01(\tR\bclientIp\"\x82\x02\n" +
 	"\x17AuthorizeSshKeyResponse\x12\x19\n" +
 	"\bgrant_id\x18\x01 \x01(\tR\agrantId\x12!\n" +
 	"\fplacement_id\x18\x02 \x01(\tR\vplacementId\x126\n" +
 	"\bdeadline\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\bdeadline\x12!\n" +
 	"\fmax_sessions\x18\x04 \x01(\rR\vmaxSessions\x12!\n" +
-	"\fmax_forwards\x18\x05 \x01(\rR\vmaxForwards\"W\n" +
+	"\fmax_forwards\x18\x05 \x01(\rR\vmaxForwards\x12+\n" +
+	"\x11order_traceparent\x18d \x01(\tR\x10orderTraceparent\"W\n" +
 	"\x1bAcquireSshConnectionRequest\x12\x19\n" +
 	"\bgrant_id\x18\x01 \x01(\tR\agrantId\x12\x1d\n" +
 	"\n" +
@@ -5942,7 +5981,7 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x12placeholder_sha256\x18\x01 \x01(\fR\x11placeholderSha256\x120\n" +
 	"\x04spec\x18\x02 \x01(\v2\x1c.bugnet.router.v1.SecretSpecR\x04spec\x123\n" +
 	"\x05value\x18\x03 \x01(\v2\x1d.bugnet.router.v1.SealedValueR\x05value\x12!\n" +
-	"\fcustom_hosts\x18\x04 \x03(\tR\vcustomHosts\"\x90\x04\n" +
+	"\fcustom_hosts\x18\x04 \x03(\tR\vcustomHosts\"\xbd\x04\n" +
 	"\x15ResolveTunnelResponse\x12!\n" +
 	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\x126\n" +
 	"\bdeadline\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bdeadline\x12\x1d\n" +
@@ -5957,7 +5996,8 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x12requests_in_flight\x18\t \x01(\rR\x10requestsInFlight\x12F\n" +
 	"\fsource_check\x18\n" +
 	" \x01(\v2#.bugnet.router.v1.TunnelSourceCheckR\vsourceCheck\x120\n" +
-	"\x04x402\x18\v \x01(\v2\x1c.bugnet.router.v1.X402ConfigR\x04x402\"\xce\x01\n" +
+	"\x04x402\x18\v \x01(\v2\x1c.bugnet.router.v1.X402ConfigR\x04x402\x12+\n" +
+	"\x11order_traceparent\x18d \x01(\tR\x10orderTraceparent\"\xce\x01\n" +
 	"\vX402Service\x12\x1d\n" +
 	"\n" +
 	"service_id\x18\x01 \x01(\tR\tserviceId\x12\x12\n" +

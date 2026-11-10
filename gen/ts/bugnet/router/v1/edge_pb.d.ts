@@ -439,6 +439,13 @@ export declare type ResolvePreviewResponse = Message<"bugnet.router.v1.ResolvePr
    * @generated from field: google.protobuf.Timestamp started_at = 9;
    */
   startedAt?: Timestamp | undefined;
+
+  /**
+   * W3C traceparent of the router's span for this call, in the order's trace, empty when off
+   *
+   * @generated from field: string order_traceparent = 100;
+   */
+  orderTraceparent: string;
 };
 
 /**
@@ -593,6 +600,13 @@ export declare type OpenTransferResponse = Message<"bugnet.router.v1.OpenTransfe
    * @generated from field: bytes sha256 = 11;
    */
   sha256: Uint8Array;
+
+  /**
+   * W3C traceparent of the router's span for this call, in the order's trace, empty when off
+   *
+   * @generated from field: string order_traceparent = 100;
+   */
+  orderTraceparent: string;
 };
 
 /**
@@ -1495,6 +1509,13 @@ export declare type AuthorizeSshKeyResponse = Message<"bugnet.router.v1.Authoriz
    * @generated from field: uint32 max_forwards = 5;
    */
   maxForwards: number;
+
+  /**
+   * W3C traceparent of the router's span for this call, in the order's trace, empty when off
+   *
+   * @generated from field: string order_traceparent = 100;
+   */
+  orderTraceparent: string;
 };
 
 /**
@@ -1939,6 +1960,13 @@ export declare type ResolveTunnelResponse = Message<"bugnet.router.v1.ResolveTun
    * @generated from field: bugnet.router.v1.X402Config x402 = 11;
    */
   x402?: X402Config | undefined;
+
+  /**
+   * W3C traceparent of the router's span for this call, in the order's trace, empty when off
+   *
+   * @generated from field: string order_traceparent = 100;
+   */
+  orderTraceparent: string;
 };
 
 /**
