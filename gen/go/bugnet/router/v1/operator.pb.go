@@ -9,6 +9,7 @@ package routerv1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -138,6 +139,10 @@ const (
 	SampleKind_SAMPLE_KIND_PLACEMENT   SampleKind = 1
 	SampleKind_SAMPLE_KIND_CANARY      SampleKind = 2
 	SampleKind_SAMPLE_KIND_BENCH       SampleKind = 3
+	// A pool member filled and parked
+	SampleKind_SAMPLE_KIND_POOL SampleKind = 4
+	// A reservation's preparation, before any order
+	SampleKind_SAMPLE_KIND_RESERVE SampleKind = 5
 )
 
 // Enum value maps for SampleKind.
@@ -147,12 +152,16 @@ var (
 		1: "SAMPLE_KIND_PLACEMENT",
 		2: "SAMPLE_KIND_CANARY",
 		3: "SAMPLE_KIND_BENCH",
+		4: "SAMPLE_KIND_POOL",
+		5: "SAMPLE_KIND_RESERVE",
 	}
 	SampleKind_value = map[string]int32{
 		"SAMPLE_KIND_UNSPECIFIED": 0,
 		"SAMPLE_KIND_PLACEMENT":   1,
 		"SAMPLE_KIND_CANARY":      2,
 		"SAMPLE_KIND_BENCH":       3,
+		"SAMPLE_KIND_POOL":        4,
+		"SAMPLE_KIND_RESERVE":     5,
 	}
 )
 
@@ -368,8 +377,12 @@ type OperatorPlacement struct {
 	ExtendPayers      []string `protobuf:"bytes,9,rep,name=extend_payers,json=extendPayers,proto3" json:"extend_payers,omitempty"`
 	SourceLabel       string   `protobuf:"bytes,10,opt,name=source_label,json=sourceLabel,proto3" json:"source_label,omitempty"`
 	TerminationReason string   `protobuf:"bytes,11,opt,name=termination_reason,json=terminationReason,proto3" json:"termination_reason,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// cold, pooled or reserved
+	StartPath string `protobuf:"bytes,12,opt,name=start_path,json=startPath,proto3" json:"start_path,omitempty"`
+	// A second attempt ran beside the first
+	Hedged        bool `protobuf:"varint,13,opt,name=hedged,proto3" json:"hedged,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *OperatorPlacement) Reset() {
@@ -477,6 +490,20 @@ func (x *OperatorPlacement) GetTerminationReason() string {
 		return x.TerminationReason
 	}
 	return ""
+}
+
+func (x *OperatorPlacement) GetStartPath() string {
+	if x != nil {
+		return x.StartPath
+	}
+	return ""
+}
+
+func (x *OperatorPlacement) GetHedged() bool {
+	if x != nil {
+		return x.Hedged
+	}
+	return false
 }
 
 type FindPlacementRequest struct {
@@ -2162,7 +2189,19 @@ type StartReport struct {
 	Total             *StepStats `protobuf:"bytes,16,opt,name=total,proto3" json:"total,omitempty"`
 	CostMicros        int64      `protobuf:"varint,17,opt,name=cost_micros,json=costMicros,proto3" json:"cost_micros,omitempty"`
 	// Failures by provider error code
-	Errors        map[string]uint32 `protobuf:"bytes,18,rep,name=errors,proto3" json:"errors,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	Errors map[string]uint32 `protobuf:"bytes,18,rep,name=errors,proto3" json:"errors,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	// cold, pooled, reserved or hedged, empty for kinds without a path
+	StartPath string `protobuf:"bytes,19,opt,name=start_path,json=startPath,proto3" json:"start_path,omitempty"`
+	// CreatePlacement to ready
+	Bind *StepStats `protobuf:"bytes,20,opt,name=bind,proto3" json:"bind,omitempty"`
+	// Payment to ready, from the order's issued_at or else CreatePlacement
+	PaidToReady *StepStats `protobuf:"bytes,21,opt,name=paid_to_ready,json=paidToReady,proto3" json:"paid_to_ready,omitempty"`
+	// The placement's first Exec to its first output frame
+	FirstFrame *StepStats `protobuf:"bytes,22,opt,name=first_frame,json=firstFrame,proto3" json:"first_frame,omitempty"`
+	// Payment to the first frame, the figure the 5 s target is checked on
+	PaidToFirstFrame *StepStats `protobuf:"bytes,23,opt,name=paid_to_first_frame,json=paidToFirstFrame,proto3" json:"paid_to_first_frame,omitempty"`
+	// Unpark or claim until Exec reaches the sandbox
+	Wake          *StepStats `protobuf:"bytes,24,opt,name=wake,proto3" json:"wake,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2323,6 +2362,48 @@ func (x *StartReport) GetErrors() map[string]uint32 {
 	return nil
 }
 
+func (x *StartReport) GetStartPath() string {
+	if x != nil {
+		return x.StartPath
+	}
+	return ""
+}
+
+func (x *StartReport) GetBind() *StepStats {
+	if x != nil {
+		return x.Bind
+	}
+	return nil
+}
+
+func (x *StartReport) GetPaidToReady() *StepStats {
+	if x != nil {
+		return x.PaidToReady
+	}
+	return nil
+}
+
+func (x *StartReport) GetFirstFrame() *StepStats {
+	if x != nil {
+		return x.FirstFrame
+	}
+	return nil
+}
+
+func (x *StartReport) GetPaidToFirstFrame() *StepStats {
+	if x != nil {
+		return x.PaidToFirstFrame
+	}
+	return nil
+}
+
+func (x *StartReport) GetWake() *StepStats {
+	if x != nil {
+		return x.Wake
+	}
+	return nil
+}
+
 type ReportStartsRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// One benchmark, or every sample since a time
@@ -2335,7 +2416,9 @@ type ReportStartsRequest struct {
 	// Every kind when empty
 	Kinds []SampleKind `protobuf:"varint,3,rep,packed,name=kinds,proto3,enum=bugnet.router.v1.SampleKind" json:"kinds,omitempty"`
 	// Every provider when empty
-	Provider      string `protobuf:"bytes,4,opt,name=provider,proto3" json:"provider,omitempty"`
+	Provider string `protobuf:"bytes,4,opt,name=provider,proto3" json:"provider,omitempty"`
+	// Every path when empty
+	StartPaths    []string `protobuf:"bytes,5,rep,name=start_paths,json=startPaths,proto3" json:"start_paths,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2407,6 +2490,13 @@ func (x *ReportStartsRequest) GetProvider() string {
 		return x.Provider
 	}
 	return ""
+}
+
+func (x *ReportStartsRequest) GetStartPaths() []string {
+	if x != nil {
+		return x.StartPaths
+	}
+	return nil
 }
 
 type isReportStartsRequest_Window interface {
@@ -2724,11 +2814,384 @@ func (x *GetSessionHoldResponse) GetHoldUntil() *timestamppb.Timestamp {
 	return nil
 }
 
+type PoolStatus struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Provider string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
+	Size     string                 `protobuf:"bytes,2,opt,name=size,proto3" json:"size,omitempty"`
+	// router or provider, whoever keeps the members
+	KeptBy  string `protobuf:"bytes,3,opt,name=kept_by,json=keptBy,proto3" json:"kept_by,omitempty"`
+	Target  uint32 `protobuf:"varint,4,opt,name=target,proto3" json:"target,omitempty"`
+	Min     uint32 `protobuf:"varint,5,opt,name=min,proto3" json:"min,omitempty"`
+	Max     uint32 `protobuf:"varint,6,opt,name=max,proto3" json:"max,omitempty"`
+	Warm    uint32 `protobuf:"varint,7,opt,name=warm,proto3" json:"warm,omitempty"`
+	Filling uint32 `protobuf:"varint,8,opt,name=filling,proto3" json:"filling,omitempty"`
+	// Members that open reservations hold
+	Held           uint32 `protobuf:"varint,9,opt,name=held,proto3" json:"held,omitempty"`
+	ClaimsLastHour uint32 `protobuf:"varint,10,opt,name=claims_last_hour,json=claimsLastHour,proto3" json:"claims_last_hour,omitempty"`
+	// Orders and reservations that wanted the pool and found it empty
+	MissesLastHour uint32 `protobuf:"varint,11,opt,name=misses_last_hour,json=missesLastHour,proto3" json:"misses_last_hour,omitempty"`
+	// Members destroyed unused in the last day, lapsed reservations included
+	WastedLastDay uint32 `protobuf:"varint,12,opt,name=wasted_last_day,json=wastedLastDay,proto3" json:"wasted_last_day,omitempty"`
+	// Idle cost, parked or Koyeb-kept, and waste over the last day
+	CostMicrosLastDay int64  `protobuf:"varint,13,opt,name=cost_micros_last_day,json=costMicrosLastDay,proto3" json:"cost_micros_last_day,omitempty"`
+	FillP95Ms         uint32 `protobuf:"varint,14,opt,name=fill_p95_ms,json=fillP95Ms,proto3" json:"fill_p95_ms,omitempty"`
+	WakeP95Ms         uint32 `protobuf:"varint,15,opt,name=wake_p95_ms,json=wakeP95Ms,proto3" json:"wake_p95_ms,omitempty"`
+	// Unset while the pool refills
+	PausedUntil *timestamppb.Timestamp `protobuf:"bytes,16,opt,name=paused_until,json=pausedUntil,proto3" json:"paused_until,omitempty"`
+	// drained, failing or spend, empty while the pool refills
+	PausedReason  string `protobuf:"bytes,17,opt,name=paused_reason,json=pausedReason,proto3" json:"paused_reason,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PoolStatus) Reset() {
+	*x = PoolStatus{}
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PoolStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PoolStatus) ProtoMessage() {}
+
+func (x *PoolStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PoolStatus.ProtoReflect.Descriptor instead.
+func (*PoolStatus) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *PoolStatus) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *PoolStatus) GetSize() string {
+	if x != nil {
+		return x.Size
+	}
+	return ""
+}
+
+func (x *PoolStatus) GetKeptBy() string {
+	if x != nil {
+		return x.KeptBy
+	}
+	return ""
+}
+
+func (x *PoolStatus) GetTarget() uint32 {
+	if x != nil {
+		return x.Target
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetMin() uint32 {
+	if x != nil {
+		return x.Min
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetMax() uint32 {
+	if x != nil {
+		return x.Max
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetWarm() uint32 {
+	if x != nil {
+		return x.Warm
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetFilling() uint32 {
+	if x != nil {
+		return x.Filling
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetHeld() uint32 {
+	if x != nil {
+		return x.Held
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetClaimsLastHour() uint32 {
+	if x != nil {
+		return x.ClaimsLastHour
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetMissesLastHour() uint32 {
+	if x != nil {
+		return x.MissesLastHour
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetWastedLastDay() uint32 {
+	if x != nil {
+		return x.WastedLastDay
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetCostMicrosLastDay() int64 {
+	if x != nil {
+		return x.CostMicrosLastDay
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetFillP95Ms() uint32 {
+	if x != nil {
+		return x.FillP95Ms
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetWakeP95Ms() uint32 {
+	if x != nil {
+		return x.WakeP95Ms
+	}
+	return 0
+}
+
+func (x *PoolStatus) GetPausedUntil() *timestamppb.Timestamp {
+	if x != nil {
+		return x.PausedUntil
+	}
+	return nil
+}
+
+func (x *PoolStatus) GetPausedReason() string {
+	if x != nil {
+		return x.PausedReason
+	}
+	return ""
+}
+
+type ListPoolsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPoolsRequest) Reset() {
+	*x = ListPoolsRequest{}
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPoolsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPoolsRequest) ProtoMessage() {}
+
+func (x *ListPoolsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPoolsRequest.ProtoReflect.Descriptor instead.
+func (*ListPoolsRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{36}
+}
+
+type ListPoolsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pools         []*PoolStatus          `protobuf:"bytes,1,rep,name=pools,proto3" json:"pools,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPoolsResponse) Reset() {
+	*x = ListPoolsResponse{}
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPoolsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPoolsResponse) ProtoMessage() {}
+
+func (x *ListPoolsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPoolsResponse.ProtoReflect.Descriptor instead.
+func (*ListPoolsResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *ListPoolsResponse) GetPools() []*PoolStatus {
+	if x != nil {
+		return x.Pools
+	}
+	return nil
+}
+
+type DrainPoolRequest struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Provider string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
+	Size     string                 `protobuf:"bytes,2,opt,name=size,proto3" json:"size,omitempty"`
+	// Refill stays off this long, and refills at once when unset
+	PauseFor      *durationpb.Duration `protobuf:"bytes,3,opt,name=pause_for,json=pauseFor,proto3" json:"pause_for,omitempty"`
+	Actor         string               `protobuf:"bytes,4,opt,name=actor,proto3" json:"actor,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DrainPoolRequest) Reset() {
+	*x = DrainPoolRequest{}
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DrainPoolRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DrainPoolRequest) ProtoMessage() {}
+
+func (x *DrainPoolRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DrainPoolRequest.ProtoReflect.Descriptor instead.
+func (*DrainPoolRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *DrainPoolRequest) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *DrainPoolRequest) GetSize() string {
+	if x != nil {
+		return x.Size
+	}
+	return ""
+}
+
+func (x *DrainPoolRequest) GetPauseFor() *durationpb.Duration {
+	if x != nil {
+		return x.PauseFor
+	}
+	return nil
+}
+
+func (x *DrainPoolRequest) GetActor() string {
+	if x != nil {
+		return x.Actor
+	}
+	return ""
+}
+
+type DrainPoolResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Warm members queued for destruction
+	Retired       uint32 `protobuf:"varint,1,opt,name=retired,proto3" json:"retired,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DrainPoolResponse) Reset() {
+	*x = DrainPoolResponse{}
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DrainPoolResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DrainPoolResponse) ProtoMessage() {}
+
+func (x *DrainPoolResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DrainPoolResponse.ProtoReflect.Descriptor instead.
+func (*DrainPoolResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *DrainPoolResponse) GetRetired() uint32 {
+	if x != nil {
+		return x.Retired
+	}
+	return 0
+}
+
 var File_bugnet_router_v1_operator_proto protoreflect.FileDescriptor
 
 const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\n" +
-	"\x1fbugnet/router/v1/operator.proto\x12\x10bugnet.router.v1\x1a\x1dbugnet/router/v1/router.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"L\n" +
+	"\x1fbugnet/router/v1/operator.proto\x12\x10bugnet.router.v1\x1a\x1dbugnet/router/v1/router.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"L\n" +
 	"\x0fProviderSandbox\x12\x1a\n" +
 	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x1d\n" +
 	"\n" +
@@ -2739,7 +3202,7 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"preview_id\x18\x02 \x01(\tH\x00R\tpreviewId\x12\x1c\n" +
 	"\btransfer\x18\x03 \x01(\tH\x00R\btransfer\x12N\n" +
 	"\x10provider_sandbox\x18\x04 \x01(\v2!.bugnet.router.v1.ProviderSandboxH\x00R\x0fproviderSandboxB\b\n" +
-	"\x06target\"\xd9\x03\n" +
+	"\x06target\"\x90\x04\n" +
 	"\x11OperatorPlacement\x12!\n" +
 	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\x126\n" +
 	"\x05state\x18\x02 \x01(\x0e2 .bugnet.router.v1.PlacementStateR\x05state\x12\x1a\n" +
@@ -2754,7 +3217,10 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\rextend_payers\x18\t \x03(\tR\fextendPayers\x12!\n" +
 	"\fsource_label\x18\n" +
 	" \x01(\tR\vsourceLabel\x12-\n" +
-	"\x12termination_reason\x18\v \x01(\tR\x11terminationReason\"Q\n" +
+	"\x12termination_reason\x18\v \x01(\tR\x11terminationReason\x12\x1d\n" +
+	"\n" +
+	"start_path\x18\f \x01(\tR\tstartPath\x12\x16\n" +
+	"\x06hedged\x18\r \x01(\bR\x06hedged\"Q\n" +
 	"\x14FindPlacementRequest\x129\n" +
 	"\x06target\x18\x01 \x01(\v2!.bugnet.router.v1.PlacementTargetR\x06target\"Z\n" +
 	"\x15FindPlacementResponse\x12A\n" +
@@ -2883,7 +3349,7 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\asamples\x18\x01 \x01(\rR\asamples\x12\x15\n" +
 	"\x06p50_ms\x18\x02 \x01(\rR\x05p50Ms\x12\x15\n" +
 	"\x06p90_ms\x18\x03 \x01(\rR\x05p90Ms\x12\x15\n" +
-	"\x06p99_ms\x18\x04 \x01(\rR\x05p99Ms\"\xdf\x06\n" +
+	"\x06p99_ms\x18\x04 \x01(\rR\x05p99Ms\"\xab\t\n" +
 	"\vStartReport\x12\x1a\n" +
 	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\tR\x04size\x120\n" +
@@ -2904,15 +3370,25 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\x05total\x18\x10 \x01(\v2\x1b.bugnet.router.v1.StepStatsR\x05total\x12\x1f\n" +
 	"\vcost_micros\x18\x11 \x01(\x03R\n" +
 	"costMicros\x12A\n" +
-	"\x06errors\x18\x12 \x03(\v2).bugnet.router.v1.StartReport.ErrorsEntryR\x06errors\x1a9\n" +
+	"\x06errors\x18\x12 \x03(\v2).bugnet.router.v1.StartReport.ErrorsEntryR\x06errors\x12\x1d\n" +
+	"\n" +
+	"start_path\x18\x13 \x01(\tR\tstartPath\x12/\n" +
+	"\x04bind\x18\x14 \x01(\v2\x1b.bugnet.router.v1.StepStatsR\x04bind\x12?\n" +
+	"\rpaid_to_ready\x18\x15 \x01(\v2\x1b.bugnet.router.v1.StepStatsR\vpaidToReady\x12<\n" +
+	"\vfirst_frame\x18\x16 \x01(\v2\x1b.bugnet.router.v1.StepStatsR\n" +
+	"firstFrame\x12J\n" +
+	"\x13paid_to_first_frame\x18\x17 \x01(\v2\x1b.bugnet.router.v1.StepStatsR\x10paidToFirstFrame\x12/\n" +
+	"\x04wake\x18\x18 \x01(\v2\x1b.bugnet.router.v1.StepStatsR\x04wake\x1a9\n" +
 	"\vErrorsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\rR\x05value:\x028\x01\"\xc0\x01\n" +
+	"\x05value\x18\x02 \x01(\rR\x05value:\x028\x01\"\xe1\x01\n" +
 	"\x13ReportStartsRequest\x12\x1b\n" +
 	"\bbench_id\x18\x01 \x01(\tH\x00R\abenchId\x122\n" +
 	"\x05since\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x05since\x122\n" +
 	"\x05kinds\x18\x03 \x03(\x0e2\x1c.bugnet.router.v1.SampleKindR\x05kinds\x12\x1a\n" +
-	"\bprovider\x18\x04 \x01(\tR\bproviderB\b\n" +
+	"\bprovider\x18\x04 \x01(\tR\bprovider\x12\x1f\n" +
+	"\vstart_paths\x18\x05 \x03(\tR\n" +
+	"startPathsB\b\n" +
 	"\x06window\"i\n" +
 	"\x14ReportStartsResponse\x127\n" +
 	"\areports\x18\x01 \x03(\v2\x1d.bugnet.router.v1.StartReportR\areports\x12\x18\n" +
@@ -2937,7 +3413,37 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"recordJson\x12\x1b\n" +
 	"\tclosed_by\x18\x02 \x01(\tR\bclosedBy\x129\n" +
 	"\n" +
-	"hold_until\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tholdUntil*y\n" +
+	"hold_until\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tholdUntil\"\xa4\x04\n" +
+	"\n" +
+	"PoolStatus\x12\x1a\n" +
+	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\tR\x04size\x12\x17\n" +
+	"\akept_by\x18\x03 \x01(\tR\x06keptBy\x12\x16\n" +
+	"\x06target\x18\x04 \x01(\rR\x06target\x12\x10\n" +
+	"\x03min\x18\x05 \x01(\rR\x03min\x12\x10\n" +
+	"\x03max\x18\x06 \x01(\rR\x03max\x12\x12\n" +
+	"\x04warm\x18\a \x01(\rR\x04warm\x12\x18\n" +
+	"\afilling\x18\b \x01(\rR\afilling\x12\x12\n" +
+	"\x04held\x18\t \x01(\rR\x04held\x12(\n" +
+	"\x10claims_last_hour\x18\n" +
+	" \x01(\rR\x0eclaimsLastHour\x12(\n" +
+	"\x10misses_last_hour\x18\v \x01(\rR\x0emissesLastHour\x12&\n" +
+	"\x0fwasted_last_day\x18\f \x01(\rR\rwastedLastDay\x12/\n" +
+	"\x14cost_micros_last_day\x18\r \x01(\x03R\x11costMicrosLastDay\x12\x1e\n" +
+	"\vfill_p95_ms\x18\x0e \x01(\rR\tfillP95Ms\x12\x1e\n" +
+	"\vwake_p95_ms\x18\x0f \x01(\rR\twakeP95Ms\x12=\n" +
+	"\fpaused_until\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampR\vpausedUntil\x12#\n" +
+	"\rpaused_reason\x18\x11 \x01(\tR\fpausedReason\"\x12\n" +
+	"\x10ListPoolsRequest\"G\n" +
+	"\x11ListPoolsResponse\x122\n" +
+	"\x05pools\x18\x01 \x03(\v2\x1c.bugnet.router.v1.PoolStatusR\x05pools\"\x90\x01\n" +
+	"\x10DrainPoolRequest\x12\x1a\n" +
+	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\tR\x04size\x126\n" +
+	"\tpause_for\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\bpauseFor\x12\x14\n" +
+	"\x05actor\x18\x04 \x01(\tR\x05actor\"-\n" +
+	"\x11DrainPoolResponse\x12\x18\n" +
+	"\aretired\x18\x01 \x01(\rR\aretired*y\n" +
 	"\x11OperatorEndReason\x12#\n" +
 	"\x1fOPERATOR_END_REASON_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19OPERATOR_END_REASON_ABUSE\x10\x01\x12 \n" +
@@ -2948,13 +3454,15 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\x19SIGNAL_CLASS_CONTROL_LOST\x10\x02\x12 \n" +
 	"\x1cSIGNAL_CLASS_PROVIDER_FAILED\x10\x03\x12\x18\n" +
 	"\x14SIGNAL_CLASS_ACCOUNT\x10\x04\x12\x1f\n" +
-	"\x1bSIGNAL_CLASS_SANDBOX_EXITED\x10\x05*s\n" +
+	"\x1bSIGNAL_CLASS_SANDBOX_EXITED\x10\x05*\xa2\x01\n" +
 	"\n" +
 	"SampleKind\x12\x1b\n" +
 	"\x17SAMPLE_KIND_UNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15SAMPLE_KIND_PLACEMENT\x10\x01\x12\x16\n" +
 	"\x12SAMPLE_KIND_CANARY\x10\x02\x12\x15\n" +
-	"\x11SAMPLE_KIND_BENCH\x10\x032\xdb\t\n" +
+	"\x11SAMPLE_KIND_BENCH\x10\x03\x12\x14\n" +
+	"\x10SAMPLE_KIND_POOL\x10\x04\x12\x17\n" +
+	"\x13SAMPLE_KIND_RESERVE\x10\x052\x87\v\n" +
 	"\x0fOperatorService\x12Z\n" +
 	"\vBlockWallet\x12$.bugnet.router.v1.BlockWalletRequest\x1a%.bugnet.router.v1.BlockWalletResponse\x12`\n" +
 	"\rUnblockWallet\x12&.bugnet.router.v1.UnblockWalletRequest\x1a'.bugnet.router.v1.UnblockWalletResponse\x12T\n" +
@@ -2969,7 +3477,9 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"StartBench\x12#.bugnet.router.v1.StartBenchRequest\x1a$.bugnet.router.v1.StartBenchResponse\x12]\n" +
 	"\fReportStarts\x12%.bugnet.router.v1.ReportStartsRequest\x1a&.bugnet.router.v1.ReportStartsResponse\x12Z\n" +
 	"\vGetEstimate\x12$.bugnet.router.v1.GetEstimateRequest\x1a%.bugnet.router.v1.GetEstimateResponse\x12c\n" +
-	"\x0eGetSessionHold\x12'.bugnet.router.v1.GetSessionHoldRequest\x1a(.bugnet.router.v1.GetSessionHoldResponseBDZBgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"\x0eGetSessionHold\x12'.bugnet.router.v1.GetSessionHoldRequest\x1a(.bugnet.router.v1.GetSessionHoldResponse\x12T\n" +
+	"\tListPools\x12\".bugnet.router.v1.ListPoolsRequest\x1a#.bugnet.router.v1.ListPoolsResponse\x12T\n" +
+	"\tDrainPool\x12\".bugnet.router.v1.DrainPoolRequest\x1a#.bugnet.router.v1.DrainPoolResponseBDZBgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_operator_proto_rawDescOnce sync.Once
@@ -2984,7 +3494,7 @@ func file_bugnet_router_v1_operator_proto_rawDescGZIP() []byte {
 }
 
 var file_bugnet_router_v1_operator_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_bugnet_router_v1_operator_proto_msgTypes = make([]protoimpl.MessageInfo, 36)
+var file_bugnet_router_v1_operator_proto_msgTypes = make([]protoimpl.MessageInfo, 41)
 var file_bugnet_router_v1_operator_proto_goTypes = []any{
 	(OperatorEndReason)(0),         // 0: bugnet.router.v1.OperatorEndReason
 	(SignalClass)(0),               // 1: bugnet.router.v1.SignalClass
@@ -3024,26 +3534,32 @@ var file_bugnet_router_v1_operator_proto_goTypes = []any{
 	(*GetEstimateResponse)(nil),    // 35: bugnet.router.v1.GetEstimateResponse
 	(*GetSessionHoldRequest)(nil),  // 36: bugnet.router.v1.GetSessionHoldRequest
 	(*GetSessionHoldResponse)(nil), // 37: bugnet.router.v1.GetSessionHoldResponse
-	nil,                            // 38: bugnet.router.v1.StartReport.ErrorsEntry
-	(PlacementState)(0),            // 39: bugnet.router.v1.PlacementState
-	(*timestamppb.Timestamp)(nil),  // 40: google.protobuf.Timestamp
+	(*PoolStatus)(nil),             // 38: bugnet.router.v1.PoolStatus
+	(*ListPoolsRequest)(nil),       // 39: bugnet.router.v1.ListPoolsRequest
+	(*ListPoolsResponse)(nil),      // 40: bugnet.router.v1.ListPoolsResponse
+	(*DrainPoolRequest)(nil),       // 41: bugnet.router.v1.DrainPoolRequest
+	(*DrainPoolResponse)(nil),      // 42: bugnet.router.v1.DrainPoolResponse
+	nil,                            // 43: bugnet.router.v1.StartReport.ErrorsEntry
+	(PlacementState)(0),            // 44: bugnet.router.v1.PlacementState
+	(*timestamppb.Timestamp)(nil),  // 45: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),    // 46: google.protobuf.Duration
 }
 var file_bugnet_router_v1_operator_proto_depIdxs = []int32{
 	3,  // 0: bugnet.router.v1.PlacementTarget.provider_sandbox:type_name -> bugnet.router.v1.ProviderSandbox
-	39, // 1: bugnet.router.v1.OperatorPlacement.state:type_name -> bugnet.router.v1.PlacementState
-	40, // 2: bugnet.router.v1.OperatorPlacement.created_at:type_name -> google.protobuf.Timestamp
-	40, // 3: bugnet.router.v1.OperatorPlacement.deadline:type_name -> google.protobuf.Timestamp
+	44, // 1: bugnet.router.v1.OperatorPlacement.state:type_name -> bugnet.router.v1.PlacementState
+	45, // 2: bugnet.router.v1.OperatorPlacement.created_at:type_name -> google.protobuf.Timestamp
+	45, // 3: bugnet.router.v1.OperatorPlacement.deadline:type_name -> google.protobuf.Timestamp
 	4,  // 4: bugnet.router.v1.FindPlacementRequest.target:type_name -> bugnet.router.v1.PlacementTarget
 	5,  // 5: bugnet.router.v1.FindPlacementResponse.placement:type_name -> bugnet.router.v1.OperatorPlacement
 	4,  // 6: bugnet.router.v1.EndPlacementRequest.target:type_name -> bugnet.router.v1.PlacementTarget
 	0,  // 7: bugnet.router.v1.EndPlacementRequest.reason:type_name -> bugnet.router.v1.OperatorEndReason
 	5,  // 8: bugnet.router.v1.EndPlacementResponse.placement:type_name -> bugnet.router.v1.OperatorPlacement
-	40, // 9: bugnet.router.v1.Wallet.first_seen:type_name -> google.protobuf.Timestamp
-	40, // 10: bugnet.router.v1.Wallet.last_seen:type_name -> google.protobuf.Timestamp
-	40, // 11: bugnet.router.v1.Wallet.blocked_at:type_name -> google.protobuf.Timestamp
-	40, // 12: bugnet.router.v1.Wallet.blocked_until:type_name -> google.protobuf.Timestamp
-	40, // 13: bugnet.router.v1.WalletEvent.created_at:type_name -> google.protobuf.Timestamp
-	40, // 14: bugnet.router.v1.BlockWalletRequest.until:type_name -> google.protobuf.Timestamp
+	45, // 9: bugnet.router.v1.Wallet.first_seen:type_name -> google.protobuf.Timestamp
+	45, // 10: bugnet.router.v1.Wallet.last_seen:type_name -> google.protobuf.Timestamp
+	45, // 11: bugnet.router.v1.Wallet.blocked_at:type_name -> google.protobuf.Timestamp
+	45, // 12: bugnet.router.v1.Wallet.blocked_until:type_name -> google.protobuf.Timestamp
+	45, // 13: bugnet.router.v1.WalletEvent.created_at:type_name -> google.protobuf.Timestamp
+	45, // 14: bugnet.router.v1.BlockWalletRequest.until:type_name -> google.protobuf.Timestamp
 	12, // 15: bugnet.router.v1.BlockWalletResponse.wallet:type_name -> bugnet.router.v1.Wallet
 	12, // 16: bugnet.router.v1.UnblockWalletResponse.wallet:type_name -> bugnet.router.v1.Wallet
 	12, // 17: bugnet.router.v1.GetWalletResponse.wallet:type_name -> bugnet.router.v1.Wallet
@@ -3051,12 +3567,12 @@ var file_bugnet_router_v1_operator_proto_depIdxs = []int32{
 	13, // 19: bugnet.router.v1.GetWalletResponse.events:type_name -> bugnet.router.v1.WalletEvent
 	12, // 20: bugnet.router.v1.ListWalletsResponse.wallets:type_name -> bugnet.router.v1.Wallet
 	1,  // 21: bugnet.router.v1.Signal.signal_class:type_name -> bugnet.router.v1.SignalClass
-	40, // 22: bugnet.router.v1.Signal.created_at:type_name -> google.protobuf.Timestamp
-	40, // 23: bugnet.router.v1.ListSignalsRequest.since:type_name -> google.protobuf.Timestamp
+	45, // 22: bugnet.router.v1.Signal.created_at:type_name -> google.protobuf.Timestamp
+	45, // 23: bugnet.router.v1.ListSignalsRequest.since:type_name -> google.protobuf.Timestamp
 	1,  // 24: bugnet.router.v1.ListSignalsRequest.signal_class:type_name -> bugnet.router.v1.SignalClass
 	22, // 25: bugnet.router.v1.ListSignalsResponse.signals:type_name -> bugnet.router.v1.Signal
-	40, // 26: bugnet.router.v1.ProviderStatus.state_since:type_name -> google.protobuf.Timestamp
-	40, // 27: bugnet.router.v1.ProviderStatus.polled_at:type_name -> google.protobuf.Timestamp
+	45, // 26: bugnet.router.v1.ProviderStatus.state_since:type_name -> google.protobuf.Timestamp
+	45, // 27: bugnet.router.v1.ProviderStatus.polled_at:type_name -> google.protobuf.Timestamp
 	25, // 28: bugnet.router.v1.ListProvidersResponse.providers:type_name -> bugnet.router.v1.ProviderStatus
 	2,  // 29: bugnet.router.v1.StartReport.kind:type_name -> bugnet.router.v1.SampleKind
 	30, // 30: bugnet.router.v1.StartReport.create:type_name -> bugnet.router.v1.StepStats
@@ -3067,43 +3583,55 @@ var file_bugnet_router_v1_operator_proto_depIdxs = []int32{
 	30, // 35: bugnet.router.v1.StartReport.warm_command:type_name -> bugnet.router.v1.StepStats
 	30, // 36: bugnet.router.v1.StartReport.destroy:type_name -> bugnet.router.v1.StepStats
 	30, // 37: bugnet.router.v1.StartReport.total:type_name -> bugnet.router.v1.StepStats
-	38, // 38: bugnet.router.v1.StartReport.errors:type_name -> bugnet.router.v1.StartReport.ErrorsEntry
-	40, // 39: bugnet.router.v1.ReportStartsRequest.since:type_name -> google.protobuf.Timestamp
-	2,  // 40: bugnet.router.v1.ReportStartsRequest.kinds:type_name -> bugnet.router.v1.SampleKind
-	31, // 41: bugnet.router.v1.ReportStartsResponse.reports:type_name -> bugnet.router.v1.StartReport
-	40, // 42: bugnet.router.v1.GetEstimateResponse.created_at:type_name -> google.protobuf.Timestamp
-	40, // 43: bugnet.router.v1.GetSessionHoldResponse.hold_until:type_name -> google.protobuf.Timestamp
-	14, // 44: bugnet.router.v1.OperatorService.BlockWallet:input_type -> bugnet.router.v1.BlockWalletRequest
-	16, // 45: bugnet.router.v1.OperatorService.UnblockWallet:input_type -> bugnet.router.v1.UnblockWalletRequest
-	18, // 46: bugnet.router.v1.OperatorService.GetWallet:input_type -> bugnet.router.v1.GetWalletRequest
-	20, // 47: bugnet.router.v1.OperatorService.ListWallets:input_type -> bugnet.router.v1.ListWalletsRequest
-	6,  // 48: bugnet.router.v1.OperatorService.FindPlacement:input_type -> bugnet.router.v1.FindPlacementRequest
-	8,  // 49: bugnet.router.v1.OperatorService.EndPlacement:input_type -> bugnet.router.v1.EndPlacementRequest
-	10, // 50: bugnet.router.v1.OperatorService.RevokePreview:input_type -> bugnet.router.v1.RevokePreviewRequest
-	23, // 51: bugnet.router.v1.OperatorService.ListSignals:input_type -> bugnet.router.v1.ListSignalsRequest
-	26, // 52: bugnet.router.v1.OperatorService.ListProviders:input_type -> bugnet.router.v1.ListProvidersRequest
-	28, // 53: bugnet.router.v1.OperatorService.StartBench:input_type -> bugnet.router.v1.StartBenchRequest
-	32, // 54: bugnet.router.v1.OperatorService.ReportStarts:input_type -> bugnet.router.v1.ReportStartsRequest
-	34, // 55: bugnet.router.v1.OperatorService.GetEstimate:input_type -> bugnet.router.v1.GetEstimateRequest
-	36, // 56: bugnet.router.v1.OperatorService.GetSessionHold:input_type -> bugnet.router.v1.GetSessionHoldRequest
-	15, // 57: bugnet.router.v1.OperatorService.BlockWallet:output_type -> bugnet.router.v1.BlockWalletResponse
-	17, // 58: bugnet.router.v1.OperatorService.UnblockWallet:output_type -> bugnet.router.v1.UnblockWalletResponse
-	19, // 59: bugnet.router.v1.OperatorService.GetWallet:output_type -> bugnet.router.v1.GetWalletResponse
-	21, // 60: bugnet.router.v1.OperatorService.ListWallets:output_type -> bugnet.router.v1.ListWalletsResponse
-	7,  // 61: bugnet.router.v1.OperatorService.FindPlacement:output_type -> bugnet.router.v1.FindPlacementResponse
-	9,  // 62: bugnet.router.v1.OperatorService.EndPlacement:output_type -> bugnet.router.v1.EndPlacementResponse
-	11, // 63: bugnet.router.v1.OperatorService.RevokePreview:output_type -> bugnet.router.v1.RevokePreviewResponse
-	24, // 64: bugnet.router.v1.OperatorService.ListSignals:output_type -> bugnet.router.v1.ListSignalsResponse
-	27, // 65: bugnet.router.v1.OperatorService.ListProviders:output_type -> bugnet.router.v1.ListProvidersResponse
-	29, // 66: bugnet.router.v1.OperatorService.StartBench:output_type -> bugnet.router.v1.StartBenchResponse
-	33, // 67: bugnet.router.v1.OperatorService.ReportStarts:output_type -> bugnet.router.v1.ReportStartsResponse
-	35, // 68: bugnet.router.v1.OperatorService.GetEstimate:output_type -> bugnet.router.v1.GetEstimateResponse
-	37, // 69: bugnet.router.v1.OperatorService.GetSessionHold:output_type -> bugnet.router.v1.GetSessionHoldResponse
-	57, // [57:70] is the sub-list for method output_type
-	44, // [44:57] is the sub-list for method input_type
-	44, // [44:44] is the sub-list for extension type_name
-	44, // [44:44] is the sub-list for extension extendee
-	0,  // [0:44] is the sub-list for field type_name
+	43, // 38: bugnet.router.v1.StartReport.errors:type_name -> bugnet.router.v1.StartReport.ErrorsEntry
+	30, // 39: bugnet.router.v1.StartReport.bind:type_name -> bugnet.router.v1.StepStats
+	30, // 40: bugnet.router.v1.StartReport.paid_to_ready:type_name -> bugnet.router.v1.StepStats
+	30, // 41: bugnet.router.v1.StartReport.first_frame:type_name -> bugnet.router.v1.StepStats
+	30, // 42: bugnet.router.v1.StartReport.paid_to_first_frame:type_name -> bugnet.router.v1.StepStats
+	30, // 43: bugnet.router.v1.StartReport.wake:type_name -> bugnet.router.v1.StepStats
+	45, // 44: bugnet.router.v1.ReportStartsRequest.since:type_name -> google.protobuf.Timestamp
+	2,  // 45: bugnet.router.v1.ReportStartsRequest.kinds:type_name -> bugnet.router.v1.SampleKind
+	31, // 46: bugnet.router.v1.ReportStartsResponse.reports:type_name -> bugnet.router.v1.StartReport
+	45, // 47: bugnet.router.v1.GetEstimateResponse.created_at:type_name -> google.protobuf.Timestamp
+	45, // 48: bugnet.router.v1.GetSessionHoldResponse.hold_until:type_name -> google.protobuf.Timestamp
+	45, // 49: bugnet.router.v1.PoolStatus.paused_until:type_name -> google.protobuf.Timestamp
+	38, // 50: bugnet.router.v1.ListPoolsResponse.pools:type_name -> bugnet.router.v1.PoolStatus
+	46, // 51: bugnet.router.v1.DrainPoolRequest.pause_for:type_name -> google.protobuf.Duration
+	14, // 52: bugnet.router.v1.OperatorService.BlockWallet:input_type -> bugnet.router.v1.BlockWalletRequest
+	16, // 53: bugnet.router.v1.OperatorService.UnblockWallet:input_type -> bugnet.router.v1.UnblockWalletRequest
+	18, // 54: bugnet.router.v1.OperatorService.GetWallet:input_type -> bugnet.router.v1.GetWalletRequest
+	20, // 55: bugnet.router.v1.OperatorService.ListWallets:input_type -> bugnet.router.v1.ListWalletsRequest
+	6,  // 56: bugnet.router.v1.OperatorService.FindPlacement:input_type -> bugnet.router.v1.FindPlacementRequest
+	8,  // 57: bugnet.router.v1.OperatorService.EndPlacement:input_type -> bugnet.router.v1.EndPlacementRequest
+	10, // 58: bugnet.router.v1.OperatorService.RevokePreview:input_type -> bugnet.router.v1.RevokePreviewRequest
+	23, // 59: bugnet.router.v1.OperatorService.ListSignals:input_type -> bugnet.router.v1.ListSignalsRequest
+	26, // 60: bugnet.router.v1.OperatorService.ListProviders:input_type -> bugnet.router.v1.ListProvidersRequest
+	28, // 61: bugnet.router.v1.OperatorService.StartBench:input_type -> bugnet.router.v1.StartBenchRequest
+	32, // 62: bugnet.router.v1.OperatorService.ReportStarts:input_type -> bugnet.router.v1.ReportStartsRequest
+	34, // 63: bugnet.router.v1.OperatorService.GetEstimate:input_type -> bugnet.router.v1.GetEstimateRequest
+	36, // 64: bugnet.router.v1.OperatorService.GetSessionHold:input_type -> bugnet.router.v1.GetSessionHoldRequest
+	39, // 65: bugnet.router.v1.OperatorService.ListPools:input_type -> bugnet.router.v1.ListPoolsRequest
+	41, // 66: bugnet.router.v1.OperatorService.DrainPool:input_type -> bugnet.router.v1.DrainPoolRequest
+	15, // 67: bugnet.router.v1.OperatorService.BlockWallet:output_type -> bugnet.router.v1.BlockWalletResponse
+	17, // 68: bugnet.router.v1.OperatorService.UnblockWallet:output_type -> bugnet.router.v1.UnblockWalletResponse
+	19, // 69: bugnet.router.v1.OperatorService.GetWallet:output_type -> bugnet.router.v1.GetWalletResponse
+	21, // 70: bugnet.router.v1.OperatorService.ListWallets:output_type -> bugnet.router.v1.ListWalletsResponse
+	7,  // 71: bugnet.router.v1.OperatorService.FindPlacement:output_type -> bugnet.router.v1.FindPlacementResponse
+	9,  // 72: bugnet.router.v1.OperatorService.EndPlacement:output_type -> bugnet.router.v1.EndPlacementResponse
+	11, // 73: bugnet.router.v1.OperatorService.RevokePreview:output_type -> bugnet.router.v1.RevokePreviewResponse
+	24, // 74: bugnet.router.v1.OperatorService.ListSignals:output_type -> bugnet.router.v1.ListSignalsResponse
+	27, // 75: bugnet.router.v1.OperatorService.ListProviders:output_type -> bugnet.router.v1.ListProvidersResponse
+	29, // 76: bugnet.router.v1.OperatorService.StartBench:output_type -> bugnet.router.v1.StartBenchResponse
+	33, // 77: bugnet.router.v1.OperatorService.ReportStarts:output_type -> bugnet.router.v1.ReportStartsResponse
+	35, // 78: bugnet.router.v1.OperatorService.GetEstimate:output_type -> bugnet.router.v1.GetEstimateResponse
+	37, // 79: bugnet.router.v1.OperatorService.GetSessionHold:output_type -> bugnet.router.v1.GetSessionHoldResponse
+	40, // 80: bugnet.router.v1.OperatorService.ListPools:output_type -> bugnet.router.v1.ListPoolsResponse
+	42, // 81: bugnet.router.v1.OperatorService.DrainPool:output_type -> bugnet.router.v1.DrainPoolResponse
+	67, // [67:82] is the sub-list for method output_type
+	52, // [52:67] is the sub-list for method input_type
+	52, // [52:52] is the sub-list for extension type_name
+	52, // [52:52] is the sub-list for extension extendee
+	0,  // [0:52] is the sub-list for field type_name
 }
 
 func init() { file_bugnet_router_v1_operator_proto_init() }
@@ -3128,7 +3656,7 @@ func file_bugnet_router_v1_operator_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bugnet_router_v1_operator_proto_rawDesc), len(file_bugnet_router_v1_operator_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   36,
+			NumMessages:   41,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

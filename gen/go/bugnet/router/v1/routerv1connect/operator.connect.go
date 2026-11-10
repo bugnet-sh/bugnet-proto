@@ -72,6 +72,12 @@ const (
 	// OperatorServiceGetSessionHoldProcedure is the fully-qualified name of the OperatorService's
 	// GetSessionHold RPC.
 	OperatorServiceGetSessionHoldProcedure = "/bugnet.router.v1.OperatorService/GetSessionHold"
+	// OperatorServiceListPoolsProcedure is the fully-qualified name of the OperatorService's ListPools
+	// RPC.
+	OperatorServiceListPoolsProcedure = "/bugnet.router.v1.OperatorService/ListPools"
+	// OperatorServiceDrainPoolProcedure is the fully-qualified name of the OperatorService's DrainPool
+	// RPC.
+	OperatorServiceDrainPoolProcedure = "/bugnet.router.v1.OperatorService/DrainPool"
 )
 
 // OperatorServiceClient is a client for the bugnet.router.v1.OperatorService service.
@@ -91,6 +97,9 @@ type OperatorServiceClient interface {
 	GetEstimate(context.Context, *connect.Request[v1.GetEstimateRequest]) (*connect.Response[v1.GetEstimateResponse], error)
 	// A held session record's page JSON, never served to the public link
 	GetSessionHold(context.Context, *connect.Request[v1.GetSessionHoldRequest]) (*connect.Response[v1.GetSessionHoldResponse], error)
+	ListPools(context.Context, *connect.Request[v1.ListPoolsRequest]) (*connect.Response[v1.ListPoolsResponse], error)
+	// Retires every warm member of one pool, and can pause its refill
+	DrainPool(context.Context, *connect.Request[v1.DrainPoolRequest]) (*connect.Response[v1.DrainPoolResponse], error)
 }
 
 // NewOperatorServiceClient constructs a client for the bugnet.router.v1.OperatorService service. By
@@ -182,6 +191,18 @@ func NewOperatorServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(operatorServiceMethods.ByName("GetSessionHold")),
 			connect.WithClientOptions(opts...),
 		),
+		listPools: connect.NewClient[v1.ListPoolsRequest, v1.ListPoolsResponse](
+			httpClient,
+			baseURL+OperatorServiceListPoolsProcedure,
+			connect.WithSchema(operatorServiceMethods.ByName("ListPools")),
+			connect.WithClientOptions(opts...),
+		),
+		drainPool: connect.NewClient[v1.DrainPoolRequest, v1.DrainPoolResponse](
+			httpClient,
+			baseURL+OperatorServiceDrainPoolProcedure,
+			connect.WithSchema(operatorServiceMethods.ByName("DrainPool")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -200,6 +221,8 @@ type operatorServiceClient struct {
 	reportStarts   *connect.Client[v1.ReportStartsRequest, v1.ReportStartsResponse]
 	getEstimate    *connect.Client[v1.GetEstimateRequest, v1.GetEstimateResponse]
 	getSessionHold *connect.Client[v1.GetSessionHoldRequest, v1.GetSessionHoldResponse]
+	listPools      *connect.Client[v1.ListPoolsRequest, v1.ListPoolsResponse]
+	drainPool      *connect.Client[v1.DrainPoolRequest, v1.DrainPoolResponse]
 }
 
 // BlockWallet calls bugnet.router.v1.OperatorService.BlockWallet.
@@ -267,6 +290,16 @@ func (c *operatorServiceClient) GetSessionHold(ctx context.Context, req *connect
 	return c.getSessionHold.CallUnary(ctx, req)
 }
 
+// ListPools calls bugnet.router.v1.OperatorService.ListPools.
+func (c *operatorServiceClient) ListPools(ctx context.Context, req *connect.Request[v1.ListPoolsRequest]) (*connect.Response[v1.ListPoolsResponse], error) {
+	return c.listPools.CallUnary(ctx, req)
+}
+
+// DrainPool calls bugnet.router.v1.OperatorService.DrainPool.
+func (c *operatorServiceClient) DrainPool(ctx context.Context, req *connect.Request[v1.DrainPoolRequest]) (*connect.Response[v1.DrainPoolResponse], error) {
+	return c.drainPool.CallUnary(ctx, req)
+}
+
 // OperatorServiceHandler is an implementation of the bugnet.router.v1.OperatorService service.
 type OperatorServiceHandler interface {
 	BlockWallet(context.Context, *connect.Request[v1.BlockWalletRequest]) (*connect.Response[v1.BlockWalletResponse], error)
@@ -284,6 +317,9 @@ type OperatorServiceHandler interface {
 	GetEstimate(context.Context, *connect.Request[v1.GetEstimateRequest]) (*connect.Response[v1.GetEstimateResponse], error)
 	// A held session record's page JSON, never served to the public link
 	GetSessionHold(context.Context, *connect.Request[v1.GetSessionHoldRequest]) (*connect.Response[v1.GetSessionHoldResponse], error)
+	ListPools(context.Context, *connect.Request[v1.ListPoolsRequest]) (*connect.Response[v1.ListPoolsResponse], error)
+	// Retires every warm member of one pool, and can pause its refill
+	DrainPool(context.Context, *connect.Request[v1.DrainPoolRequest]) (*connect.Response[v1.DrainPoolResponse], error)
 }
 
 // NewOperatorServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -371,6 +407,18 @@ func NewOperatorServiceHandler(svc OperatorServiceHandler, opts ...connect.Handl
 		connect.WithSchema(operatorServiceMethods.ByName("GetSessionHold")),
 		connect.WithHandlerOptions(opts...),
 	)
+	operatorServiceListPoolsHandler := connect.NewUnaryHandler(
+		OperatorServiceListPoolsProcedure,
+		svc.ListPools,
+		connect.WithSchema(operatorServiceMethods.ByName("ListPools")),
+		connect.WithHandlerOptions(opts...),
+	)
+	operatorServiceDrainPoolHandler := connect.NewUnaryHandler(
+		OperatorServiceDrainPoolProcedure,
+		svc.DrainPool,
+		connect.WithSchema(operatorServiceMethods.ByName("DrainPool")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/bugnet.router.v1.OperatorService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case OperatorServiceBlockWalletProcedure:
@@ -399,6 +447,10 @@ func NewOperatorServiceHandler(svc OperatorServiceHandler, opts ...connect.Handl
 			operatorServiceGetEstimateHandler.ServeHTTP(w, r)
 		case OperatorServiceGetSessionHoldProcedure:
 			operatorServiceGetSessionHoldHandler.ServeHTTP(w, r)
+		case OperatorServiceListPoolsProcedure:
+			operatorServiceListPoolsHandler.ServeHTTP(w, r)
+		case OperatorServiceDrainPoolProcedure:
+			operatorServiceDrainPoolHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -458,4 +510,12 @@ func (UnimplementedOperatorServiceHandler) GetEstimate(context.Context, *connect
 
 func (UnimplementedOperatorServiceHandler) GetSessionHold(context.Context, *connect.Request[v1.GetSessionHoldRequest]) (*connect.Response[v1.GetSessionHoldResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.OperatorService.GetSessionHold is not implemented"))
+}
+
+func (UnimplementedOperatorServiceHandler) ListPools(context.Context, *connect.Request[v1.ListPoolsRequest]) (*connect.Response[v1.ListPoolsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.OperatorService.ListPools is not implemented"))
+}
+
+func (UnimplementedOperatorServiceHandler) DrainPool(context.Context, *connect.Request[v1.DrainPoolRequest]) (*connect.Response[v1.DrainPoolResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.OperatorService.DrainPool is not implemented"))
 }

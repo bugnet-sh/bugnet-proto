@@ -5,7 +5,7 @@
 import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 import type { PlacementState } from "./router_pb.js";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
 
 /**
  * Describes the file bugnet/router/v1/operator.proto.
@@ -143,6 +143,20 @@ export declare type OperatorPlacement = Message<"bugnet.router.v1.OperatorPlacem
    * @generated from field: string termination_reason = 11;
    */
   terminationReason: string;
+
+  /**
+   * cold, pooled or reserved
+   *
+   * @generated from field: string start_path = 12;
+   */
+  startPath: string;
+
+  /**
+   * A second attempt ran beside the first
+   *
+   * @generated from field: bool hedged = 13;
+   */
+  hedged: boolean;
 };
 
 /**
@@ -1048,6 +1062,48 @@ export declare type StartReport = Message<"bugnet.router.v1.StartReport"> & {
    * @generated from field: map<string, uint32> errors = 18;
    */
   errors: { [key: string]: number };
+
+  /**
+   * cold, pooled, reserved or hedged, empty for kinds without a path
+   *
+   * @generated from field: string start_path = 19;
+   */
+  startPath: string;
+
+  /**
+   * CreatePlacement to ready
+   *
+   * @generated from field: bugnet.router.v1.StepStats bind = 20;
+   */
+  bind?: StepStats | undefined;
+
+  /**
+   * Payment to ready, from the order's issued_at or else CreatePlacement
+   *
+   * @generated from field: bugnet.router.v1.StepStats paid_to_ready = 21;
+   */
+  paidToReady?: StepStats | undefined;
+
+  /**
+   * The placement's first Exec to its first output frame
+   *
+   * @generated from field: bugnet.router.v1.StepStats first_frame = 22;
+   */
+  firstFrame?: StepStats | undefined;
+
+  /**
+   * Payment to the first frame, the figure the 5 s target is checked on
+   *
+   * @generated from field: bugnet.router.v1.StepStats paid_to_first_frame = 23;
+   */
+  paidToFirstFrame?: StepStats | undefined;
+
+  /**
+   * Unpark or claim until Exec reaches the sandbox
+   *
+   * @generated from field: bugnet.router.v1.StepStats wake = 24;
+   */
+  wake?: StepStats | undefined;
 };
 
 /**
@@ -1092,6 +1148,13 @@ export declare type ReportStartsRequest = Message<"bugnet.router.v1.ReportStarts
    * @generated from field: string provider = 4;
    */
   provider: string;
+
+  /**
+   * Every path when empty
+   *
+   * @generated from field: repeated string start_paths = 5;
+   */
+  startPaths: string[];
 };
 
 /**
@@ -1240,6 +1303,195 @@ export declare type GetSessionHoldResponse = Message<"bugnet.router.v1.GetSessio
 export declare const GetSessionHoldResponseSchema: GenMessage<GetSessionHoldResponse>;
 
 /**
+ * @generated from message bugnet.router.v1.PoolStatus
+ */
+export declare type PoolStatus = Message<"bugnet.router.v1.PoolStatus"> & {
+  /**
+   * @generated from field: string provider = 1;
+   */
+  provider: string;
+
+  /**
+   * @generated from field: string size = 2;
+   */
+  size: string;
+
+  /**
+   * router or provider, whoever keeps the members
+   *
+   * @generated from field: string kept_by = 3;
+   */
+  keptBy: string;
+
+  /**
+   * @generated from field: uint32 target = 4;
+   */
+  target: number;
+
+  /**
+   * @generated from field: uint32 min = 5;
+   */
+  min: number;
+
+  /**
+   * @generated from field: uint32 max = 6;
+   */
+  max: number;
+
+  /**
+   * @generated from field: uint32 warm = 7;
+   */
+  warm: number;
+
+  /**
+   * @generated from field: uint32 filling = 8;
+   */
+  filling: number;
+
+  /**
+   * Members that open reservations hold
+   *
+   * @generated from field: uint32 held = 9;
+   */
+  held: number;
+
+  /**
+   * @generated from field: uint32 claims_last_hour = 10;
+   */
+  claimsLastHour: number;
+
+  /**
+   * Orders and reservations that wanted the pool and found it empty
+   *
+   * @generated from field: uint32 misses_last_hour = 11;
+   */
+  missesLastHour: number;
+
+  /**
+   * Members destroyed unused in the last day, lapsed reservations included
+   *
+   * @generated from field: uint32 wasted_last_day = 12;
+   */
+  wastedLastDay: number;
+
+  /**
+   * Idle cost, parked or Koyeb-kept, and waste over the last day
+   *
+   * @generated from field: int64 cost_micros_last_day = 13;
+   */
+  costMicrosLastDay: bigint;
+
+  /**
+   * @generated from field: uint32 fill_p95_ms = 14;
+   */
+  fillP95Ms: number;
+
+  /**
+   * @generated from field: uint32 wake_p95_ms = 15;
+   */
+  wakeP95Ms: number;
+
+  /**
+   * Unset while the pool refills
+   *
+   * @generated from field: google.protobuf.Timestamp paused_until = 16;
+   */
+  pausedUntil?: Timestamp | undefined;
+
+  /**
+   * drained, failing or spend, empty while the pool refills
+   *
+   * @generated from field: string paused_reason = 17;
+   */
+  pausedReason: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.PoolStatus.
+ * Use `create(PoolStatusSchema)` to create a new message.
+ */
+export declare const PoolStatusSchema: GenMessage<PoolStatus>;
+
+/**
+ * @generated from message bugnet.router.v1.ListPoolsRequest
+ */
+export declare type ListPoolsRequest = Message<"bugnet.router.v1.ListPoolsRequest"> & {
+};
+
+/**
+ * Describes the message bugnet.router.v1.ListPoolsRequest.
+ * Use `create(ListPoolsRequestSchema)` to create a new message.
+ */
+export declare const ListPoolsRequestSchema: GenMessage<ListPoolsRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.ListPoolsResponse
+ */
+export declare type ListPoolsResponse = Message<"bugnet.router.v1.ListPoolsResponse"> & {
+  /**
+   * @generated from field: repeated bugnet.router.v1.PoolStatus pools = 1;
+   */
+  pools: PoolStatus[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.ListPoolsResponse.
+ * Use `create(ListPoolsResponseSchema)` to create a new message.
+ */
+export declare const ListPoolsResponseSchema: GenMessage<ListPoolsResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.DrainPoolRequest
+ */
+export declare type DrainPoolRequest = Message<"bugnet.router.v1.DrainPoolRequest"> & {
+  /**
+   * @generated from field: string provider = 1;
+   */
+  provider: string;
+
+  /**
+   * @generated from field: string size = 2;
+   */
+  size: string;
+
+  /**
+   * Refill stays off this long, and refills at once when unset
+   *
+   * @generated from field: google.protobuf.Duration pause_for = 3;
+   */
+  pauseFor?: Duration | undefined;
+
+  /**
+   * @generated from field: string actor = 4;
+   */
+  actor: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.DrainPoolRequest.
+ * Use `create(DrainPoolRequestSchema)` to create a new message.
+ */
+export declare const DrainPoolRequestSchema: GenMessage<DrainPoolRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.DrainPoolResponse
+ */
+export declare type DrainPoolResponse = Message<"bugnet.router.v1.DrainPoolResponse"> & {
+  /**
+   * Warm members queued for destruction
+   *
+   * @generated from field: uint32 retired = 1;
+   */
+  retired: number;
+};
+
+/**
+ * Describes the message bugnet.router.v1.DrainPoolResponse.
+ * Use `create(DrainPoolResponseSchema)` to create a new message.
+ */
+export declare const DrainPoolResponseSchema: GenMessage<DrainPoolResponse>;
+
+/**
  * @generated from enum bugnet.router.v1.OperatorEndReason
  */
 export enum OperatorEndReason {
@@ -1331,6 +1583,20 @@ export enum SampleKind {
    * @generated from enum value: SAMPLE_KIND_BENCH = 3;
    */
   BENCH = 3,
+
+  /**
+   * A pool member filled and parked
+   *
+   * @generated from enum value: SAMPLE_KIND_POOL = 4;
+   */
+  POOL = 4,
+
+  /**
+   * A reservation's preparation, before any order
+   *
+   * @generated from enum value: SAMPLE_KIND_RESERVE = 5;
+   */
+  RESERVE = 5,
 }
 
 /**
@@ -1451,6 +1717,24 @@ export declare const OperatorService: GenService<{
     methodKind: "unary";
     input: typeof GetSessionHoldRequestSchema;
     output: typeof GetSessionHoldResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.OperatorService.ListPools
+   */
+  listPools: {
+    methodKind: "unary";
+    input: typeof ListPoolsRequestSchema;
+    output: typeof ListPoolsResponseSchema;
+  },
+  /**
+   * Retires every warm member of one pool, and can pause its refill
+   *
+   * @generated from rpc bugnet.router.v1.OperatorService.DrainPool
+   */
+  drainPool: {
+    methodKind: "unary";
+    input: typeof DrainPoolRequestSchema;
+    output: typeof DrainPoolResponseSchema;
   },
 }>;
 
