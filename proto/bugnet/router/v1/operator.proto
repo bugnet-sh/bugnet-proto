@@ -28,6 +28,8 @@ service OperatorService {
   rpc ListPools(ListPoolsRequest) returns (ListPoolsResponse);
   // Retires every warm member of one pool, and can pause its refill
   rpc DrainPool(DrainPoolRequest) returns (DrainPoolResponse);
+  // Live placements by provider and base image version, so an old artifact is retired safely
+  rpc ListImageUse(ListImageUseRequest) returns (ListImageUseResponse);
 }
 
 /* Placements */
@@ -68,6 +70,8 @@ message OperatorPlacement {
   string start_path = 12;
   // A second attempt ran beside the first
   bool hedged = 13;
+  // Empty when the sandbox runs the provider's own image
+  string image_version = 14;
 }
 
 message FindPlacementRequest {
@@ -254,6 +258,29 @@ message ProviderStatus {
   google.protobuf.Timestamp polled_at = 12;
   // Sandboxes on the account that no known deployment owns, at the last count
   uint32 foreign_sandboxes = 13;
+  // The base image version the provider's creates start from, empty for its own image
+  string image_version = 14;
+  // False when images.accept keeps the provider out of placements
+  bool image_accepted = 15;
+}
+
+message ListImageUseRequest {
+  // Empty for every provider
+  string provider = 1;
+}
+
+message ImageUse {
+  string provider = 1;
+  // Empty for sandboxes on the provider's own image
+  string image_version = 2;
+  // Placements ready or terminating on this version
+  uint32 live_placements = 3;
+  // The last time a placement on this version became ready
+  google.protobuf.Timestamp last_ready_at = 4;
+}
+
+message ListImageUseResponse {
+  repeated ImageUse uses = 1;
 }
 
 message ListProvidersRequest {}
