@@ -275,6 +275,16 @@ enum PlacementState {
   PLACEMENT_STATE_FAILED = 5;
 }
 
+// The Bugnet base image a sandbox started from
+message SandboxImage {
+  // Such as 2026.11.1, empty when the sandbox runs the provider's own image
+  string version = 1;
+  // Such as ubuntu-24.04, empty when unknown
+  string os = 2;
+  // A tool's major and minor version, or none, as the image build measured it
+  map<string, string> tools = 3;
+}
+
 message Placement {
   string placement_id = 1;
   PlacementState state = 2;
@@ -291,7 +301,8 @@ message Placement {
   // The repository the router placed in the sandbox
   Bootstrap bootstrap = 11;
 
-  // Field 12 belongs to the base image task
+  // Set once the sandbox is ready
+  SandboxImage image = 12;
 
   // When the placement became terminated or failed, unset before
   google.protobuf.Timestamp ended_at = 13;

@@ -380,7 +380,9 @@ type OperatorPlacement struct {
 	// cold, pooled or reserved
 	StartPath string `protobuf:"bytes,12,opt,name=start_path,json=startPath,proto3" json:"start_path,omitempty"`
 	// A second attempt ran beside the first
-	Hedged        bool `protobuf:"varint,13,opt,name=hedged,proto3" json:"hedged,omitempty"`
+	Hedged bool `protobuf:"varint,13,opt,name=hedged,proto3" json:"hedged,omitempty"`
+	// Empty when the sandbox runs the provider's own image
+	ImageVersion  string `protobuf:"bytes,14,opt,name=image_version,json=imageVersion,proto3" json:"image_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -504,6 +506,13 @@ func (x *OperatorPlacement) GetHedged() bool {
 		return x.Hedged
 	}
 	return false
+}
+
+func (x *OperatorPlacement) GetImageVersion() string {
+	if x != nil {
+		return x.ImageVersion
+	}
+	return ""
 }
 
 type FindPlacementRequest struct {
@@ -1746,8 +1755,12 @@ type ProviderStatus struct {
 	PolledAt    *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=polled_at,json=polledAt,proto3" json:"polled_at,omitempty"`
 	// Sandboxes on the account that no known deployment owns, at the last count
 	ForeignSandboxes uint32 `protobuf:"varint,13,opt,name=foreign_sandboxes,json=foreignSandboxes,proto3" json:"foreign_sandboxes,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// The base image version the provider's creates start from, empty for its own image
+	ImageVersion string `protobuf:"bytes,14,opt,name=image_version,json=imageVersion,proto3" json:"image_version,omitempty"`
+	// False when images.accept keeps the provider out of placements
+	ImageAccepted bool `protobuf:"varint,15,opt,name=image_accepted,json=imageAccepted,proto3" json:"image_accepted,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ProviderStatus) Reset() {
@@ -1871,6 +1884,180 @@ func (x *ProviderStatus) GetForeignSandboxes() uint32 {
 	return 0
 }
 
+func (x *ProviderStatus) GetImageVersion() string {
+	if x != nil {
+		return x.ImageVersion
+	}
+	return ""
+}
+
+func (x *ProviderStatus) GetImageAccepted() bool {
+	if x != nil {
+		return x.ImageAccepted
+	}
+	return false
+}
+
+type ListImageUseRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Empty for every provider
+	Provider      string `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListImageUseRequest) Reset() {
+	*x = ListImageUseRequest{}
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListImageUseRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListImageUseRequest) ProtoMessage() {}
+
+func (x *ListImageUseRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListImageUseRequest.ProtoReflect.Descriptor instead.
+func (*ListImageUseRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ListImageUseRequest) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+type ImageUse struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Provider string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
+	// Empty for sandboxes on the provider's own image
+	ImageVersion string `protobuf:"bytes,2,opt,name=image_version,json=imageVersion,proto3" json:"image_version,omitempty"`
+	// Placements ready or terminating on this version
+	LivePlacements uint32 `protobuf:"varint,3,opt,name=live_placements,json=livePlacements,proto3" json:"live_placements,omitempty"`
+	// The last time a placement on this version became ready
+	LastReadyAt   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=last_ready_at,json=lastReadyAt,proto3" json:"last_ready_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ImageUse) Reset() {
+	*x = ImageUse{}
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImageUse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImageUse) ProtoMessage() {}
+
+func (x *ImageUse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImageUse.ProtoReflect.Descriptor instead.
+func (*ImageUse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *ImageUse) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *ImageUse) GetImageVersion() string {
+	if x != nil {
+		return x.ImageVersion
+	}
+	return ""
+}
+
+func (x *ImageUse) GetLivePlacements() uint32 {
+	if x != nil {
+		return x.LivePlacements
+	}
+	return 0
+}
+
+func (x *ImageUse) GetLastReadyAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastReadyAt
+	}
+	return nil
+}
+
+type ListImageUseResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Uses          []*ImageUse            `protobuf:"bytes,1,rep,name=uses,proto3" json:"uses,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListImageUseResponse) Reset() {
+	*x = ListImageUseResponse{}
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListImageUseResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListImageUseResponse) ProtoMessage() {}
+
+func (x *ListImageUseResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListImageUseResponse.ProtoReflect.Descriptor instead.
+func (*ListImageUseResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *ListImageUseResponse) GetUses() []*ImageUse {
+	if x != nil {
+		return x.Uses
+	}
+	return nil
+}
+
 type ListProvidersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1879,7 +2066,7 @@ type ListProvidersRequest struct {
 
 func (x *ListProvidersRequest) Reset() {
 	*x = ListProvidersRequest{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[23]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1891,7 +2078,7 @@ func (x *ListProvidersRequest) String() string {
 func (*ListProvidersRequest) ProtoMessage() {}
 
 func (x *ListProvidersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[23]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1904,7 +2091,7 @@ func (x *ListProvidersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProvidersRequest.ProtoReflect.Descriptor instead.
 func (*ListProvidersRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{23}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{26}
 }
 
 type ListProvidersResponse struct {
@@ -1916,7 +2103,7 @@ type ListProvidersResponse struct {
 
 func (x *ListProvidersResponse) Reset() {
 	*x = ListProvidersResponse{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[24]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1928,7 +2115,7 @@ func (x *ListProvidersResponse) String() string {
 func (*ListProvidersResponse) ProtoMessage() {}
 
 func (x *ListProvidersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[24]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1941,7 +2128,7 @@ func (x *ListProvidersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProvidersResponse.ProtoReflect.Descriptor instead.
 func (*ListProvidersResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{24}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ListProvidersResponse) GetProviders() []*ProviderStatus {
@@ -1971,7 +2158,7 @@ type StartBenchRequest struct {
 
 func (x *StartBenchRequest) Reset() {
 	*x = StartBenchRequest{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[25]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1983,7 +2170,7 @@ func (x *StartBenchRequest) String() string {
 func (*StartBenchRequest) ProtoMessage() {}
 
 func (x *StartBenchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[25]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1996,7 +2183,7 @@ func (x *StartBenchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartBenchRequest.ProtoReflect.Descriptor instead.
 func (*StartBenchRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{25}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *StartBenchRequest) GetProvider() string {
@@ -2058,7 +2245,7 @@ type StartBenchResponse struct {
 
 func (x *StartBenchResponse) Reset() {
 	*x = StartBenchResponse{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[26]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2070,7 +2257,7 @@ func (x *StartBenchResponse) String() string {
 func (*StartBenchResponse) ProtoMessage() {}
 
 func (x *StartBenchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[26]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2083,7 +2270,7 @@ func (x *StartBenchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartBenchResponse.ProtoReflect.Descriptor instead.
 func (*StartBenchResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{26}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *StartBenchResponse) GetBenchId() string {
@@ -2112,7 +2299,7 @@ type StepStats struct {
 
 func (x *StepStats) Reset() {
 	*x = StepStats{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[27]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2124,7 +2311,7 @@ func (x *StepStats) String() string {
 func (*StepStats) ProtoMessage() {}
 
 func (x *StepStats) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[27]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2137,7 +2324,7 @@ func (x *StepStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StepStats.ProtoReflect.Descriptor instead.
 func (*StepStats) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{27}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *StepStats) GetSamples() uint32 {
@@ -2208,7 +2395,7 @@ type StartReport struct {
 
 func (x *StartReport) Reset() {
 	*x = StartReport{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[28]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2220,7 +2407,7 @@ func (x *StartReport) String() string {
 func (*StartReport) ProtoMessage() {}
 
 func (x *StartReport) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[28]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2233,7 +2420,7 @@ func (x *StartReport) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartReport.ProtoReflect.Descriptor instead.
 func (*StartReport) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{28}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *StartReport) GetProvider() string {
@@ -2425,7 +2612,7 @@ type ReportStartsRequest struct {
 
 func (x *ReportStartsRequest) Reset() {
 	*x = ReportStartsRequest{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[29]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2437,7 +2624,7 @@ func (x *ReportStartsRequest) String() string {
 func (*ReportStartsRequest) ProtoMessage() {}
 
 func (x *ReportStartsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[29]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2450,7 +2637,7 @@ func (x *ReportStartsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportStartsRequest.ProtoReflect.Descriptor instead.
 func (*ReportStartsRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{29}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *ReportStartsRequest) GetWindow() isReportStartsRequest_Window {
@@ -2527,7 +2714,7 @@ type ReportStartsResponse struct {
 
 func (x *ReportStartsResponse) Reset() {
 	*x = ReportStartsResponse{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[30]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2539,7 +2726,7 @@ func (x *ReportStartsResponse) String() string {
 func (*ReportStartsResponse) ProtoMessage() {}
 
 func (x *ReportStartsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[30]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2552,7 +2739,7 @@ func (x *ReportStartsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportStartsResponse.ProtoReflect.Descriptor instead.
 func (*ReportStartsResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{30}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ReportStartsResponse) GetReports() []*StartReport {
@@ -2578,7 +2765,7 @@ type GetEstimateRequest struct {
 
 func (x *GetEstimateRequest) Reset() {
 	*x = GetEstimateRequest{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[31]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2590,7 +2777,7 @@ func (x *GetEstimateRequest) String() string {
 func (*GetEstimateRequest) ProtoMessage() {}
 
 func (x *GetEstimateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[31]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2603,7 +2790,7 @@ func (x *GetEstimateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetEstimateRequest.ProtoReflect.Descriptor instead.
 func (*GetEstimateRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{31}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *GetEstimateRequest) GetEstimateId() string {
@@ -2631,7 +2818,7 @@ type GetEstimateResponse struct {
 
 func (x *GetEstimateResponse) Reset() {
 	*x = GetEstimateResponse{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[32]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2643,7 +2830,7 @@ func (x *GetEstimateResponse) String() string {
 func (*GetEstimateResponse) ProtoMessage() {}
 
 func (x *GetEstimateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[32]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2656,7 +2843,7 @@ func (x *GetEstimateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetEstimateResponse.ProtoReflect.Descriptor instead.
 func (*GetEstimateResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{32}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *GetEstimateResponse) GetEstimateId() string {
@@ -2717,7 +2904,7 @@ type GetSessionHoldRequest struct {
 
 func (x *GetSessionHoldRequest) Reset() {
 	*x = GetSessionHoldRequest{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[33]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2729,7 +2916,7 @@ func (x *GetSessionHoldRequest) String() string {
 func (*GetSessionHoldRequest) ProtoMessage() {}
 
 func (x *GetSessionHoldRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[33]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2742,7 +2929,7 @@ func (x *GetSessionHoldRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSessionHoldRequest.ProtoReflect.Descriptor instead.
 func (*GetSessionHoldRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{33}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *GetSessionHoldRequest) GetPlacementId() string {
@@ -2765,7 +2952,7 @@ type GetSessionHoldResponse struct {
 
 func (x *GetSessionHoldResponse) Reset() {
 	*x = GetSessionHoldResponse{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[34]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2777,7 +2964,7 @@ func (x *GetSessionHoldResponse) String() string {
 func (*GetSessionHoldResponse) ProtoMessage() {}
 
 func (x *GetSessionHoldResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[34]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2790,7 +2977,7 @@ func (x *GetSessionHoldResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSessionHoldResponse.ProtoReflect.Descriptor instead.
 func (*GetSessionHoldResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{34}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *GetSessionHoldResponse) GetRecordJson() []byte {
@@ -2846,7 +3033,7 @@ type PoolStatus struct {
 
 func (x *PoolStatus) Reset() {
 	*x = PoolStatus{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[35]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2858,7 +3045,7 @@ func (x *PoolStatus) String() string {
 func (*PoolStatus) ProtoMessage() {}
 
 func (x *PoolStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[35]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2871,7 +3058,7 @@ func (x *PoolStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PoolStatus.ProtoReflect.Descriptor instead.
 func (*PoolStatus) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{35}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *PoolStatus) GetProvider() string {
@@ -3001,7 +3188,7 @@ type ListPoolsRequest struct {
 
 func (x *ListPoolsRequest) Reset() {
 	*x = ListPoolsRequest{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[36]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3013,7 +3200,7 @@ func (x *ListPoolsRequest) String() string {
 func (*ListPoolsRequest) ProtoMessage() {}
 
 func (x *ListPoolsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[36]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3026,7 +3213,7 @@ func (x *ListPoolsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPoolsRequest.ProtoReflect.Descriptor instead.
 func (*ListPoolsRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{36}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{39}
 }
 
 type ListPoolsResponse struct {
@@ -3038,7 +3225,7 @@ type ListPoolsResponse struct {
 
 func (x *ListPoolsResponse) Reset() {
 	*x = ListPoolsResponse{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[37]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3050,7 +3237,7 @@ func (x *ListPoolsResponse) String() string {
 func (*ListPoolsResponse) ProtoMessage() {}
 
 func (x *ListPoolsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[37]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3063,7 +3250,7 @@ func (x *ListPoolsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPoolsResponse.ProtoReflect.Descriptor instead.
 func (*ListPoolsResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{37}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *ListPoolsResponse) GetPools() []*PoolStatus {
@@ -3086,7 +3273,7 @@ type DrainPoolRequest struct {
 
 func (x *DrainPoolRequest) Reset() {
 	*x = DrainPoolRequest{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[38]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3098,7 +3285,7 @@ func (x *DrainPoolRequest) String() string {
 func (*DrainPoolRequest) ProtoMessage() {}
 
 func (x *DrainPoolRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[38]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3111,7 +3298,7 @@ func (x *DrainPoolRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DrainPoolRequest.ProtoReflect.Descriptor instead.
 func (*DrainPoolRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{38}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *DrainPoolRequest) GetProvider() string {
@@ -3152,7 +3339,7 @@ type DrainPoolResponse struct {
 
 func (x *DrainPoolResponse) Reset() {
 	*x = DrainPoolResponse{}
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[39]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3164,7 +3351,7 @@ func (x *DrainPoolResponse) String() string {
 func (*DrainPoolResponse) ProtoMessage() {}
 
 func (x *DrainPoolResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_operator_proto_msgTypes[39]
+	mi := &file_bugnet_router_v1_operator_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3177,7 +3364,7 @@ func (x *DrainPoolResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DrainPoolResponse.ProtoReflect.Descriptor instead.
 func (*DrainPoolResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{39}
+	return file_bugnet_router_v1_operator_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *DrainPoolResponse) GetRetired() uint32 {
@@ -3202,7 +3389,7 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"preview_id\x18\x02 \x01(\tH\x00R\tpreviewId\x12\x1c\n" +
 	"\btransfer\x18\x03 \x01(\tH\x00R\btransfer\x12N\n" +
 	"\x10provider_sandbox\x18\x04 \x01(\v2!.bugnet.router.v1.ProviderSandboxH\x00R\x0fproviderSandboxB\b\n" +
-	"\x06target\"\x90\x04\n" +
+	"\x06target\"\xb5\x04\n" +
 	"\x11OperatorPlacement\x12!\n" +
 	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\x126\n" +
 	"\x05state\x18\x02 \x01(\x0e2 .bugnet.router.v1.PlacementStateR\x05state\x12\x1a\n" +
@@ -3220,7 +3407,8 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\x12termination_reason\x18\v \x01(\tR\x11terminationReason\x12\x1d\n" +
 	"\n" +
 	"start_path\x18\f \x01(\tR\tstartPath\x12\x16\n" +
-	"\x06hedged\x18\r \x01(\bR\x06hedged\"Q\n" +
+	"\x06hedged\x18\r \x01(\bR\x06hedged\x12#\n" +
+	"\rimage_version\x18\x0e \x01(\tR\fimageVersion\"Q\n" +
 	"\x14FindPlacementRequest\x129\n" +
 	"\x06target\x18\x01 \x01(\v2!.bugnet.router.v1.PlacementTargetR\x06target\"Z\n" +
 	"\x15FindPlacementResponse\x12A\n" +
@@ -3313,7 +3501,7 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\x05limit\x18\x04 \x01(\rR\x05limit\x12\x1b\n" +
 	"\theld_only\x18\x05 \x01(\bR\bheldOnly\"I\n" +
 	"\x13ListSignalsResponse\x122\n" +
-	"\asignals\x18\x01 \x03(\v2\x18.bugnet.router.v1.SignalR\asignals\"\xf4\x03\n" +
+	"\asignals\x18\x01 \x03(\v2\x18.bugnet.router.v1.SignalR\asignals\"\xc0\x04\n" +
 	"\x0eProviderStatus\x12\x1a\n" +
 	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x14\n" +
 	"\x05state\x18\x02 \x01(\tR\x05state\x12\x18\n" +
@@ -3330,7 +3518,18 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	" \x01(\rR\rexternalInUse\x12!\n" +
 	"\flimit_source\x18\v \x01(\tR\vlimitSource\x127\n" +
 	"\tpolled_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\bpolledAt\x12+\n" +
-	"\x11foreign_sandboxes\x18\r \x01(\rR\x10foreignSandboxes\"\x16\n" +
+	"\x11foreign_sandboxes\x18\r \x01(\rR\x10foreignSandboxes\x12#\n" +
+	"\rimage_version\x18\x0e \x01(\tR\fimageVersion\x12%\n" +
+	"\x0eimage_accepted\x18\x0f \x01(\bR\rimageAccepted\"1\n" +
+	"\x13ListImageUseRequest\x12\x1a\n" +
+	"\bprovider\x18\x01 \x01(\tR\bprovider\"\xb4\x01\n" +
+	"\bImageUse\x12\x1a\n" +
+	"\bprovider\x18\x01 \x01(\tR\bprovider\x12#\n" +
+	"\rimage_version\x18\x02 \x01(\tR\fimageVersion\x12'\n" +
+	"\x0flive_placements\x18\x03 \x01(\rR\x0elivePlacements\x12>\n" +
+	"\rlast_ready_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\vlastReadyAt\"F\n" +
+	"\x14ListImageUseResponse\x12.\n" +
+	"\x04uses\x18\x01 \x03(\v2\x1a.bugnet.router.v1.ImageUseR\x04uses\"\x16\n" +
 	"\x14ListProvidersRequest\"W\n" +
 	"\x15ListProvidersResponse\x12>\n" +
 	"\tproviders\x18\x01 \x03(\v2 .bugnet.router.v1.ProviderStatusR\tproviders\"\xeb\x01\n" +
@@ -3462,7 +3661,7 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\x12SAMPLE_KIND_CANARY\x10\x02\x12\x15\n" +
 	"\x11SAMPLE_KIND_BENCH\x10\x03\x12\x14\n" +
 	"\x10SAMPLE_KIND_POOL\x10\x04\x12\x17\n" +
-	"\x13SAMPLE_KIND_RESERVE\x10\x052\x87\v\n" +
+	"\x13SAMPLE_KIND_RESERVE\x10\x052\xe6\v\n" +
 	"\x0fOperatorService\x12Z\n" +
 	"\vBlockWallet\x12$.bugnet.router.v1.BlockWalletRequest\x1a%.bugnet.router.v1.BlockWalletResponse\x12`\n" +
 	"\rUnblockWallet\x12&.bugnet.router.v1.UnblockWalletRequest\x1a'.bugnet.router.v1.UnblockWalletResponse\x12T\n" +
@@ -3479,7 +3678,8 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\vGetEstimate\x12$.bugnet.router.v1.GetEstimateRequest\x1a%.bugnet.router.v1.GetEstimateResponse\x12c\n" +
 	"\x0eGetSessionHold\x12'.bugnet.router.v1.GetSessionHoldRequest\x1a(.bugnet.router.v1.GetSessionHoldResponse\x12T\n" +
 	"\tListPools\x12\".bugnet.router.v1.ListPoolsRequest\x1a#.bugnet.router.v1.ListPoolsResponse\x12T\n" +
-	"\tDrainPool\x12\".bugnet.router.v1.DrainPoolRequest\x1a#.bugnet.router.v1.DrainPoolResponseBDZBgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
+	"\tDrainPool\x12\".bugnet.router.v1.DrainPoolRequest\x1a#.bugnet.router.v1.DrainPoolResponse\x12]\n" +
+	"\fListImageUse\x12%.bugnet.router.v1.ListImageUseRequest\x1a&.bugnet.router.v1.ListImageUseResponseBDZBgithub.com/bugnet-sh/bugnet-proto/gen/go/bugnet/router/v1;routerv1b\x06proto3"
 
 var (
 	file_bugnet_router_v1_operator_proto_rawDescOnce sync.Once
@@ -3494,7 +3694,7 @@ func file_bugnet_router_v1_operator_proto_rawDescGZIP() []byte {
 }
 
 var file_bugnet_router_v1_operator_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_bugnet_router_v1_operator_proto_msgTypes = make([]protoimpl.MessageInfo, 41)
+var file_bugnet_router_v1_operator_proto_msgTypes = make([]protoimpl.MessageInfo, 44)
 var file_bugnet_router_v1_operator_proto_goTypes = []any{
 	(OperatorEndReason)(0),         // 0: bugnet.router.v1.OperatorEndReason
 	(SignalClass)(0),               // 1: bugnet.router.v1.SignalClass
@@ -3522,44 +3722,47 @@ var file_bugnet_router_v1_operator_proto_goTypes = []any{
 	(*ListSignalsRequest)(nil),     // 23: bugnet.router.v1.ListSignalsRequest
 	(*ListSignalsResponse)(nil),    // 24: bugnet.router.v1.ListSignalsResponse
 	(*ProviderStatus)(nil),         // 25: bugnet.router.v1.ProviderStatus
-	(*ListProvidersRequest)(nil),   // 26: bugnet.router.v1.ListProvidersRequest
-	(*ListProvidersResponse)(nil),  // 27: bugnet.router.v1.ListProvidersResponse
-	(*StartBenchRequest)(nil),      // 28: bugnet.router.v1.StartBenchRequest
-	(*StartBenchResponse)(nil),     // 29: bugnet.router.v1.StartBenchResponse
-	(*StepStats)(nil),              // 30: bugnet.router.v1.StepStats
-	(*StartReport)(nil),            // 31: bugnet.router.v1.StartReport
-	(*ReportStartsRequest)(nil),    // 32: bugnet.router.v1.ReportStartsRequest
-	(*ReportStartsResponse)(nil),   // 33: bugnet.router.v1.ReportStartsResponse
-	(*GetEstimateRequest)(nil),     // 34: bugnet.router.v1.GetEstimateRequest
-	(*GetEstimateResponse)(nil),    // 35: bugnet.router.v1.GetEstimateResponse
-	(*GetSessionHoldRequest)(nil),  // 36: bugnet.router.v1.GetSessionHoldRequest
-	(*GetSessionHoldResponse)(nil), // 37: bugnet.router.v1.GetSessionHoldResponse
-	(*PoolStatus)(nil),             // 38: bugnet.router.v1.PoolStatus
-	(*ListPoolsRequest)(nil),       // 39: bugnet.router.v1.ListPoolsRequest
-	(*ListPoolsResponse)(nil),      // 40: bugnet.router.v1.ListPoolsResponse
-	(*DrainPoolRequest)(nil),       // 41: bugnet.router.v1.DrainPoolRequest
-	(*DrainPoolResponse)(nil),      // 42: bugnet.router.v1.DrainPoolResponse
-	nil,                            // 43: bugnet.router.v1.StartReport.ErrorsEntry
-	(PlacementState)(0),            // 44: bugnet.router.v1.PlacementState
-	(*timestamppb.Timestamp)(nil),  // 45: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),    // 46: google.protobuf.Duration
+	(*ListImageUseRequest)(nil),    // 26: bugnet.router.v1.ListImageUseRequest
+	(*ImageUse)(nil),               // 27: bugnet.router.v1.ImageUse
+	(*ListImageUseResponse)(nil),   // 28: bugnet.router.v1.ListImageUseResponse
+	(*ListProvidersRequest)(nil),   // 29: bugnet.router.v1.ListProvidersRequest
+	(*ListProvidersResponse)(nil),  // 30: bugnet.router.v1.ListProvidersResponse
+	(*StartBenchRequest)(nil),      // 31: bugnet.router.v1.StartBenchRequest
+	(*StartBenchResponse)(nil),     // 32: bugnet.router.v1.StartBenchResponse
+	(*StepStats)(nil),              // 33: bugnet.router.v1.StepStats
+	(*StartReport)(nil),            // 34: bugnet.router.v1.StartReport
+	(*ReportStartsRequest)(nil),    // 35: bugnet.router.v1.ReportStartsRequest
+	(*ReportStartsResponse)(nil),   // 36: bugnet.router.v1.ReportStartsResponse
+	(*GetEstimateRequest)(nil),     // 37: bugnet.router.v1.GetEstimateRequest
+	(*GetEstimateResponse)(nil),    // 38: bugnet.router.v1.GetEstimateResponse
+	(*GetSessionHoldRequest)(nil),  // 39: bugnet.router.v1.GetSessionHoldRequest
+	(*GetSessionHoldResponse)(nil), // 40: bugnet.router.v1.GetSessionHoldResponse
+	(*PoolStatus)(nil),             // 41: bugnet.router.v1.PoolStatus
+	(*ListPoolsRequest)(nil),       // 42: bugnet.router.v1.ListPoolsRequest
+	(*ListPoolsResponse)(nil),      // 43: bugnet.router.v1.ListPoolsResponse
+	(*DrainPoolRequest)(nil),       // 44: bugnet.router.v1.DrainPoolRequest
+	(*DrainPoolResponse)(nil),      // 45: bugnet.router.v1.DrainPoolResponse
+	nil,                            // 46: bugnet.router.v1.StartReport.ErrorsEntry
+	(PlacementState)(0),            // 47: bugnet.router.v1.PlacementState
+	(*timestamppb.Timestamp)(nil),  // 48: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),    // 49: google.protobuf.Duration
 }
 var file_bugnet_router_v1_operator_proto_depIdxs = []int32{
 	3,  // 0: bugnet.router.v1.PlacementTarget.provider_sandbox:type_name -> bugnet.router.v1.ProviderSandbox
-	44, // 1: bugnet.router.v1.OperatorPlacement.state:type_name -> bugnet.router.v1.PlacementState
-	45, // 2: bugnet.router.v1.OperatorPlacement.created_at:type_name -> google.protobuf.Timestamp
-	45, // 3: bugnet.router.v1.OperatorPlacement.deadline:type_name -> google.protobuf.Timestamp
+	47, // 1: bugnet.router.v1.OperatorPlacement.state:type_name -> bugnet.router.v1.PlacementState
+	48, // 2: bugnet.router.v1.OperatorPlacement.created_at:type_name -> google.protobuf.Timestamp
+	48, // 3: bugnet.router.v1.OperatorPlacement.deadline:type_name -> google.protobuf.Timestamp
 	4,  // 4: bugnet.router.v1.FindPlacementRequest.target:type_name -> bugnet.router.v1.PlacementTarget
 	5,  // 5: bugnet.router.v1.FindPlacementResponse.placement:type_name -> bugnet.router.v1.OperatorPlacement
 	4,  // 6: bugnet.router.v1.EndPlacementRequest.target:type_name -> bugnet.router.v1.PlacementTarget
 	0,  // 7: bugnet.router.v1.EndPlacementRequest.reason:type_name -> bugnet.router.v1.OperatorEndReason
 	5,  // 8: bugnet.router.v1.EndPlacementResponse.placement:type_name -> bugnet.router.v1.OperatorPlacement
-	45, // 9: bugnet.router.v1.Wallet.first_seen:type_name -> google.protobuf.Timestamp
-	45, // 10: bugnet.router.v1.Wallet.last_seen:type_name -> google.protobuf.Timestamp
-	45, // 11: bugnet.router.v1.Wallet.blocked_at:type_name -> google.protobuf.Timestamp
-	45, // 12: bugnet.router.v1.Wallet.blocked_until:type_name -> google.protobuf.Timestamp
-	45, // 13: bugnet.router.v1.WalletEvent.created_at:type_name -> google.protobuf.Timestamp
-	45, // 14: bugnet.router.v1.BlockWalletRequest.until:type_name -> google.protobuf.Timestamp
+	48, // 9: bugnet.router.v1.Wallet.first_seen:type_name -> google.protobuf.Timestamp
+	48, // 10: bugnet.router.v1.Wallet.last_seen:type_name -> google.protobuf.Timestamp
+	48, // 11: bugnet.router.v1.Wallet.blocked_at:type_name -> google.protobuf.Timestamp
+	48, // 12: bugnet.router.v1.Wallet.blocked_until:type_name -> google.protobuf.Timestamp
+	48, // 13: bugnet.router.v1.WalletEvent.created_at:type_name -> google.protobuf.Timestamp
+	48, // 14: bugnet.router.v1.BlockWalletRequest.until:type_name -> google.protobuf.Timestamp
 	12, // 15: bugnet.router.v1.BlockWalletResponse.wallet:type_name -> bugnet.router.v1.Wallet
 	12, // 16: bugnet.router.v1.UnblockWalletResponse.wallet:type_name -> bugnet.router.v1.Wallet
 	12, // 17: bugnet.router.v1.GetWalletResponse.wallet:type_name -> bugnet.router.v1.Wallet
@@ -3567,71 +3770,75 @@ var file_bugnet_router_v1_operator_proto_depIdxs = []int32{
 	13, // 19: bugnet.router.v1.GetWalletResponse.events:type_name -> bugnet.router.v1.WalletEvent
 	12, // 20: bugnet.router.v1.ListWalletsResponse.wallets:type_name -> bugnet.router.v1.Wallet
 	1,  // 21: bugnet.router.v1.Signal.signal_class:type_name -> bugnet.router.v1.SignalClass
-	45, // 22: bugnet.router.v1.Signal.created_at:type_name -> google.protobuf.Timestamp
-	45, // 23: bugnet.router.v1.ListSignalsRequest.since:type_name -> google.protobuf.Timestamp
+	48, // 22: bugnet.router.v1.Signal.created_at:type_name -> google.protobuf.Timestamp
+	48, // 23: bugnet.router.v1.ListSignalsRequest.since:type_name -> google.protobuf.Timestamp
 	1,  // 24: bugnet.router.v1.ListSignalsRequest.signal_class:type_name -> bugnet.router.v1.SignalClass
 	22, // 25: bugnet.router.v1.ListSignalsResponse.signals:type_name -> bugnet.router.v1.Signal
-	45, // 26: bugnet.router.v1.ProviderStatus.state_since:type_name -> google.protobuf.Timestamp
-	45, // 27: bugnet.router.v1.ProviderStatus.polled_at:type_name -> google.protobuf.Timestamp
-	25, // 28: bugnet.router.v1.ListProvidersResponse.providers:type_name -> bugnet.router.v1.ProviderStatus
-	2,  // 29: bugnet.router.v1.StartReport.kind:type_name -> bugnet.router.v1.SampleKind
-	30, // 30: bugnet.router.v1.StartReport.create:type_name -> bugnet.router.v1.StepStats
-	30, // 31: bugnet.router.v1.StartReport.ready:type_name -> bugnet.router.v1.StepStats
-	30, // 32: bugnet.router.v1.StartReport.runner:type_name -> bugnet.router.v1.StepStats
-	30, // 33: bugnet.router.v1.StartReport.gate:type_name -> bugnet.router.v1.StepStats
-	30, // 34: bugnet.router.v1.StartReport.first_command:type_name -> bugnet.router.v1.StepStats
-	30, // 35: bugnet.router.v1.StartReport.warm_command:type_name -> bugnet.router.v1.StepStats
-	30, // 36: bugnet.router.v1.StartReport.destroy:type_name -> bugnet.router.v1.StepStats
-	30, // 37: bugnet.router.v1.StartReport.total:type_name -> bugnet.router.v1.StepStats
-	43, // 38: bugnet.router.v1.StartReport.errors:type_name -> bugnet.router.v1.StartReport.ErrorsEntry
-	30, // 39: bugnet.router.v1.StartReport.bind:type_name -> bugnet.router.v1.StepStats
-	30, // 40: bugnet.router.v1.StartReport.paid_to_ready:type_name -> bugnet.router.v1.StepStats
-	30, // 41: bugnet.router.v1.StartReport.first_frame:type_name -> bugnet.router.v1.StepStats
-	30, // 42: bugnet.router.v1.StartReport.paid_to_first_frame:type_name -> bugnet.router.v1.StepStats
-	30, // 43: bugnet.router.v1.StartReport.wake:type_name -> bugnet.router.v1.StepStats
-	45, // 44: bugnet.router.v1.ReportStartsRequest.since:type_name -> google.protobuf.Timestamp
-	2,  // 45: bugnet.router.v1.ReportStartsRequest.kinds:type_name -> bugnet.router.v1.SampleKind
-	31, // 46: bugnet.router.v1.ReportStartsResponse.reports:type_name -> bugnet.router.v1.StartReport
-	45, // 47: bugnet.router.v1.GetEstimateResponse.created_at:type_name -> google.protobuf.Timestamp
-	45, // 48: bugnet.router.v1.GetSessionHoldResponse.hold_until:type_name -> google.protobuf.Timestamp
-	45, // 49: bugnet.router.v1.PoolStatus.paused_until:type_name -> google.protobuf.Timestamp
-	38, // 50: bugnet.router.v1.ListPoolsResponse.pools:type_name -> bugnet.router.v1.PoolStatus
-	46, // 51: bugnet.router.v1.DrainPoolRequest.pause_for:type_name -> google.protobuf.Duration
-	14, // 52: bugnet.router.v1.OperatorService.BlockWallet:input_type -> bugnet.router.v1.BlockWalletRequest
-	16, // 53: bugnet.router.v1.OperatorService.UnblockWallet:input_type -> bugnet.router.v1.UnblockWalletRequest
-	18, // 54: bugnet.router.v1.OperatorService.GetWallet:input_type -> bugnet.router.v1.GetWalletRequest
-	20, // 55: bugnet.router.v1.OperatorService.ListWallets:input_type -> bugnet.router.v1.ListWalletsRequest
-	6,  // 56: bugnet.router.v1.OperatorService.FindPlacement:input_type -> bugnet.router.v1.FindPlacementRequest
-	8,  // 57: bugnet.router.v1.OperatorService.EndPlacement:input_type -> bugnet.router.v1.EndPlacementRequest
-	10, // 58: bugnet.router.v1.OperatorService.RevokePreview:input_type -> bugnet.router.v1.RevokePreviewRequest
-	23, // 59: bugnet.router.v1.OperatorService.ListSignals:input_type -> bugnet.router.v1.ListSignalsRequest
-	26, // 60: bugnet.router.v1.OperatorService.ListProviders:input_type -> bugnet.router.v1.ListProvidersRequest
-	28, // 61: bugnet.router.v1.OperatorService.StartBench:input_type -> bugnet.router.v1.StartBenchRequest
-	32, // 62: bugnet.router.v1.OperatorService.ReportStarts:input_type -> bugnet.router.v1.ReportStartsRequest
-	34, // 63: bugnet.router.v1.OperatorService.GetEstimate:input_type -> bugnet.router.v1.GetEstimateRequest
-	36, // 64: bugnet.router.v1.OperatorService.GetSessionHold:input_type -> bugnet.router.v1.GetSessionHoldRequest
-	39, // 65: bugnet.router.v1.OperatorService.ListPools:input_type -> bugnet.router.v1.ListPoolsRequest
-	41, // 66: bugnet.router.v1.OperatorService.DrainPool:input_type -> bugnet.router.v1.DrainPoolRequest
-	15, // 67: bugnet.router.v1.OperatorService.BlockWallet:output_type -> bugnet.router.v1.BlockWalletResponse
-	17, // 68: bugnet.router.v1.OperatorService.UnblockWallet:output_type -> bugnet.router.v1.UnblockWalletResponse
-	19, // 69: bugnet.router.v1.OperatorService.GetWallet:output_type -> bugnet.router.v1.GetWalletResponse
-	21, // 70: bugnet.router.v1.OperatorService.ListWallets:output_type -> bugnet.router.v1.ListWalletsResponse
-	7,  // 71: bugnet.router.v1.OperatorService.FindPlacement:output_type -> bugnet.router.v1.FindPlacementResponse
-	9,  // 72: bugnet.router.v1.OperatorService.EndPlacement:output_type -> bugnet.router.v1.EndPlacementResponse
-	11, // 73: bugnet.router.v1.OperatorService.RevokePreview:output_type -> bugnet.router.v1.RevokePreviewResponse
-	24, // 74: bugnet.router.v1.OperatorService.ListSignals:output_type -> bugnet.router.v1.ListSignalsResponse
-	27, // 75: bugnet.router.v1.OperatorService.ListProviders:output_type -> bugnet.router.v1.ListProvidersResponse
-	29, // 76: bugnet.router.v1.OperatorService.StartBench:output_type -> bugnet.router.v1.StartBenchResponse
-	33, // 77: bugnet.router.v1.OperatorService.ReportStarts:output_type -> bugnet.router.v1.ReportStartsResponse
-	35, // 78: bugnet.router.v1.OperatorService.GetEstimate:output_type -> bugnet.router.v1.GetEstimateResponse
-	37, // 79: bugnet.router.v1.OperatorService.GetSessionHold:output_type -> bugnet.router.v1.GetSessionHoldResponse
-	40, // 80: bugnet.router.v1.OperatorService.ListPools:output_type -> bugnet.router.v1.ListPoolsResponse
-	42, // 81: bugnet.router.v1.OperatorService.DrainPool:output_type -> bugnet.router.v1.DrainPoolResponse
-	67, // [67:82] is the sub-list for method output_type
-	52, // [52:67] is the sub-list for method input_type
-	52, // [52:52] is the sub-list for extension type_name
-	52, // [52:52] is the sub-list for extension extendee
-	0,  // [0:52] is the sub-list for field type_name
+	48, // 26: bugnet.router.v1.ProviderStatus.state_since:type_name -> google.protobuf.Timestamp
+	48, // 27: bugnet.router.v1.ProviderStatus.polled_at:type_name -> google.protobuf.Timestamp
+	48, // 28: bugnet.router.v1.ImageUse.last_ready_at:type_name -> google.protobuf.Timestamp
+	27, // 29: bugnet.router.v1.ListImageUseResponse.uses:type_name -> bugnet.router.v1.ImageUse
+	25, // 30: bugnet.router.v1.ListProvidersResponse.providers:type_name -> bugnet.router.v1.ProviderStatus
+	2,  // 31: bugnet.router.v1.StartReport.kind:type_name -> bugnet.router.v1.SampleKind
+	33, // 32: bugnet.router.v1.StartReport.create:type_name -> bugnet.router.v1.StepStats
+	33, // 33: bugnet.router.v1.StartReport.ready:type_name -> bugnet.router.v1.StepStats
+	33, // 34: bugnet.router.v1.StartReport.runner:type_name -> bugnet.router.v1.StepStats
+	33, // 35: bugnet.router.v1.StartReport.gate:type_name -> bugnet.router.v1.StepStats
+	33, // 36: bugnet.router.v1.StartReport.first_command:type_name -> bugnet.router.v1.StepStats
+	33, // 37: bugnet.router.v1.StartReport.warm_command:type_name -> bugnet.router.v1.StepStats
+	33, // 38: bugnet.router.v1.StartReport.destroy:type_name -> bugnet.router.v1.StepStats
+	33, // 39: bugnet.router.v1.StartReport.total:type_name -> bugnet.router.v1.StepStats
+	46, // 40: bugnet.router.v1.StartReport.errors:type_name -> bugnet.router.v1.StartReport.ErrorsEntry
+	33, // 41: bugnet.router.v1.StartReport.bind:type_name -> bugnet.router.v1.StepStats
+	33, // 42: bugnet.router.v1.StartReport.paid_to_ready:type_name -> bugnet.router.v1.StepStats
+	33, // 43: bugnet.router.v1.StartReport.first_frame:type_name -> bugnet.router.v1.StepStats
+	33, // 44: bugnet.router.v1.StartReport.paid_to_first_frame:type_name -> bugnet.router.v1.StepStats
+	33, // 45: bugnet.router.v1.StartReport.wake:type_name -> bugnet.router.v1.StepStats
+	48, // 46: bugnet.router.v1.ReportStartsRequest.since:type_name -> google.protobuf.Timestamp
+	2,  // 47: bugnet.router.v1.ReportStartsRequest.kinds:type_name -> bugnet.router.v1.SampleKind
+	34, // 48: bugnet.router.v1.ReportStartsResponse.reports:type_name -> bugnet.router.v1.StartReport
+	48, // 49: bugnet.router.v1.GetEstimateResponse.created_at:type_name -> google.protobuf.Timestamp
+	48, // 50: bugnet.router.v1.GetSessionHoldResponse.hold_until:type_name -> google.protobuf.Timestamp
+	48, // 51: bugnet.router.v1.PoolStatus.paused_until:type_name -> google.protobuf.Timestamp
+	41, // 52: bugnet.router.v1.ListPoolsResponse.pools:type_name -> bugnet.router.v1.PoolStatus
+	49, // 53: bugnet.router.v1.DrainPoolRequest.pause_for:type_name -> google.protobuf.Duration
+	14, // 54: bugnet.router.v1.OperatorService.BlockWallet:input_type -> bugnet.router.v1.BlockWalletRequest
+	16, // 55: bugnet.router.v1.OperatorService.UnblockWallet:input_type -> bugnet.router.v1.UnblockWalletRequest
+	18, // 56: bugnet.router.v1.OperatorService.GetWallet:input_type -> bugnet.router.v1.GetWalletRequest
+	20, // 57: bugnet.router.v1.OperatorService.ListWallets:input_type -> bugnet.router.v1.ListWalletsRequest
+	6,  // 58: bugnet.router.v1.OperatorService.FindPlacement:input_type -> bugnet.router.v1.FindPlacementRequest
+	8,  // 59: bugnet.router.v1.OperatorService.EndPlacement:input_type -> bugnet.router.v1.EndPlacementRequest
+	10, // 60: bugnet.router.v1.OperatorService.RevokePreview:input_type -> bugnet.router.v1.RevokePreviewRequest
+	23, // 61: bugnet.router.v1.OperatorService.ListSignals:input_type -> bugnet.router.v1.ListSignalsRequest
+	29, // 62: bugnet.router.v1.OperatorService.ListProviders:input_type -> bugnet.router.v1.ListProvidersRequest
+	31, // 63: bugnet.router.v1.OperatorService.StartBench:input_type -> bugnet.router.v1.StartBenchRequest
+	35, // 64: bugnet.router.v1.OperatorService.ReportStarts:input_type -> bugnet.router.v1.ReportStartsRequest
+	37, // 65: bugnet.router.v1.OperatorService.GetEstimate:input_type -> bugnet.router.v1.GetEstimateRequest
+	39, // 66: bugnet.router.v1.OperatorService.GetSessionHold:input_type -> bugnet.router.v1.GetSessionHoldRequest
+	42, // 67: bugnet.router.v1.OperatorService.ListPools:input_type -> bugnet.router.v1.ListPoolsRequest
+	44, // 68: bugnet.router.v1.OperatorService.DrainPool:input_type -> bugnet.router.v1.DrainPoolRequest
+	26, // 69: bugnet.router.v1.OperatorService.ListImageUse:input_type -> bugnet.router.v1.ListImageUseRequest
+	15, // 70: bugnet.router.v1.OperatorService.BlockWallet:output_type -> bugnet.router.v1.BlockWalletResponse
+	17, // 71: bugnet.router.v1.OperatorService.UnblockWallet:output_type -> bugnet.router.v1.UnblockWalletResponse
+	19, // 72: bugnet.router.v1.OperatorService.GetWallet:output_type -> bugnet.router.v1.GetWalletResponse
+	21, // 73: bugnet.router.v1.OperatorService.ListWallets:output_type -> bugnet.router.v1.ListWalletsResponse
+	7,  // 74: bugnet.router.v1.OperatorService.FindPlacement:output_type -> bugnet.router.v1.FindPlacementResponse
+	9,  // 75: bugnet.router.v1.OperatorService.EndPlacement:output_type -> bugnet.router.v1.EndPlacementResponse
+	11, // 76: bugnet.router.v1.OperatorService.RevokePreview:output_type -> bugnet.router.v1.RevokePreviewResponse
+	24, // 77: bugnet.router.v1.OperatorService.ListSignals:output_type -> bugnet.router.v1.ListSignalsResponse
+	30, // 78: bugnet.router.v1.OperatorService.ListProviders:output_type -> bugnet.router.v1.ListProvidersResponse
+	32, // 79: bugnet.router.v1.OperatorService.StartBench:output_type -> bugnet.router.v1.StartBenchResponse
+	36, // 80: bugnet.router.v1.OperatorService.ReportStarts:output_type -> bugnet.router.v1.ReportStartsResponse
+	38, // 81: bugnet.router.v1.OperatorService.GetEstimate:output_type -> bugnet.router.v1.GetEstimateResponse
+	40, // 82: bugnet.router.v1.OperatorService.GetSessionHold:output_type -> bugnet.router.v1.GetSessionHoldResponse
+	43, // 83: bugnet.router.v1.OperatorService.ListPools:output_type -> bugnet.router.v1.ListPoolsResponse
+	45, // 84: bugnet.router.v1.OperatorService.DrainPool:output_type -> bugnet.router.v1.DrainPoolResponse
+	28, // 85: bugnet.router.v1.OperatorService.ListImageUse:output_type -> bugnet.router.v1.ListImageUseResponse
+	70, // [70:86] is the sub-list for method output_type
+	54, // [54:70] is the sub-list for method input_type
+	54, // [54:54] is the sub-list for extension type_name
+	54, // [54:54] is the sub-list for extension extendee
+	0,  // [0:54] is the sub-list for field type_name
 }
 
 func init() { file_bugnet_router_v1_operator_proto_init() }
@@ -3646,7 +3853,7 @@ func file_bugnet_router_v1_operator_proto_init() {
 		(*PlacementTarget_Transfer)(nil),
 		(*PlacementTarget_ProviderSandbox)(nil),
 	}
-	file_bugnet_router_v1_operator_proto_msgTypes[29].OneofWrappers = []any{
+	file_bugnet_router_v1_operator_proto_msgTypes[32].OneofWrappers = []any{
 		(*ReportStartsRequest_BenchId)(nil),
 		(*ReportStartsRequest_Since)(nil),
 	}
@@ -3656,7 +3863,7 @@ func file_bugnet_router_v1_operator_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bugnet_router_v1_operator_proto_rawDesc), len(file_bugnet_router_v1_operator_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   41,
+			NumMessages:   44,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

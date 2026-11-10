@@ -461,6 +461,40 @@ export declare type PricePackageResponse = Message<"bugnet.router.v1.PricePackag
 export declare const PricePackageResponseSchema: GenMessage<PricePackageResponse>;
 
 /**
+ * The Bugnet base image a sandbox started from
+ *
+ * @generated from message bugnet.router.v1.SandboxImage
+ */
+export declare type SandboxImage = Message<"bugnet.router.v1.SandboxImage"> & {
+  /**
+   * Such as 2026.11.1, empty when the sandbox runs the provider's own image
+   *
+   * @generated from field: string version = 1;
+   */
+  version: string;
+
+  /**
+   * Such as ubuntu-24.04, empty when unknown
+   *
+   * @generated from field: string os = 2;
+   */
+  os: string;
+
+  /**
+   * A tool's major and minor version, or none, as the image build measured it
+   *
+   * @generated from field: map<string, string> tools = 3;
+   */
+  tools: { [key: string]: string };
+};
+
+/**
+ * Describes the message bugnet.router.v1.SandboxImage.
+ * Use `create(SandboxImageSchema)` to create a new message.
+ */
+export declare const SandboxImageSchema: GenMessage<SandboxImage>;
+
+/**
  * @generated from message bugnet.router.v1.Placement
  */
 export declare type Placement = Message<"bugnet.router.v1.Placement"> & {
@@ -524,6 +558,13 @@ export declare type Placement = Message<"bugnet.router.v1.Placement"> & {
    * @generated from field: bugnet.router.v1.Bootstrap bootstrap = 11;
    */
   bootstrap?: Bootstrap | undefined;
+
+  /**
+   * Set once the sandbox is ready
+   *
+   * @generated from field: bugnet.router.v1.SandboxImage image = 12;
+   */
+  image?: SandboxImage | undefined;
 
   /**
    * When the placement became terminated or failed, unset before

@@ -791,3 +791,22 @@ func TestPoolStatusRoundTrips(t *testing.T) {
 		PauseFor: durationpb.New(time.Hour)}
 	eq(t, proto.Equal(roundTrip(t, drain), drain), true)
 }
+
+func TestSandboxImageRoundTrips(t *testing.T) {
+	in := &routerv1.Placement{Image: &routerv1.SandboxImage{Version: "2026.11.1",
+		Os: "ubuntu-24.04", Tools: map[string]string{"node": "24.11", "docker": "none"}}}
+	eq(t, proto.Equal(roundTrip(t, in), in), true)
+	eq(t, roundTrip(t, &routerv1.OperatorPlacement{ImageVersion: "2026.11.1"}).ImageVersion,
+		"2026.11.1")
+	st := &routerv1.ProviderStatus{ImageVersion: "2026.11.1", ImageAccepted: true}
+	eq(t, proto.Equal(roundTrip(t, st), st), true)
+}
+
+func TestListImageUseProcedure(t *testing.T) {
+	eq(t, routerv1connect.OperatorServiceListImageUseProcedure,
+		"/bugnet.router.v1.OperatorService/ListImageUse")
+	in := &routerv1.ListImageUseResponse{Uses: []*routerv1.ImageUse{{Provider: "e2b",
+		ImageVersion: "2026.11.1", LivePlacements: 3,
+		LastReadyAt: timestamppb.New(time.Unix(1700000000, 0))}}}
+	eq(t, proto.Equal(roundTrip(t, in), in), true)
+}

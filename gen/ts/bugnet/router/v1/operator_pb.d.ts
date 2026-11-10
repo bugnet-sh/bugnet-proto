@@ -157,6 +157,13 @@ export declare type OperatorPlacement = Message<"bugnet.router.v1.OperatorPlacem
    * @generated from field: bool hedged = 13;
    */
   hedged: boolean;
+
+  /**
+   * Empty when the sandbox runs the provider's own image
+   *
+   * @generated from field: string image_version = 14;
+   */
+  imageVersion: string;
 };
 
 /**
@@ -821,6 +828,20 @@ export declare type ProviderStatus = Message<"bugnet.router.v1.ProviderStatus"> 
    * @generated from field: uint32 foreign_sandboxes = 13;
    */
   foreignSandboxes: number;
+
+  /**
+   * The base image version the provider's creates start from, empty for its own image
+   *
+   * @generated from field: string image_version = 14;
+   */
+  imageVersion: string;
+
+  /**
+   * False when images.accept keeps the provider out of placements
+   *
+   * @generated from field: bool image_accepted = 15;
+   */
+  imageAccepted: boolean;
 };
 
 /**
@@ -828,6 +849,77 @@ export declare type ProviderStatus = Message<"bugnet.router.v1.ProviderStatus"> 
  * Use `create(ProviderStatusSchema)` to create a new message.
  */
 export declare const ProviderStatusSchema: GenMessage<ProviderStatus>;
+
+/**
+ * @generated from message bugnet.router.v1.ListImageUseRequest
+ */
+export declare type ListImageUseRequest = Message<"bugnet.router.v1.ListImageUseRequest"> & {
+  /**
+   * Empty for every provider
+   *
+   * @generated from field: string provider = 1;
+   */
+  provider: string;
+};
+
+/**
+ * Describes the message bugnet.router.v1.ListImageUseRequest.
+ * Use `create(ListImageUseRequestSchema)` to create a new message.
+ */
+export declare const ListImageUseRequestSchema: GenMessage<ListImageUseRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.ImageUse
+ */
+export declare type ImageUse = Message<"bugnet.router.v1.ImageUse"> & {
+  /**
+   * @generated from field: string provider = 1;
+   */
+  provider: string;
+
+  /**
+   * Empty for sandboxes on the provider's own image
+   *
+   * @generated from field: string image_version = 2;
+   */
+  imageVersion: string;
+
+  /**
+   * Placements ready or terminating on this version
+   *
+   * @generated from field: uint32 live_placements = 3;
+   */
+  livePlacements: number;
+
+  /**
+   * The last time a placement on this version became ready
+   *
+   * @generated from field: google.protobuf.Timestamp last_ready_at = 4;
+   */
+  lastReadyAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message bugnet.router.v1.ImageUse.
+ * Use `create(ImageUseSchema)` to create a new message.
+ */
+export declare const ImageUseSchema: GenMessage<ImageUse>;
+
+/**
+ * @generated from message bugnet.router.v1.ListImageUseResponse
+ */
+export declare type ListImageUseResponse = Message<"bugnet.router.v1.ListImageUseResponse"> & {
+  /**
+   * @generated from field: repeated bugnet.router.v1.ImageUse uses = 1;
+   */
+  uses: ImageUse[];
+};
+
+/**
+ * Describes the message bugnet.router.v1.ListImageUseResponse.
+ * Use `create(ListImageUseResponseSchema)` to create a new message.
+ */
+export declare const ListImageUseResponseSchema: GenMessage<ListImageUseResponse>;
 
 /**
  * @generated from message bugnet.router.v1.ListProvidersRequest
@@ -1735,6 +1827,16 @@ export declare const OperatorService: GenService<{
     methodKind: "unary";
     input: typeof DrainPoolRequestSchema;
     output: typeof DrainPoolResponseSchema;
+  },
+  /**
+   * Live placements by provider and base image version, so an old artifact is retired safely
+   *
+   * @generated from rpc bugnet.router.v1.OperatorService.ListImageUse
+   */
+  listImageUse: {
+    methodKind: "unary";
+    input: typeof ListImageUseRequestSchema;
+    output: typeof ListImageUseResponseSchema;
   },
 }>;
 

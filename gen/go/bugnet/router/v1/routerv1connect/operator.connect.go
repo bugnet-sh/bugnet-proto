@@ -78,6 +78,9 @@ const (
 	// OperatorServiceDrainPoolProcedure is the fully-qualified name of the OperatorService's DrainPool
 	// RPC.
 	OperatorServiceDrainPoolProcedure = "/bugnet.router.v1.OperatorService/DrainPool"
+	// OperatorServiceListImageUseProcedure is the fully-qualified name of the OperatorService's
+	// ListImageUse RPC.
+	OperatorServiceListImageUseProcedure = "/bugnet.router.v1.OperatorService/ListImageUse"
 )
 
 // OperatorServiceClient is a client for the bugnet.router.v1.OperatorService service.
@@ -100,6 +103,8 @@ type OperatorServiceClient interface {
 	ListPools(context.Context, *connect.Request[v1.ListPoolsRequest]) (*connect.Response[v1.ListPoolsResponse], error)
 	// Retires every warm member of one pool, and can pause its refill
 	DrainPool(context.Context, *connect.Request[v1.DrainPoolRequest]) (*connect.Response[v1.DrainPoolResponse], error)
+	// Live placements by provider and base image version, so an old artifact is retired safely
+	ListImageUse(context.Context, *connect.Request[v1.ListImageUseRequest]) (*connect.Response[v1.ListImageUseResponse], error)
 }
 
 // NewOperatorServiceClient constructs a client for the bugnet.router.v1.OperatorService service. By
@@ -203,6 +208,12 @@ func NewOperatorServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(operatorServiceMethods.ByName("DrainPool")),
 			connect.WithClientOptions(opts...),
 		),
+		listImageUse: connect.NewClient[v1.ListImageUseRequest, v1.ListImageUseResponse](
+			httpClient,
+			baseURL+OperatorServiceListImageUseProcedure,
+			connect.WithSchema(operatorServiceMethods.ByName("ListImageUse")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -223,6 +234,7 @@ type operatorServiceClient struct {
 	getSessionHold *connect.Client[v1.GetSessionHoldRequest, v1.GetSessionHoldResponse]
 	listPools      *connect.Client[v1.ListPoolsRequest, v1.ListPoolsResponse]
 	drainPool      *connect.Client[v1.DrainPoolRequest, v1.DrainPoolResponse]
+	listImageUse   *connect.Client[v1.ListImageUseRequest, v1.ListImageUseResponse]
 }
 
 // BlockWallet calls bugnet.router.v1.OperatorService.BlockWallet.
@@ -300,6 +312,11 @@ func (c *operatorServiceClient) DrainPool(ctx context.Context, req *connect.Requ
 	return c.drainPool.CallUnary(ctx, req)
 }
 
+// ListImageUse calls bugnet.router.v1.OperatorService.ListImageUse.
+func (c *operatorServiceClient) ListImageUse(ctx context.Context, req *connect.Request[v1.ListImageUseRequest]) (*connect.Response[v1.ListImageUseResponse], error) {
+	return c.listImageUse.CallUnary(ctx, req)
+}
+
 // OperatorServiceHandler is an implementation of the bugnet.router.v1.OperatorService service.
 type OperatorServiceHandler interface {
 	BlockWallet(context.Context, *connect.Request[v1.BlockWalletRequest]) (*connect.Response[v1.BlockWalletResponse], error)
@@ -320,6 +337,8 @@ type OperatorServiceHandler interface {
 	ListPools(context.Context, *connect.Request[v1.ListPoolsRequest]) (*connect.Response[v1.ListPoolsResponse], error)
 	// Retires every warm member of one pool, and can pause its refill
 	DrainPool(context.Context, *connect.Request[v1.DrainPoolRequest]) (*connect.Response[v1.DrainPoolResponse], error)
+	// Live placements by provider and base image version, so an old artifact is retired safely
+	ListImageUse(context.Context, *connect.Request[v1.ListImageUseRequest]) (*connect.Response[v1.ListImageUseResponse], error)
 }
 
 // NewOperatorServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -419,6 +438,12 @@ func NewOperatorServiceHandler(svc OperatorServiceHandler, opts ...connect.Handl
 		connect.WithSchema(operatorServiceMethods.ByName("DrainPool")),
 		connect.WithHandlerOptions(opts...),
 	)
+	operatorServiceListImageUseHandler := connect.NewUnaryHandler(
+		OperatorServiceListImageUseProcedure,
+		svc.ListImageUse,
+		connect.WithSchema(operatorServiceMethods.ByName("ListImageUse")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/bugnet.router.v1.OperatorService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case OperatorServiceBlockWalletProcedure:
@@ -451,6 +476,8 @@ func NewOperatorServiceHandler(svc OperatorServiceHandler, opts ...connect.Handl
 			operatorServiceListPoolsHandler.ServeHTTP(w, r)
 		case OperatorServiceDrainPoolProcedure:
 			operatorServiceDrainPoolHandler.ServeHTTP(w, r)
+		case OperatorServiceListImageUseProcedure:
+			operatorServiceListImageUseHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -518,4 +545,8 @@ func (UnimplementedOperatorServiceHandler) ListPools(context.Context, *connect.R
 
 func (UnimplementedOperatorServiceHandler) DrainPool(context.Context, *connect.Request[v1.DrainPoolRequest]) (*connect.Response[v1.DrainPoolResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.OperatorService.DrainPool is not implemented"))
+}
+
+func (UnimplementedOperatorServiceHandler) ListImageUse(context.Context, *connect.Request[v1.ListImageUseRequest]) (*connect.Response[v1.ListImageUseResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bugnet.router.v1.OperatorService.ListImageUse is not implemented"))
 }
