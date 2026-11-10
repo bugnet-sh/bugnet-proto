@@ -164,6 +164,13 @@ export declare type OperatorPlacement = Message<"bugnet.router.v1.OperatorPlacem
    * @generated from field: string image_version = 14;
    */
   imageVersion: string;
+
+  /**
+   * The order trace id, 32 lowercase hex characters derived from the handle's SHA-256
+   *
+   * @generated from field: string order_trace_id = 100;
+   */
+  orderTraceId: string;
 };
 
 /**

@@ -72,6 +72,8 @@ message OperatorPlacement {
   bool hedged = 13;
   // Empty when the sandbox runs the provider's own image
   string image_version = 14;
+  // The order trace id, 32 lowercase hex characters derived from the handle's SHA-256
+  string order_trace_id = 100;
 }
 
 message FindPlacementRequest {

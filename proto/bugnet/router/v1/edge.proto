@@ -187,6 +187,8 @@ message ResolvePreviewResponse {
   // The repository or model the sandbox runs, when known
   string source_label = 8;
   google.protobuf.Timestamp started_at = 9;
+  // W3C traceparent of the router's span for this call, in the order's trace, empty when off
+  string order_traceparent = 100;
 }
 
 message RepairPreviewRequest {
@@ -229,6 +231,8 @@ message OpenTransferResponse {
   EdgeBudget budget = 10;
   // A download's SHA-256 from mint when it set want_sha256, empty otherwise
   bytes sha256 = 11;
+  // W3C traceparent of the router's span for this call, in the order's trace, empty when off
+  string order_traceparent = 100;
 }
 
 message ReadTransferRequest {
@@ -465,6 +469,8 @@ message AuthorizeSshKeyResponse {
   google.protobuf.Timestamp deadline = 3;
   uint32 max_sessions = 4;
   uint32 max_forwards = 5;
+  // W3C traceparent of the router's span for this call, in the order's trace, empty when off
+  string order_traceparent = 100;
 }
 
 message AcquireSshConnectionRequest {
@@ -589,6 +595,8 @@ message ResolveTunnelResponse {
   TunnelSourceCheck source_check = 10;
   // The placement's x402 services, caps and unpaid use
   X402Config x402 = 11;
+  // W3C traceparent of the router's span for this call, in the order's trace, empty when off
+  string order_traceparent = 100;
 }
 
 /* x402 */

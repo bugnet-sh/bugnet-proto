@@ -382,7 +382,9 @@ type OperatorPlacement struct {
 	// A second attempt ran beside the first
 	Hedged bool `protobuf:"varint,13,opt,name=hedged,proto3" json:"hedged,omitempty"`
 	// Empty when the sandbox runs the provider's own image
-	ImageVersion  string `protobuf:"bytes,14,opt,name=image_version,json=imageVersion,proto3" json:"image_version,omitempty"`
+	ImageVersion string `protobuf:"bytes,14,opt,name=image_version,json=imageVersion,proto3" json:"image_version,omitempty"`
+	// The order trace id, 32 lowercase hex characters derived from the handle's SHA-256
+	OrderTraceId  string `protobuf:"bytes,100,opt,name=order_trace_id,json=orderTraceId,proto3" json:"order_trace_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -511,6 +513,13 @@ func (x *OperatorPlacement) GetHedged() bool {
 func (x *OperatorPlacement) GetImageVersion() string {
 	if x != nil {
 		return x.ImageVersion
+	}
+	return ""
+}
+
+func (x *OperatorPlacement) GetOrderTraceId() string {
+	if x != nil {
+		return x.OrderTraceId
 	}
 	return ""
 }
@@ -3389,7 +3398,7 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"preview_id\x18\x02 \x01(\tH\x00R\tpreviewId\x12\x1c\n" +
 	"\btransfer\x18\x03 \x01(\tH\x00R\btransfer\x12N\n" +
 	"\x10provider_sandbox\x18\x04 \x01(\v2!.bugnet.router.v1.ProviderSandboxH\x00R\x0fproviderSandboxB\b\n" +
-	"\x06target\"\xb5\x04\n" +
+	"\x06target\"\xdb\x04\n" +
 	"\x11OperatorPlacement\x12!\n" +
 	"\fplacement_id\x18\x01 \x01(\tR\vplacementId\x126\n" +
 	"\x05state\x18\x02 \x01(\x0e2 .bugnet.router.v1.PlacementStateR\x05state\x12\x1a\n" +
@@ -3408,7 +3417,8 @@ const file_bugnet_router_v1_operator_proto_rawDesc = "" +
 	"\n" +
 	"start_path\x18\f \x01(\tR\tstartPath\x12\x16\n" +
 	"\x06hedged\x18\r \x01(\bR\x06hedged\x12#\n" +
-	"\rimage_version\x18\x0e \x01(\tR\fimageVersion\"Q\n" +
+	"\rimage_version\x18\x0e \x01(\tR\fimageVersion\x12$\n" +
+	"\x0eorder_trace_id\x18d \x01(\tR\forderTraceId\"Q\n" +
 	"\x14FindPlacementRequest\x129\n" +
 	"\x06target\x18\x01 \x01(\v2!.bugnet.router.v1.PlacementTargetR\x06target\"Z\n" +
 	"\x15FindPlacementResponse\x12A\n" +
