@@ -626,6 +626,13 @@ export declare type ReadTransferRequest = Message<"bugnet.router.v1.ReadTransfer
    * @generated from field: uint64 length = 4;
    */
   length: bigint;
+
+  /**
+   * The router keeps the claim after a read that reaches the end, until EndTransfer
+   *
+   * @generated from field: bool hold_end = 5;
+   */
+  holdEnd: boolean;
 };
 
 /**
@@ -716,6 +723,46 @@ export declare type WriteTransferResponse = Message<"bugnet.router.v1.WriteTrans
  * Use `create(WriteTransferResponseSchema)` to create a new message.
  */
 export declare const WriteTransferResponseSchema: GenMessage<WriteTransferResponse>;
+
+/**
+ * @generated from message bugnet.router.v1.EndTransferRequest
+ */
+export declare type EndTransferRequest = Message<"bugnet.router.v1.EndTransferRequest"> & {
+  /**
+   * @generated from field: string transfer_id = 1;
+   */
+  transferId: string;
+
+  /**
+   * @generated from field: string lease = 2;
+   */
+  lease: string;
+
+  /**
+   * The edge flushed every byte to the client
+   *
+   * @generated from field: bool delivered = 3;
+   */
+  delivered: boolean;
+};
+
+/**
+ * Describes the message bugnet.router.v1.EndTransferRequest.
+ * Use `create(EndTransferRequestSchema)` to create a new message.
+ */
+export declare const EndTransferRequestSchema: GenMessage<EndTransferRequest>;
+
+/**
+ * @generated from message bugnet.router.v1.EndTransferResponse
+ */
+export declare type EndTransferResponse = Message<"bugnet.router.v1.EndTransferResponse"> & {
+};
+
+/**
+ * Describes the message bugnet.router.v1.EndTransferResponse.
+ * Use `create(EndTransferResponseSchema)` to create a new message.
+ */
+export declare const EndTransferResponseSchema: GenMessage<EndTransferResponse>;
 
 /**
  * @generated from message bugnet.router.v1.GetSecretLinkRequest
@@ -2605,6 +2652,14 @@ export declare const EdgeService: GenService<{
     methodKind: "client_streaming";
     input: typeof WriteTransferRequestSchema;
     output: typeof WriteTransferResponseSchema;
+  },
+  /**
+   * @generated from rpc bugnet.router.v1.EdgeService.EndTransfer
+   */
+  endTransfer: {
+    methodKind: "unary";
+    input: typeof EndTransferRequestSchema;
+    output: typeof EndTransferResponseSchema;
   },
   /**
    * @generated from rpc bugnet.router.v1.EdgeService.DeliverHook

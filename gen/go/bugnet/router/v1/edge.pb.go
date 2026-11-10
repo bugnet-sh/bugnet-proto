@@ -1456,7 +1456,9 @@ type ReadTransferRequest struct {
 	Lease      string                 `protobuf:"bytes,2,opt,name=lease,proto3" json:"lease,omitempty"`
 	Offset     uint64                 `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
 	// 0 reads to the size at open
-	Length        uint64 `protobuf:"varint,4,opt,name=length,proto3" json:"length,omitempty"`
+	Length uint64 `protobuf:"varint,4,opt,name=length,proto3" json:"length,omitempty"`
+	// The router keeps the claim after a read that reaches the end, until EndTransfer
+	HoldEnd       bool `protobuf:"varint,5,opt,name=hold_end,json=holdEnd,proto3" json:"hold_end,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1517,6 +1519,13 @@ func (x *ReadTransferRequest) GetLength() uint64 {
 		return x.Length
 	}
 	return 0
+}
+
+func (x *ReadTransferRequest) GetHoldEnd() bool {
+	if x != nil {
+		return x.HoldEnd
+	}
+	return false
 }
 
 type ReadTransferResponse struct {
@@ -1696,6 +1705,103 @@ func (x *WriteTransferResponse) GetSha256() []byte {
 	return nil
 }
 
+type EndTransferRequest struct {
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	TransferId string                 `protobuf:"bytes,1,opt,name=transfer_id,json=transferId,proto3" json:"transfer_id,omitempty"`
+	Lease      string                 `protobuf:"bytes,2,opt,name=lease,proto3" json:"lease,omitempty"`
+	// The edge flushed every byte to the client
+	Delivered     bool `protobuf:"varint,3,opt,name=delivered,proto3" json:"delivered,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EndTransferRequest) Reset() {
+	*x = EndTransferRequest{}
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EndTransferRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EndTransferRequest) ProtoMessage() {}
+
+func (x *EndTransferRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EndTransferRequest.ProtoReflect.Descriptor instead.
+func (*EndTransferRequest) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *EndTransferRequest) GetTransferId() string {
+	if x != nil {
+		return x.TransferId
+	}
+	return ""
+}
+
+func (x *EndTransferRequest) GetLease() string {
+	if x != nil {
+		return x.Lease
+	}
+	return ""
+}
+
+func (x *EndTransferRequest) GetDelivered() bool {
+	if x != nil {
+		return x.Delivered
+	}
+	return false
+}
+
+type EndTransferResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EndTransferResponse) Reset() {
+	*x = EndTransferResponse{}
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EndTransferResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EndTransferResponse) ProtoMessage() {}
+
+func (x *EndTransferResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EndTransferResponse.ProtoReflect.Descriptor instead.
+func (*EndTransferResponse) Descriptor() ([]byte, []int) {
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{23}
+}
+
 type GetSecretLinkRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	LinkToken     string                 `protobuf:"bytes,1,opt,name=link_token,json=linkToken,proto3" json:"link_token,omitempty"`
@@ -1705,7 +1811,7 @@ type GetSecretLinkRequest struct {
 
 func (x *GetSecretLinkRequest) Reset() {
 	*x = GetSecretLinkRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[22]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1717,7 +1823,7 @@ func (x *GetSecretLinkRequest) String() string {
 func (*GetSecretLinkRequest) ProtoMessage() {}
 
 func (x *GetSecretLinkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[22]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1730,7 +1836,7 @@ func (x *GetSecretLinkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSecretLinkRequest.ProtoReflect.Descriptor instead.
 func (*GetSecretLinkRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{22}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GetSecretLinkRequest) GetLinkToken() string {
@@ -1756,7 +1862,7 @@ type GetSecretLinkResponse struct {
 
 func (x *GetSecretLinkResponse) Reset() {
 	*x = GetSecretLinkResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[23]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1768,7 +1874,7 @@ func (x *GetSecretLinkResponse) String() string {
 func (*GetSecretLinkResponse) ProtoMessage() {}
 
 func (x *GetSecretLinkResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[23]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1781,7 +1887,7 @@ func (x *GetSecretLinkResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSecretLinkResponse.ProtoReflect.Descriptor instead.
 func (*GetSecretLinkResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{23}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GetSecretLinkResponse) GetPairingCode() string {
@@ -1840,7 +1946,7 @@ type SubmitSecretLinkRequest struct {
 
 func (x *SubmitSecretLinkRequest) Reset() {
 	*x = SubmitSecretLinkRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[24]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1852,7 +1958,7 @@ func (x *SubmitSecretLinkRequest) String() string {
 func (*SubmitSecretLinkRequest) ProtoMessage() {}
 
 func (x *SubmitSecretLinkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[24]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1865,7 +1971,7 @@ func (x *SubmitSecretLinkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitSecretLinkRequest.ProtoReflect.Descriptor instead.
 func (*SubmitSecretLinkRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{24}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *SubmitSecretLinkRequest) GetLinkToken() string {
@@ -1912,7 +2018,7 @@ type SubmitSecretLinkResponse struct {
 
 func (x *SubmitSecretLinkResponse) Reset() {
 	*x = SubmitSecretLinkResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[25]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1924,7 +2030,7 @@ func (x *SubmitSecretLinkResponse) String() string {
 func (*SubmitSecretLinkResponse) ProtoMessage() {}
 
 func (x *SubmitSecretLinkResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[25]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1937,7 +2043,7 @@ func (x *SubmitSecretLinkResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitSecretLinkResponse.ProtoReflect.Descriptor instead.
 func (*SubmitSecretLinkResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{25}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *SubmitSecretLinkResponse) GetSecret() *SecretInfo {
@@ -1959,7 +2065,7 @@ type GetBridgeSealingKeyRequest struct {
 
 func (x *GetBridgeSealingKeyRequest) Reset() {
 	*x = GetBridgeSealingKeyRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[26]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1971,7 +2077,7 @@ func (x *GetBridgeSealingKeyRequest) String() string {
 func (*GetBridgeSealingKeyRequest) ProtoMessage() {}
 
 func (x *GetBridgeSealingKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[26]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1984,7 +2090,7 @@ func (x *GetBridgeSealingKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBridgeSealingKeyRequest.ProtoReflect.Descriptor instead.
 func (*GetBridgeSealingKeyRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{26}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *GetBridgeSealingKeyRequest) GetPutGrant() string {
@@ -2010,7 +2116,7 @@ type GetBridgeSealingKeyResponse struct {
 
 func (x *GetBridgeSealingKeyResponse) Reset() {
 	*x = GetBridgeSealingKeyResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[27]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2022,7 +2128,7 @@ func (x *GetBridgeSealingKeyResponse) String() string {
 func (*GetBridgeSealingKeyResponse) ProtoMessage() {}
 
 func (x *GetBridgeSealingKeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[27]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2035,7 +2141,7 @@ func (x *GetBridgeSealingKeyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBridgeSealingKeyResponse.ProtoReflect.Descriptor instead.
 func (*GetBridgeSealingKeyResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{27}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *GetBridgeSealingKeyResponse) GetSealingKeys() []*SealingKey {
@@ -2059,7 +2165,7 @@ type PutBridgeSecretRequest struct {
 
 func (x *PutBridgeSecretRequest) Reset() {
 	*x = PutBridgeSecretRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[28]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2071,7 +2177,7 @@ func (x *PutBridgeSecretRequest) String() string {
 func (*PutBridgeSecretRequest) ProtoMessage() {}
 
 func (x *PutBridgeSecretRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[28]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2084,7 +2190,7 @@ func (x *PutBridgeSecretRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PutBridgeSecretRequest.ProtoReflect.Descriptor instead.
 func (*PutBridgeSecretRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{28}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *PutBridgeSecretRequest) GetPutGrant() string {
@@ -2132,7 +2238,7 @@ type PutBridgeSecretResponse struct {
 
 func (x *PutBridgeSecretResponse) Reset() {
 	*x = PutBridgeSecretResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[29]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2144,7 +2250,7 @@ func (x *PutBridgeSecretResponse) String() string {
 func (*PutBridgeSecretResponse) ProtoMessage() {}
 
 func (x *PutBridgeSecretResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[29]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2157,7 +2263,7 @@ func (x *PutBridgeSecretResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PutBridgeSecretResponse.ProtoReflect.Descriptor instead.
 func (*PutBridgeSecretResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{29}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *PutBridgeSecretResponse) GetSecret() *SecretInfo {
@@ -2189,7 +2295,7 @@ type DeliverHookRequest struct {
 
 func (x *DeliverHookRequest) Reset() {
 	*x = DeliverHookRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[30]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2201,7 +2307,7 @@ func (x *DeliverHookRequest) String() string {
 func (*DeliverHookRequest) ProtoMessage() {}
 
 func (x *DeliverHookRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[30]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2214,7 +2320,7 @@ func (x *DeliverHookRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeliverHookRequest.ProtoReflect.Descriptor instead.
 func (*DeliverHookRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{30}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *DeliverHookRequest) GetProvider() string {
@@ -2255,7 +2361,7 @@ type DeliverHookResponse struct {
 
 func (x *DeliverHookResponse) Reset() {
 	*x = DeliverHookResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[31]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2267,7 +2373,7 @@ func (x *DeliverHookResponse) String() string {
 func (*DeliverHookResponse) ProtoMessage() {}
 
 func (x *DeliverHookResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[31]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2280,7 +2386,7 @@ func (x *DeliverHookResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeliverHookResponse.ProtoReflect.Descriptor instead.
 func (*DeliverHookResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{31}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *DeliverHookResponse) GetStatus() uint32 {
@@ -2300,7 +2406,7 @@ type ReportEdgeUsageRequest struct {
 
 func (x *ReportEdgeUsageRequest) Reset() {
 	*x = ReportEdgeUsageRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[32]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2312,7 +2418,7 @@ func (x *ReportEdgeUsageRequest) String() string {
 func (*ReportEdgeUsageRequest) ProtoMessage() {}
 
 func (x *ReportEdgeUsageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[32]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2325,7 +2431,7 @@ func (x *ReportEdgeUsageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportEdgeUsageRequest.ProtoReflect.Descriptor instead.
 func (*ReportEdgeUsageRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{32}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *ReportEdgeUsageRequest) GetReporterId() string {
@@ -2354,7 +2460,7 @@ type ReportEdgeUsageResponse struct {
 
 func (x *ReportEdgeUsageResponse) Reset() {
 	*x = ReportEdgeUsageResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[33]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2366,7 +2472,7 @@ func (x *ReportEdgeUsageResponse) String() string {
 func (*ReportEdgeUsageResponse) ProtoMessage() {}
 
 func (x *ReportEdgeUsageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[33]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2379,7 +2485,7 @@ func (x *ReportEdgeUsageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportEdgeUsageResponse.ProtoReflect.Descriptor instead.
 func (*ReportEdgeUsageResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{33}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *ReportEdgeUsageResponse) GetBytesRemaining() map[string]uint64 {
@@ -2406,7 +2512,7 @@ type ReportSshUsageRequest struct {
 
 func (x *ReportSshUsageRequest) Reset() {
 	*x = ReportSshUsageRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[34]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2418,7 +2524,7 @@ func (x *ReportSshUsageRequest) String() string {
 func (*ReportSshUsageRequest) ProtoMessage() {}
 
 func (x *ReportSshUsageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[34]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2431,7 +2537,7 @@ func (x *ReportSshUsageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportSshUsageRequest.ProtoReflect.Descriptor instead.
 func (*ReportSshUsageRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{34}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *ReportSshUsageRequest) GetReporterId() string {
@@ -2459,7 +2565,7 @@ type ReportSshUsageResponse struct {
 
 func (x *ReportSshUsageResponse) Reset() {
 	*x = ReportSshUsageResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[35]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2471,7 +2577,7 @@ func (x *ReportSshUsageResponse) String() string {
 func (*ReportSshUsageResponse) ProtoMessage() {}
 
 func (x *ReportSshUsageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[35]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2484,7 +2590,7 @@ func (x *ReportSshUsageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportSshUsageResponse.ProtoReflect.Descriptor instead.
 func (*ReportSshUsageResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{35}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ReportSshUsageResponse) GetBytesRemaining() map[string]uint64 {
@@ -2513,7 +2619,7 @@ type ReportEgressUsageRequest struct {
 
 func (x *ReportEgressUsageRequest) Reset() {
 	*x = ReportEgressUsageRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[36]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2525,7 +2631,7 @@ func (x *ReportEgressUsageRequest) String() string {
 func (*ReportEgressUsageRequest) ProtoMessage() {}
 
 func (x *ReportEgressUsageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[36]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2538,7 +2644,7 @@ func (x *ReportEgressUsageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportEgressUsageRequest.ProtoReflect.Descriptor instead.
 func (*ReportEgressUsageRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{36}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *ReportEgressUsageRequest) GetReporterId() string {
@@ -2572,7 +2678,7 @@ type ReportEgressUsageResponse struct {
 
 func (x *ReportEgressUsageResponse) Reset() {
 	*x = ReportEgressUsageResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[37]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2584,7 +2690,7 @@ func (x *ReportEgressUsageResponse) String() string {
 func (*ReportEgressUsageResponse) ProtoMessage() {}
 
 func (x *ReportEgressUsageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[37]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2597,7 +2703,7 @@ func (x *ReportEgressUsageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportEgressUsageResponse.ProtoReflect.Descriptor instead.
 func (*ReportEgressUsageResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{37}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *ReportEgressUsageResponse) GetBytesRemaining() map[string]uint64 {
@@ -2617,7 +2723,7 @@ type HeldPreview struct {
 
 func (x *HeldPreview) Reset() {
 	*x = HeldPreview{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[38]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2629,7 +2735,7 @@ func (x *HeldPreview) String() string {
 func (*HeldPreview) ProtoMessage() {}
 
 func (x *HeldPreview) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[38]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2642,7 +2748,7 @@ func (x *HeldPreview) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HeldPreview.ProtoReflect.Descriptor instead.
 func (*HeldPreview) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{38}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *HeldPreview) GetPreviewId() string {
@@ -2670,7 +2776,7 @@ type CheckEdgeLeasesRequest struct {
 
 func (x *CheckEdgeLeasesRequest) Reset() {
 	*x = CheckEdgeLeasesRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[39]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2682,7 +2788,7 @@ func (x *CheckEdgeLeasesRequest) String() string {
 func (*CheckEdgeLeasesRequest) ProtoMessage() {}
 
 func (x *CheckEdgeLeasesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[39]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2695,7 +2801,7 @@ func (x *CheckEdgeLeasesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckEdgeLeasesRequest.ProtoReflect.Descriptor instead.
 func (*CheckEdgeLeasesRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{39}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *CheckEdgeLeasesRequest) GetPlacementIds() []string {
@@ -2723,7 +2829,7 @@ type EdgeLease struct {
 
 func (x *EdgeLease) Reset() {
 	*x = EdgeLease{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[40]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2735,7 +2841,7 @@ func (x *EdgeLease) String() string {
 func (*EdgeLease) ProtoMessage() {}
 
 func (x *EdgeLease) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[40]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2748,7 +2854,7 @@ func (x *EdgeLease) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EdgeLease.ProtoReflect.Descriptor instead.
 func (*EdgeLease) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{40}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *EdgeLease) GetDeadline() *timestamppb.Timestamp {
@@ -2777,7 +2883,7 @@ type CheckEdgeLeasesResponse struct {
 
 func (x *CheckEdgeLeasesResponse) Reset() {
 	*x = CheckEdgeLeasesResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[41]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2789,7 +2895,7 @@ func (x *CheckEdgeLeasesResponse) String() string {
 func (*CheckEdgeLeasesResponse) ProtoMessage() {}
 
 func (x *CheckEdgeLeasesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[41]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2802,7 +2908,7 @@ func (x *CheckEdgeLeasesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckEdgeLeasesResponse.ProtoReflect.Descriptor instead.
 func (*CheckEdgeLeasesResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{41}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *CheckEdgeLeasesResponse) GetLeases() map[string]*EdgeLease {
@@ -2828,7 +2934,7 @@ type CheckEgressLeasesRequest struct {
 
 func (x *CheckEgressLeasesRequest) Reset() {
 	*x = CheckEgressLeasesRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[42]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2840,7 +2946,7 @@ func (x *CheckEgressLeasesRequest) String() string {
 func (*CheckEgressLeasesRequest) ProtoMessage() {}
 
 func (x *CheckEgressLeasesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[42]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2853,7 +2959,7 @@ func (x *CheckEgressLeasesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckEgressLeasesRequest.ProtoReflect.Descriptor instead.
 func (*CheckEgressLeasesRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{42}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *CheckEgressLeasesRequest) GetPlacementIds() []string {
@@ -2875,7 +2981,7 @@ type EgressLease struct {
 
 func (x *EgressLease) Reset() {
 	*x = EgressLease{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[43]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2887,7 +2993,7 @@ func (x *EgressLease) String() string {
 func (*EgressLease) ProtoMessage() {}
 
 func (x *EgressLease) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[43]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2900,7 +3006,7 @@ func (x *EgressLease) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EgressLease.ProtoReflect.Descriptor instead.
 func (*EgressLease) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{43}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *EgressLease) GetDeadline() *timestamppb.Timestamp {
@@ -2933,7 +3039,7 @@ type CheckEgressLeasesResponse struct {
 
 func (x *CheckEgressLeasesResponse) Reset() {
 	*x = CheckEgressLeasesResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[44]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2945,7 +3051,7 @@ func (x *CheckEgressLeasesResponse) String() string {
 func (*CheckEgressLeasesResponse) ProtoMessage() {}
 
 func (x *CheckEgressLeasesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[44]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2958,7 +3064,7 @@ func (x *CheckEgressLeasesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckEgressLeasesResponse.ProtoReflect.Descriptor instead.
 func (*CheckEgressLeasesResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{44}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *CheckEgressLeasesResponse) GetLeases() map[string]*EgressLease {
@@ -2978,7 +3084,7 @@ type WatchEdgeEventsRequest struct {
 
 func (x *WatchEdgeEventsRequest) Reset() {
 	*x = WatchEdgeEventsRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[45]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2990,7 +3096,7 @@ func (x *WatchEdgeEventsRequest) String() string {
 func (*WatchEdgeEventsRequest) ProtoMessage() {}
 
 func (x *WatchEdgeEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[45]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3003,7 +3109,7 @@ func (x *WatchEdgeEventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchEdgeEventsRequest.ProtoReflect.Descriptor instead.
 func (*WatchEdgeEventsRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{45}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *WatchEdgeEventsRequest) GetCursor() string {
@@ -3023,7 +3129,7 @@ type WatchEdgeEventsResponse struct {
 
 func (x *WatchEdgeEventsResponse) Reset() {
 	*x = WatchEdgeEventsResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[46]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3035,7 +3141,7 @@ func (x *WatchEdgeEventsResponse) String() string {
 func (*WatchEdgeEventsResponse) ProtoMessage() {}
 
 func (x *WatchEdgeEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[46]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3048,7 +3154,7 @@ func (x *WatchEdgeEventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchEdgeEventsResponse.ProtoReflect.Descriptor instead.
 func (*WatchEdgeEventsResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{46}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *WatchEdgeEventsResponse) GetCursor() string {
@@ -3074,7 +3180,7 @@ type WatchSshEventsRequest struct {
 
 func (x *WatchSshEventsRequest) Reset() {
 	*x = WatchSshEventsRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[47]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3086,7 +3192,7 @@ func (x *WatchSshEventsRequest) String() string {
 func (*WatchSshEventsRequest) ProtoMessage() {}
 
 func (x *WatchSshEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[47]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3099,7 +3205,7 @@ func (x *WatchSshEventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchSshEventsRequest.ProtoReflect.Descriptor instead.
 func (*WatchSshEventsRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{47}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *WatchSshEventsRequest) GetCursor() string {
@@ -3119,7 +3225,7 @@ type WatchSshEventsResponse struct {
 
 func (x *WatchSshEventsResponse) Reset() {
 	*x = WatchSshEventsResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[48]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3131,7 +3237,7 @@ func (x *WatchSshEventsResponse) String() string {
 func (*WatchSshEventsResponse) ProtoMessage() {}
 
 func (x *WatchSshEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[48]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3144,7 +3250,7 @@ func (x *WatchSshEventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchSshEventsResponse.ProtoReflect.Descriptor instead.
 func (*WatchSshEventsResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{48}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *WatchSshEventsResponse) GetCursor() string {
@@ -3170,7 +3276,7 @@ type WatchEgressEventsRequest struct {
 
 func (x *WatchEgressEventsRequest) Reset() {
 	*x = WatchEgressEventsRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[49]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3182,7 +3288,7 @@ func (x *WatchEgressEventsRequest) String() string {
 func (*WatchEgressEventsRequest) ProtoMessage() {}
 
 func (x *WatchEgressEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[49]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3195,7 +3301,7 @@ func (x *WatchEgressEventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchEgressEventsRequest.ProtoReflect.Descriptor instead.
 func (*WatchEgressEventsRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{49}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *WatchEgressEventsRequest) GetCursor() string {
@@ -3215,7 +3321,7 @@ type WatchEgressEventsResponse struct {
 
 func (x *WatchEgressEventsResponse) Reset() {
 	*x = WatchEgressEventsResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[50]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3227,7 +3333,7 @@ func (x *WatchEgressEventsResponse) String() string {
 func (*WatchEgressEventsResponse) ProtoMessage() {}
 
 func (x *WatchEgressEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[50]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3240,7 +3346,7 @@ func (x *WatchEgressEventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchEgressEventsResponse.ProtoReflect.Descriptor instead.
 func (*WatchEgressEventsResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{50}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *WatchEgressEventsResponse) GetCursor() string {
@@ -3270,7 +3376,7 @@ type AuthorizeSshKeyRequest struct {
 
 func (x *AuthorizeSshKeyRequest) Reset() {
 	*x = AuthorizeSshKeyRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[51]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3282,7 +3388,7 @@ func (x *AuthorizeSshKeyRequest) String() string {
 func (*AuthorizeSshKeyRequest) ProtoMessage() {}
 
 func (x *AuthorizeSshKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[51]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3295,7 +3401,7 @@ func (x *AuthorizeSshKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthorizeSshKeyRequest.ProtoReflect.Descriptor instead.
 func (*AuthorizeSshKeyRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{51}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *AuthorizeSshKeyRequest) GetAlias() string {
@@ -3333,7 +3439,7 @@ type AuthorizeSshKeyResponse struct {
 
 func (x *AuthorizeSshKeyResponse) Reset() {
 	*x = AuthorizeSshKeyResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[52]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3345,7 +3451,7 @@ func (x *AuthorizeSshKeyResponse) String() string {
 func (*AuthorizeSshKeyResponse) ProtoMessage() {}
 
 func (x *AuthorizeSshKeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[52]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3358,7 +3464,7 @@ func (x *AuthorizeSshKeyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthorizeSshKeyResponse.ProtoReflect.Descriptor instead.
 func (*AuthorizeSshKeyResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{52}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *AuthorizeSshKeyResponse) GetGrantId() string {
@@ -3406,7 +3512,7 @@ type AcquireSshConnectionRequest struct {
 
 func (x *AcquireSshConnectionRequest) Reset() {
 	*x = AcquireSshConnectionRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[53]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3418,7 +3524,7 @@ func (x *AcquireSshConnectionRequest) String() string {
 func (*AcquireSshConnectionRequest) ProtoMessage() {}
 
 func (x *AcquireSshConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[53]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3431,7 +3537,7 @@ func (x *AcquireSshConnectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AcquireSshConnectionRequest.ProtoReflect.Descriptor instead.
 func (*AcquireSshConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{53}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *AcquireSshConnectionRequest) GetGrantId() string {
@@ -3459,7 +3565,7 @@ type AcquireSshConnectionResponse struct {
 
 func (x *AcquireSshConnectionResponse) Reset() {
 	*x = AcquireSshConnectionResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[54]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3471,7 +3577,7 @@ func (x *AcquireSshConnectionResponse) String() string {
 func (*AcquireSshConnectionResponse) ProtoMessage() {}
 
 func (x *AcquireSshConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[54]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3484,7 +3590,7 @@ func (x *AcquireSshConnectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AcquireSshConnectionResponse.ProtoReflect.Descriptor instead.
 func (*AcquireSshConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{54}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *AcquireSshConnectionResponse) GetLeaseId() string {
@@ -3518,7 +3624,7 @@ type RenewSshConnectionRequest struct {
 
 func (x *RenewSshConnectionRequest) Reset() {
 	*x = RenewSshConnectionRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[55]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3530,7 +3636,7 @@ func (x *RenewSshConnectionRequest) String() string {
 func (*RenewSshConnectionRequest) ProtoMessage() {}
 
 func (x *RenewSshConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[55]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3543,7 +3649,7 @@ func (x *RenewSshConnectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RenewSshConnectionRequest.ProtoReflect.Descriptor instead.
 func (*RenewSshConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{55}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *RenewSshConnectionRequest) GetGrantId() string {
@@ -3569,7 +3675,7 @@ type RenewSshConnectionResponse struct {
 
 func (x *RenewSshConnectionResponse) Reset() {
 	*x = RenewSshConnectionResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[56]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3581,7 +3687,7 @@ func (x *RenewSshConnectionResponse) String() string {
 func (*RenewSshConnectionResponse) ProtoMessage() {}
 
 func (x *RenewSshConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[56]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3594,7 +3700,7 @@ func (x *RenewSshConnectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RenewSshConnectionResponse.ProtoReflect.Descriptor instead.
 func (*RenewSshConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{56}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *RenewSshConnectionResponse) GetLeaseExpiresAt() *timestamppb.Timestamp {
@@ -3614,7 +3720,7 @@ type ReleaseSshConnectionRequest struct {
 
 func (x *ReleaseSshConnectionRequest) Reset() {
 	*x = ReleaseSshConnectionRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[57]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3626,7 +3732,7 @@ func (x *ReleaseSshConnectionRequest) String() string {
 func (*ReleaseSshConnectionRequest) ProtoMessage() {}
 
 func (x *ReleaseSshConnectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[57]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3639,7 +3745,7 @@ func (x *ReleaseSshConnectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReleaseSshConnectionRequest.ProtoReflect.Descriptor instead.
 func (*ReleaseSshConnectionRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{57}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *ReleaseSshConnectionRequest) GetGrantId() string {
@@ -3664,7 +3770,7 @@ type ReleaseSshConnectionResponse struct {
 
 func (x *ReleaseSshConnectionResponse) Reset() {
 	*x = ReleaseSshConnectionResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[58]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3676,7 +3782,7 @@ func (x *ReleaseSshConnectionResponse) String() string {
 func (*ReleaseSshConnectionResponse) ProtoMessage() {}
 
 func (x *ReleaseSshConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[58]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3689,7 +3795,7 @@ func (x *ReleaseSshConnectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReleaseSshConnectionResponse.ProtoReflect.Descriptor instead.
 func (*ReleaseSshConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{58}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{60}
 }
 
 type OpenSshUpstreamRequest struct {
@@ -3703,7 +3809,7 @@ type OpenSshUpstreamRequest struct {
 
 func (x *OpenSshUpstreamRequest) Reset() {
 	*x = OpenSshUpstreamRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[59]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3715,7 +3821,7 @@ func (x *OpenSshUpstreamRequest) String() string {
 func (*OpenSshUpstreamRequest) ProtoMessage() {}
 
 func (x *OpenSshUpstreamRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[59]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3728,7 +3834,7 @@ func (x *OpenSshUpstreamRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OpenSshUpstreamRequest.ProtoReflect.Descriptor instead.
 func (*OpenSshUpstreamRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{59}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *OpenSshUpstreamRequest) GetGrantId() string {
@@ -3758,7 +3864,7 @@ type WebSocketUpstream struct {
 
 func (x *WebSocketUpstream) Reset() {
 	*x = WebSocketUpstream{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[60]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3770,7 +3876,7 @@ func (x *WebSocketUpstream) String() string {
 func (*WebSocketUpstream) ProtoMessage() {}
 
 func (x *WebSocketUpstream) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[60]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3783,7 +3889,7 @@ func (x *WebSocketUpstream) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebSocketUpstream.ProtoReflect.Descriptor instead.
 func (*WebSocketUpstream) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{60}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *WebSocketUpstream) GetUrl() string {
@@ -3818,7 +3924,7 @@ type TcpUpstream struct {
 
 func (x *TcpUpstream) Reset() {
 	*x = TcpUpstream{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[61]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3830,7 +3936,7 @@ func (x *TcpUpstream) String() string {
 func (*TcpUpstream) ProtoMessage() {}
 
 func (x *TcpUpstream) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[61]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3843,7 +3949,7 @@ func (x *TcpUpstream) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TcpUpstream.ProtoReflect.Descriptor instead.
 func (*TcpUpstream) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{61}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *TcpUpstream) GetAddress() string {
@@ -3871,7 +3977,7 @@ type OpenSshUpstreamResponse struct {
 
 func (x *OpenSshUpstreamResponse) Reset() {
 	*x = OpenSshUpstreamResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[62]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3883,7 +3989,7 @@ func (x *OpenSshUpstreamResponse) String() string {
 func (*OpenSshUpstreamResponse) ProtoMessage() {}
 
 func (x *OpenSshUpstreamResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[62]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3896,7 +4002,7 @@ func (x *OpenSshUpstreamResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OpenSshUpstreamResponse.ProtoReflect.Descriptor instead.
 func (*OpenSshUpstreamResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{62}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *OpenSshUpstreamResponse) GetTransport() isOpenSshUpstreamResponse_Transport {
@@ -3970,7 +4076,7 @@ type CheckSshGrantsRequest struct {
 
 func (x *CheckSshGrantsRequest) Reset() {
 	*x = CheckSshGrantsRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[63]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3982,7 +4088,7 @@ func (x *CheckSshGrantsRequest) String() string {
 func (*CheckSshGrantsRequest) ProtoMessage() {}
 
 func (x *CheckSshGrantsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[63]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3995,7 +4101,7 @@ func (x *CheckSshGrantsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckSshGrantsRequest.ProtoReflect.Descriptor instead.
 func (*CheckSshGrantsRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{63}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *CheckSshGrantsRequest) GetGrantIds() []string {
@@ -4015,7 +4121,7 @@ type CheckSshGrantsResponse struct {
 
 func (x *CheckSshGrantsResponse) Reset() {
 	*x = CheckSshGrantsResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[64]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4027,7 +4133,7 @@ func (x *CheckSshGrantsResponse) String() string {
 func (*CheckSshGrantsResponse) ProtoMessage() {}
 
 func (x *CheckSshGrantsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[64]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4040,7 +4146,7 @@ func (x *CheckSshGrantsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckSshGrantsResponse.ProtoReflect.Descriptor instead.
 func (*CheckSshGrantsResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{64}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{66}
 }
 
 func (x *CheckSshGrantsResponse) GetDeadlines() map[string]*timestamppb.Timestamp {
@@ -4065,7 +4171,7 @@ type ResolveTunnelRequest struct {
 
 func (x *ResolveTunnelRequest) Reset() {
 	*x = ResolveTunnelRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[65]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4077,7 +4183,7 @@ func (x *ResolveTunnelRequest) String() string {
 func (*ResolveTunnelRequest) ProtoMessage() {}
 
 func (x *ResolveTunnelRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[65]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4090,7 +4196,7 @@ func (x *ResolveTunnelRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResolveTunnelRequest.ProtoReflect.Descriptor instead.
 func (*ResolveTunnelRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{65}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *ResolveTunnelRequest) GetCaller() isResolveTunnelRequest_Caller {
@@ -4155,7 +4261,7 @@ type TunnelSourceCheck struct {
 
 func (x *TunnelSourceCheck) Reset() {
 	*x = TunnelSourceCheck{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[66]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4167,7 +4273,7 @@ func (x *TunnelSourceCheck) String() string {
 func (*TunnelSourceCheck) ProtoMessage() {}
 
 func (x *TunnelSourceCheck) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[66]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4180,7 +4286,7 @@ func (x *TunnelSourceCheck) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TunnelSourceCheck.ProtoReflect.Descriptor instead.
 func (*TunnelSourceCheck) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{66}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *TunnelSourceCheck) GetMode() SourceCheckMode {
@@ -4210,7 +4316,7 @@ type EgressSecret struct {
 
 func (x *EgressSecret) Reset() {
 	*x = EgressSecret{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[67]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4222,7 +4328,7 @@ func (x *EgressSecret) String() string {
 func (*EgressSecret) ProtoMessage() {}
 
 func (x *EgressSecret) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[67]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4235,7 +4341,7 @@ func (x *EgressSecret) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EgressSecret.ProtoReflect.Descriptor instead.
 func (*EgressSecret) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{67}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *EgressSecret) GetPlaceholderSha256() []byte {
@@ -4290,7 +4396,7 @@ type ResolveTunnelResponse struct {
 
 func (x *ResolveTunnelResponse) Reset() {
 	*x = ResolveTunnelResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[68]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4302,7 +4408,7 @@ func (x *ResolveTunnelResponse) String() string {
 func (*ResolveTunnelResponse) ProtoMessage() {}
 
 func (x *ResolveTunnelResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[68]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4315,7 +4421,7 @@ func (x *ResolveTunnelResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResolveTunnelResponse.ProtoReflect.Descriptor instead.
 func (*ResolveTunnelResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{68}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *ResolveTunnelResponse) GetPlacementId() string {
@@ -4411,7 +4517,7 @@ type X402Service struct {
 
 func (x *X402Service) Reset() {
 	*x = X402Service{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[69]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4423,7 +4529,7 @@ func (x *X402Service) String() string {
 func (*X402Service) ProtoMessage() {}
 
 func (x *X402Service) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[69]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4436,7 +4542,7 @@ func (x *X402Service) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use X402Service.ProtoReflect.Descriptor instead.
 func (*X402Service) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{69}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *X402Service) GetServiceId() string {
@@ -4498,7 +4604,7 @@ type X402Unpaid struct {
 
 func (x *X402Unpaid) Reset() {
 	*x = X402Unpaid{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[70]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4510,7 +4616,7 @@ func (x *X402Unpaid) String() string {
 func (*X402Unpaid) ProtoMessage() {}
 
 func (x *X402Unpaid) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[70]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4523,7 +4629,7 @@ func (x *X402Unpaid) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use X402Unpaid.ProtoReflect.Descriptor instead.
 func (*X402Unpaid) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{70}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *X402Unpaid) GetRequests() uint32 {
@@ -4558,7 +4664,7 @@ type X402Config struct {
 
 func (x *X402Config) Reset() {
 	*x = X402Config{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[71]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4570,7 +4676,7 @@ func (x *X402Config) String() string {
 func (*X402Config) ProtoMessage() {}
 
 func (x *X402Config) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[71]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4583,7 +4689,7 @@ func (x *X402Config) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use X402Config.ProtoReflect.Descriptor instead.
 func (*X402Config) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{71}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{73}
 }
 
 func (x *X402Config) GetEnabled() bool {
@@ -4637,7 +4743,7 @@ type X402UnpaidByHost struct {
 
 func (x *X402UnpaidByHost) Reset() {
 	*x = X402UnpaidByHost{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[72]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4649,7 +4755,7 @@ func (x *X402UnpaidByHost) String() string {
 func (*X402UnpaidByHost) ProtoMessage() {}
 
 func (x *X402UnpaidByHost) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[72]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4662,7 +4768,7 @@ func (x *X402UnpaidByHost) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use X402UnpaidByHost.ProtoReflect.Descriptor instead.
 func (*X402UnpaidByHost) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{72}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{74}
 }
 
 func (x *X402UnpaidByHost) GetHosts() map[string]*X402Unpaid {
@@ -4715,7 +4821,7 @@ type X402Event struct {
 
 func (x *X402Event) Reset() {
 	*x = X402Event{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[73]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4727,7 +4833,7 @@ func (x *X402Event) String() string {
 func (*X402Event) ProtoMessage() {}
 
 func (x *X402Event) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[73]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4740,7 +4846,7 @@ func (x *X402Event) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use X402Event.ProtoReflect.Descriptor instead.
 func (*X402Event) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{73}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{75}
 }
 
 func (x *X402Event) GetAt() *timestamppb.Timestamp {
@@ -4914,7 +5020,7 @@ type AppendX402EventsRequest struct {
 
 func (x *AppendX402EventsRequest) Reset() {
 	*x = AppendX402EventsRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[74]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4926,7 +5032,7 @@ func (x *AppendX402EventsRequest) String() string {
 func (*AppendX402EventsRequest) ProtoMessage() {}
 
 func (x *AppendX402EventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[74]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4939,7 +5045,7 @@ func (x *AppendX402EventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppendX402EventsRequest.ProtoReflect.Descriptor instead.
 func (*AppendX402EventsRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{74}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{76}
 }
 
 func (x *AppendX402EventsRequest) GetPlacementId() string {
@@ -4966,7 +5072,7 @@ type AppendX402EventsResponse struct {
 
 func (x *AppendX402EventsResponse) Reset() {
 	*x = AppendX402EventsResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[75]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4978,7 +5084,7 @@ func (x *AppendX402EventsResponse) String() string {
 func (*AppendX402EventsResponse) ProtoMessage() {}
 
 func (x *AppendX402EventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[75]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4991,7 +5097,7 @@ func (x *AppendX402EventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppendX402EventsResponse.ProtoReflect.Descriptor instead.
 func (*AppendX402EventsResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{75}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{77}
 }
 
 func (x *AppendX402EventsResponse) GetRejected() []uint32 {
@@ -5013,7 +5119,7 @@ type GetSessionRecordRequest struct {
 
 func (x *GetSessionRecordRequest) Reset() {
 	*x = GetSessionRecordRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[76]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5025,7 +5131,7 @@ func (x *GetSessionRecordRequest) String() string {
 func (*GetSessionRecordRequest) ProtoMessage() {}
 
 func (x *GetSessionRecordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[76]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5038,7 +5144,7 @@ func (x *GetSessionRecordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSessionRecordRequest.ProtoReflect.Descriptor instead.
 func (*GetSessionRecordRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{76}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{78}
 }
 
 func (x *GetSessionRecordRequest) GetId() string {
@@ -5069,7 +5175,7 @@ type GetSessionRecordResponse struct {
 
 func (x *GetSessionRecordResponse) Reset() {
 	*x = GetSessionRecordResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[77]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5081,7 +5187,7 @@ func (x *GetSessionRecordResponse) String() string {
 func (*GetSessionRecordResponse) ProtoMessage() {}
 
 func (x *GetSessionRecordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[77]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5094,7 +5200,7 @@ func (x *GetSessionRecordResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSessionRecordResponse.ProtoReflect.Descriptor instead.
 func (*GetSessionRecordResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{77}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *GetSessionRecordResponse) GetState() string {
@@ -5128,7 +5234,7 @@ type DeleteSessionRecordRequest struct {
 
 func (x *DeleteSessionRecordRequest) Reset() {
 	*x = DeleteSessionRecordRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[78]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5140,7 +5246,7 @@ func (x *DeleteSessionRecordRequest) String() string {
 func (*DeleteSessionRecordRequest) ProtoMessage() {}
 
 func (x *DeleteSessionRecordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[78]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5153,7 +5259,7 @@ func (x *DeleteSessionRecordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteSessionRecordRequest.ProtoReflect.Descriptor instead.
 func (*DeleteSessionRecordRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{78}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{80}
 }
 
 func (x *DeleteSessionRecordRequest) GetId() string {
@@ -5178,7 +5284,7 @@ type DeleteSessionRecordResponse struct {
 
 func (x *DeleteSessionRecordResponse) Reset() {
 	*x = DeleteSessionRecordResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[79]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5190,7 +5296,7 @@ func (x *DeleteSessionRecordResponse) String() string {
 func (*DeleteSessionRecordResponse) ProtoMessage() {}
 
 func (x *DeleteSessionRecordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[79]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5203,7 +5309,7 @@ func (x *DeleteSessionRecordResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteSessionRecordResponse.ProtoReflect.Descriptor instead.
 func (*DeleteSessionRecordResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{79}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{81}
 }
 
 type WatchSessionJobRequest struct {
@@ -5219,7 +5325,7 @@ type WatchSessionJobRequest struct {
 
 func (x *WatchSessionJobRequest) Reset() {
 	*x = WatchSessionJobRequest{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[80]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5231,7 +5337,7 @@ func (x *WatchSessionJobRequest) String() string {
 func (*WatchSessionJobRequest) ProtoMessage() {}
 
 func (x *WatchSessionJobRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[80]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5244,7 +5350,7 @@ func (x *WatchSessionJobRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchSessionJobRequest.ProtoReflect.Descriptor instead.
 func (*WatchSessionJobRequest) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{80}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{82}
 }
 
 func (x *WatchSessionJobRequest) GetId() string {
@@ -5288,7 +5394,7 @@ type SessionText struct {
 
 func (x *SessionText) Reset() {
 	*x = SessionText{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[81]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5300,7 +5406,7 @@ func (x *SessionText) String() string {
 func (*SessionText) ProtoMessage() {}
 
 func (x *SessionText) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[81]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5313,7 +5419,7 @@ func (x *SessionText) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionText.ProtoReflect.Descriptor instead.
 func (*SessionText) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{81}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{83}
 }
 
 func (x *SessionText) GetStream() OutputStream {
@@ -5347,7 +5453,7 @@ type SessionEnd struct {
 
 func (x *SessionEnd) Reset() {
 	*x = SessionEnd{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[82]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5359,7 +5465,7 @@ func (x *SessionEnd) String() string {
 func (*SessionEnd) ProtoMessage() {}
 
 func (x *SessionEnd) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[82]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5372,7 +5478,7 @@ func (x *SessionEnd) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionEnd.ProtoReflect.Descriptor instead.
 func (*SessionEnd) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{82}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{84}
 }
 
 func (x *SessionEnd) GetReason() string {
@@ -5400,7 +5506,7 @@ type WatchSessionJobResponse struct {
 
 func (x *WatchSessionJobResponse) Reset() {
 	*x = WatchSessionJobResponse{}
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[83]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5412,7 +5518,7 @@ func (x *WatchSessionJobResponse) String() string {
 func (*WatchSessionJobResponse) ProtoMessage() {}
 
 func (x *WatchSessionJobResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_bugnet_router_v1_edge_proto_msgTypes[83]
+	mi := &file_bugnet_router_v1_edge_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5425,7 +5531,7 @@ func (x *WatchSessionJobResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchSessionJobResponse.ProtoReflect.Descriptor instead.
 func (*WatchSessionJobResponse) Descriptor() ([]byte, []int) {
-	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{83}
+	return file_bugnet_router_v1_edge_proto_rawDescGZIP(), []int{85}
 }
 
 func (x *WatchSessionJobResponse) GetCursor() string {
@@ -5622,13 +5728,14 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"expires_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x124\n" +
 	"\x06budget\x18\n" +
 	" \x01(\v2\x1c.bugnet.router.v1.EdgeBudgetR\x06budget\x12\x16\n" +
-	"\x06sha256\x18\v \x01(\fR\x06sha256\"|\n" +
+	"\x06sha256\x18\v \x01(\fR\x06sha256\"\x97\x01\n" +
 	"\x13ReadTransferRequest\x12\x1f\n" +
 	"\vtransfer_id\x18\x01 \x01(\tR\n" +
 	"transferId\x12\x14\n" +
 	"\x05lease\x18\x02 \x01(\tR\x05lease\x12\x16\n" +
 	"\x06offset\x18\x03 \x01(\x04R\x06offset\x12\x16\n" +
-	"\x06length\x18\x04 \x01(\x04R\x06length\"F\n" +
+	"\x06length\x18\x04 \x01(\x04R\x06length\x12\x19\n" +
+	"\bhold_end\x18\x05 \x01(\bR\aholdEnd\"F\n" +
 	"\x14ReadTransferResponse\x12\x12\n" +
 	"\x04data\x18\x01 \x01(\fR\x04data\x12\x1a\n" +
 	"\bverified\x18\x02 \x01(\bR\bverified\"a\n" +
@@ -5640,7 +5747,13 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x15WriteTransferResponse\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x04R\x04size\x12\x16\n" +
-	"\x06sha256\x18\x03 \x01(\fR\x06sha256\"5\n" +
+	"\x06sha256\x18\x03 \x01(\fR\x06sha256\"i\n" +
+	"\x12EndTransferRequest\x12\x1f\n" +
+	"\vtransfer_id\x18\x01 \x01(\tR\n" +
+	"transferId\x12\x14\n" +
+	"\x05lease\x18\x02 \x01(\tR\x05lease\x12\x1c\n" +
+	"\tdelivered\x18\x03 \x01(\bR\tdelivered\"\x15\n" +
+	"\x13EndTransferResponse\"5\n" +
 	"\x14GetSecretLinkRequest\x12\x1d\n" +
 	"\n" +
 	"link_token\x18\x01 \x01(\tR\tlinkToken\"\xdf\x02\n" +
@@ -5962,13 +6075,14 @@ const file_bugnet_router_v1_edge_proto_rawDesc = "" +
 	"\x0fSourceCheckMode\x12!\n" +
 	"\x1dSOURCE_CHECK_MODE_UNSPECIFIED\x10\x00\x12\x1c\n" +
 	"\x18SOURCE_CHECK_MODE_REPORT\x10\x01\x12\x1d\n" +
-	"\x19SOURCE_CHECK_MODE_ENFORCE\x10\x022\x8e\a\n" +
+	"\x19SOURCE_CHECK_MODE_ENFORCE\x10\x022\xea\a\n" +
 	"\vEdgeService\x12c\n" +
 	"\x0eResolvePreview\x12'.bugnet.router.v1.ResolvePreviewRequest\x1a(.bugnet.router.v1.ResolvePreviewResponse\x12`\n" +
 	"\rRepairPreview\x12&.bugnet.router.v1.RepairPreviewRequest\x1a'.bugnet.router.v1.RepairPreviewResponse\x12]\n" +
 	"\fOpenTransfer\x12%.bugnet.router.v1.OpenTransferRequest\x1a&.bugnet.router.v1.OpenTransferResponse\x12_\n" +
 	"\fReadTransfer\x12%.bugnet.router.v1.ReadTransferRequest\x1a&.bugnet.router.v1.ReadTransferResponse0\x01\x12b\n" +
 	"\rWriteTransfer\x12&.bugnet.router.v1.WriteTransferRequest\x1a'.bugnet.router.v1.WriteTransferResponse(\x01\x12Z\n" +
+	"\vEndTransfer\x12$.bugnet.router.v1.EndTransferRequest\x1a%.bugnet.router.v1.EndTransferResponse\x12Z\n" +
 	"\vDeliverHook\x12$.bugnet.router.v1.DeliverHookRequest\x1a%.bugnet.router.v1.DeliverHookResponse\x12f\n" +
 	"\x0fReportEdgeUsage\x12(.bugnet.router.v1.ReportEdgeUsageRequest\x1a).bugnet.router.v1.ReportEdgeUsageResponse\x12f\n" +
 	"\x0fCheckEdgeLeases\x12(.bugnet.router.v1.CheckEdgeLeasesRequest\x1a).bugnet.router.v1.CheckEdgeLeasesResponse\x12h\n" +
@@ -6011,7 +6125,7 @@ func file_bugnet_router_v1_edge_proto_rawDescGZIP() []byte {
 }
 
 var file_bugnet_router_v1_edge_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_bugnet_router_v1_edge_proto_msgTypes = make([]protoimpl.MessageInfo, 95)
+var file_bugnet_router_v1_edge_proto_msgTypes = make([]protoimpl.MessageInfo, 97)
 var file_bugnet_router_v1_edge_proto_goTypes = []any{
 	(EndReason)(0),                       // 0: bugnet.router.v1.EndReason
 	(BudgetKind)(0),                      // 1: bugnet.router.v1.BudgetKind
@@ -6038,94 +6152,96 @@ var file_bugnet_router_v1_edge_proto_goTypes = []any{
 	(*ReadTransferResponse)(nil),         // 22: bugnet.router.v1.ReadTransferResponse
 	(*WriteTransferRequest)(nil),         // 23: bugnet.router.v1.WriteTransferRequest
 	(*WriteTransferResponse)(nil),        // 24: bugnet.router.v1.WriteTransferResponse
-	(*GetSecretLinkRequest)(nil),         // 25: bugnet.router.v1.GetSecretLinkRequest
-	(*GetSecretLinkResponse)(nil),        // 26: bugnet.router.v1.GetSecretLinkResponse
-	(*SubmitSecretLinkRequest)(nil),      // 27: bugnet.router.v1.SubmitSecretLinkRequest
-	(*SubmitSecretLinkResponse)(nil),     // 28: bugnet.router.v1.SubmitSecretLinkResponse
-	(*GetBridgeSealingKeyRequest)(nil),   // 29: bugnet.router.v1.GetBridgeSealingKeyRequest
-	(*GetBridgeSealingKeyResponse)(nil),  // 30: bugnet.router.v1.GetBridgeSealingKeyResponse
-	(*PutBridgeSecretRequest)(nil),       // 31: bugnet.router.v1.PutBridgeSecretRequest
-	(*PutBridgeSecretResponse)(nil),      // 32: bugnet.router.v1.PutBridgeSecretResponse
-	(*DeliverHookRequest)(nil),           // 33: bugnet.router.v1.DeliverHookRequest
-	(*DeliverHookResponse)(nil),          // 34: bugnet.router.v1.DeliverHookResponse
-	(*ReportEdgeUsageRequest)(nil),       // 35: bugnet.router.v1.ReportEdgeUsageRequest
-	(*ReportEdgeUsageResponse)(nil),      // 36: bugnet.router.v1.ReportEdgeUsageResponse
-	(*ReportSshUsageRequest)(nil),        // 37: bugnet.router.v1.ReportSshUsageRequest
-	(*ReportSshUsageResponse)(nil),       // 38: bugnet.router.v1.ReportSshUsageResponse
-	(*ReportEgressUsageRequest)(nil),     // 39: bugnet.router.v1.ReportEgressUsageRequest
-	(*ReportEgressUsageResponse)(nil),    // 40: bugnet.router.v1.ReportEgressUsageResponse
-	(*HeldPreview)(nil),                  // 41: bugnet.router.v1.HeldPreview
-	(*CheckEdgeLeasesRequest)(nil),       // 42: bugnet.router.v1.CheckEdgeLeasesRequest
-	(*EdgeLease)(nil),                    // 43: bugnet.router.v1.EdgeLease
-	(*CheckEdgeLeasesResponse)(nil),      // 44: bugnet.router.v1.CheckEdgeLeasesResponse
-	(*CheckEgressLeasesRequest)(nil),     // 45: bugnet.router.v1.CheckEgressLeasesRequest
-	(*EgressLease)(nil),                  // 46: bugnet.router.v1.EgressLease
-	(*CheckEgressLeasesResponse)(nil),    // 47: bugnet.router.v1.CheckEgressLeasesResponse
-	(*WatchEdgeEventsRequest)(nil),       // 48: bugnet.router.v1.WatchEdgeEventsRequest
-	(*WatchEdgeEventsResponse)(nil),      // 49: bugnet.router.v1.WatchEdgeEventsResponse
-	(*WatchSshEventsRequest)(nil),        // 50: bugnet.router.v1.WatchSshEventsRequest
-	(*WatchSshEventsResponse)(nil),       // 51: bugnet.router.v1.WatchSshEventsResponse
-	(*WatchEgressEventsRequest)(nil),     // 52: bugnet.router.v1.WatchEgressEventsRequest
-	(*WatchEgressEventsResponse)(nil),    // 53: bugnet.router.v1.WatchEgressEventsResponse
-	(*AuthorizeSshKeyRequest)(nil),       // 54: bugnet.router.v1.AuthorizeSshKeyRequest
-	(*AuthorizeSshKeyResponse)(nil),      // 55: bugnet.router.v1.AuthorizeSshKeyResponse
-	(*AcquireSshConnectionRequest)(nil),  // 56: bugnet.router.v1.AcquireSshConnectionRequest
-	(*AcquireSshConnectionResponse)(nil), // 57: bugnet.router.v1.AcquireSshConnectionResponse
-	(*RenewSshConnectionRequest)(nil),    // 58: bugnet.router.v1.RenewSshConnectionRequest
-	(*RenewSshConnectionResponse)(nil),   // 59: bugnet.router.v1.RenewSshConnectionResponse
-	(*ReleaseSshConnectionRequest)(nil),  // 60: bugnet.router.v1.ReleaseSshConnectionRequest
-	(*ReleaseSshConnectionResponse)(nil), // 61: bugnet.router.v1.ReleaseSshConnectionResponse
-	(*OpenSshUpstreamRequest)(nil),       // 62: bugnet.router.v1.OpenSshUpstreamRequest
-	(*WebSocketUpstream)(nil),            // 63: bugnet.router.v1.WebSocketUpstream
-	(*TcpUpstream)(nil),                  // 64: bugnet.router.v1.TcpUpstream
-	(*OpenSshUpstreamResponse)(nil),      // 65: bugnet.router.v1.OpenSshUpstreamResponse
-	(*CheckSshGrantsRequest)(nil),        // 66: bugnet.router.v1.CheckSshGrantsRequest
-	(*CheckSshGrantsResponse)(nil),       // 67: bugnet.router.v1.CheckSshGrantsResponse
-	(*ResolveTunnelRequest)(nil),         // 68: bugnet.router.v1.ResolveTunnelRequest
-	(*TunnelSourceCheck)(nil),            // 69: bugnet.router.v1.TunnelSourceCheck
-	(*EgressSecret)(nil),                 // 70: bugnet.router.v1.EgressSecret
-	(*ResolveTunnelResponse)(nil),        // 71: bugnet.router.v1.ResolveTunnelResponse
-	(*X402Service)(nil),                  // 72: bugnet.router.v1.X402Service
-	(*X402Unpaid)(nil),                   // 73: bugnet.router.v1.X402Unpaid
-	(*X402Config)(nil),                   // 74: bugnet.router.v1.X402Config
-	(*X402UnpaidByHost)(nil),             // 75: bugnet.router.v1.X402UnpaidByHost
-	(*X402Event)(nil),                    // 76: bugnet.router.v1.X402Event
-	(*AppendX402EventsRequest)(nil),      // 77: bugnet.router.v1.AppendX402EventsRequest
-	(*AppendX402EventsResponse)(nil),     // 78: bugnet.router.v1.AppendX402EventsResponse
-	(*GetSessionRecordRequest)(nil),      // 79: bugnet.router.v1.GetSessionRecordRequest
-	(*GetSessionRecordResponse)(nil),     // 80: bugnet.router.v1.GetSessionRecordResponse
-	(*DeleteSessionRecordRequest)(nil),   // 81: bugnet.router.v1.DeleteSessionRecordRequest
-	(*DeleteSessionRecordResponse)(nil),  // 82: bugnet.router.v1.DeleteSessionRecordResponse
-	(*WatchSessionJobRequest)(nil),       // 83: bugnet.router.v1.WatchSessionJobRequest
-	(*SessionText)(nil),                  // 84: bugnet.router.v1.SessionText
-	(*SessionEnd)(nil),                   // 85: bugnet.router.v1.SessionEnd
-	(*WatchSessionJobResponse)(nil),      // 86: bugnet.router.v1.WatchSessionJobResponse
-	nil,                                  // 87: bugnet.router.v1.ReportEdgeUsageResponse.BytesRemainingEntry
-	nil,                                  // 88: bugnet.router.v1.ReportEdgeUsageResponse.BytesPerSecondEntry
-	nil,                                  // 89: bugnet.router.v1.ReportSshUsageResponse.BytesRemainingEntry
-	nil,                                  // 90: bugnet.router.v1.ReportSshUsageResponse.BytesPerSecondEntry
-	nil,                                  // 91: bugnet.router.v1.ReportEgressUsageRequest.X402UnpaidEntry
-	nil,                                  // 92: bugnet.router.v1.ReportEgressUsageResponse.BytesRemainingEntry
-	nil,                                  // 93: bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry
-	nil,                                  // 94: bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry
-	nil,                                  // 95: bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry
-	nil,                                  // 96: bugnet.router.v1.X402Config.UnpaidUsedEntry
-	nil,                                  // 97: bugnet.router.v1.X402UnpaidByHost.HostsEntry
-	(*timestamppb.Timestamp)(nil),        // 98: google.protobuf.Timestamp
-	(TransferDirection)(0),               // 99: bugnet.router.v1.TransferDirection
-	(*SecretSpec)(nil),                   // 100: bugnet.router.v1.SecretSpec
-	(*SealingKey)(nil),                   // 101: bugnet.router.v1.SealingKey
-	(*SealedValue)(nil),                  // 102: bugnet.router.v1.SealedValue
-	(*SecretInfo)(nil),                   // 103: bugnet.router.v1.SecretInfo
-	(OutputStream)(0),                    // 104: bugnet.router.v1.OutputStream
-	(*JobSkip)(nil),                      // 105: bugnet.router.v1.JobSkip
-	(*JobExit)(nil),                      // 106: bugnet.router.v1.JobExit
+	(*EndTransferRequest)(nil),           // 25: bugnet.router.v1.EndTransferRequest
+	(*EndTransferResponse)(nil),          // 26: bugnet.router.v1.EndTransferResponse
+	(*GetSecretLinkRequest)(nil),         // 27: bugnet.router.v1.GetSecretLinkRequest
+	(*GetSecretLinkResponse)(nil),        // 28: bugnet.router.v1.GetSecretLinkResponse
+	(*SubmitSecretLinkRequest)(nil),      // 29: bugnet.router.v1.SubmitSecretLinkRequest
+	(*SubmitSecretLinkResponse)(nil),     // 30: bugnet.router.v1.SubmitSecretLinkResponse
+	(*GetBridgeSealingKeyRequest)(nil),   // 31: bugnet.router.v1.GetBridgeSealingKeyRequest
+	(*GetBridgeSealingKeyResponse)(nil),  // 32: bugnet.router.v1.GetBridgeSealingKeyResponse
+	(*PutBridgeSecretRequest)(nil),       // 33: bugnet.router.v1.PutBridgeSecretRequest
+	(*PutBridgeSecretResponse)(nil),      // 34: bugnet.router.v1.PutBridgeSecretResponse
+	(*DeliverHookRequest)(nil),           // 35: bugnet.router.v1.DeliverHookRequest
+	(*DeliverHookResponse)(nil),          // 36: bugnet.router.v1.DeliverHookResponse
+	(*ReportEdgeUsageRequest)(nil),       // 37: bugnet.router.v1.ReportEdgeUsageRequest
+	(*ReportEdgeUsageResponse)(nil),      // 38: bugnet.router.v1.ReportEdgeUsageResponse
+	(*ReportSshUsageRequest)(nil),        // 39: bugnet.router.v1.ReportSshUsageRequest
+	(*ReportSshUsageResponse)(nil),       // 40: bugnet.router.v1.ReportSshUsageResponse
+	(*ReportEgressUsageRequest)(nil),     // 41: bugnet.router.v1.ReportEgressUsageRequest
+	(*ReportEgressUsageResponse)(nil),    // 42: bugnet.router.v1.ReportEgressUsageResponse
+	(*HeldPreview)(nil),                  // 43: bugnet.router.v1.HeldPreview
+	(*CheckEdgeLeasesRequest)(nil),       // 44: bugnet.router.v1.CheckEdgeLeasesRequest
+	(*EdgeLease)(nil),                    // 45: bugnet.router.v1.EdgeLease
+	(*CheckEdgeLeasesResponse)(nil),      // 46: bugnet.router.v1.CheckEdgeLeasesResponse
+	(*CheckEgressLeasesRequest)(nil),     // 47: bugnet.router.v1.CheckEgressLeasesRequest
+	(*EgressLease)(nil),                  // 48: bugnet.router.v1.EgressLease
+	(*CheckEgressLeasesResponse)(nil),    // 49: bugnet.router.v1.CheckEgressLeasesResponse
+	(*WatchEdgeEventsRequest)(nil),       // 50: bugnet.router.v1.WatchEdgeEventsRequest
+	(*WatchEdgeEventsResponse)(nil),      // 51: bugnet.router.v1.WatchEdgeEventsResponse
+	(*WatchSshEventsRequest)(nil),        // 52: bugnet.router.v1.WatchSshEventsRequest
+	(*WatchSshEventsResponse)(nil),       // 53: bugnet.router.v1.WatchSshEventsResponse
+	(*WatchEgressEventsRequest)(nil),     // 54: bugnet.router.v1.WatchEgressEventsRequest
+	(*WatchEgressEventsResponse)(nil),    // 55: bugnet.router.v1.WatchEgressEventsResponse
+	(*AuthorizeSshKeyRequest)(nil),       // 56: bugnet.router.v1.AuthorizeSshKeyRequest
+	(*AuthorizeSshKeyResponse)(nil),      // 57: bugnet.router.v1.AuthorizeSshKeyResponse
+	(*AcquireSshConnectionRequest)(nil),  // 58: bugnet.router.v1.AcquireSshConnectionRequest
+	(*AcquireSshConnectionResponse)(nil), // 59: bugnet.router.v1.AcquireSshConnectionResponse
+	(*RenewSshConnectionRequest)(nil),    // 60: bugnet.router.v1.RenewSshConnectionRequest
+	(*RenewSshConnectionResponse)(nil),   // 61: bugnet.router.v1.RenewSshConnectionResponse
+	(*ReleaseSshConnectionRequest)(nil),  // 62: bugnet.router.v1.ReleaseSshConnectionRequest
+	(*ReleaseSshConnectionResponse)(nil), // 63: bugnet.router.v1.ReleaseSshConnectionResponse
+	(*OpenSshUpstreamRequest)(nil),       // 64: bugnet.router.v1.OpenSshUpstreamRequest
+	(*WebSocketUpstream)(nil),            // 65: bugnet.router.v1.WebSocketUpstream
+	(*TcpUpstream)(nil),                  // 66: bugnet.router.v1.TcpUpstream
+	(*OpenSshUpstreamResponse)(nil),      // 67: bugnet.router.v1.OpenSshUpstreamResponse
+	(*CheckSshGrantsRequest)(nil),        // 68: bugnet.router.v1.CheckSshGrantsRequest
+	(*CheckSshGrantsResponse)(nil),       // 69: bugnet.router.v1.CheckSshGrantsResponse
+	(*ResolveTunnelRequest)(nil),         // 70: bugnet.router.v1.ResolveTunnelRequest
+	(*TunnelSourceCheck)(nil),            // 71: bugnet.router.v1.TunnelSourceCheck
+	(*EgressSecret)(nil),                 // 72: bugnet.router.v1.EgressSecret
+	(*ResolveTunnelResponse)(nil),        // 73: bugnet.router.v1.ResolveTunnelResponse
+	(*X402Service)(nil),                  // 74: bugnet.router.v1.X402Service
+	(*X402Unpaid)(nil),                   // 75: bugnet.router.v1.X402Unpaid
+	(*X402Config)(nil),                   // 76: bugnet.router.v1.X402Config
+	(*X402UnpaidByHost)(nil),             // 77: bugnet.router.v1.X402UnpaidByHost
+	(*X402Event)(nil),                    // 78: bugnet.router.v1.X402Event
+	(*AppendX402EventsRequest)(nil),      // 79: bugnet.router.v1.AppendX402EventsRequest
+	(*AppendX402EventsResponse)(nil),     // 80: bugnet.router.v1.AppendX402EventsResponse
+	(*GetSessionRecordRequest)(nil),      // 81: bugnet.router.v1.GetSessionRecordRequest
+	(*GetSessionRecordResponse)(nil),     // 82: bugnet.router.v1.GetSessionRecordResponse
+	(*DeleteSessionRecordRequest)(nil),   // 83: bugnet.router.v1.DeleteSessionRecordRequest
+	(*DeleteSessionRecordResponse)(nil),  // 84: bugnet.router.v1.DeleteSessionRecordResponse
+	(*WatchSessionJobRequest)(nil),       // 85: bugnet.router.v1.WatchSessionJobRequest
+	(*SessionText)(nil),                  // 86: bugnet.router.v1.SessionText
+	(*SessionEnd)(nil),                   // 87: bugnet.router.v1.SessionEnd
+	(*WatchSessionJobResponse)(nil),      // 88: bugnet.router.v1.WatchSessionJobResponse
+	nil,                                  // 89: bugnet.router.v1.ReportEdgeUsageResponse.BytesRemainingEntry
+	nil,                                  // 90: bugnet.router.v1.ReportEdgeUsageResponse.BytesPerSecondEntry
+	nil,                                  // 91: bugnet.router.v1.ReportSshUsageResponse.BytesRemainingEntry
+	nil,                                  // 92: bugnet.router.v1.ReportSshUsageResponse.BytesPerSecondEntry
+	nil,                                  // 93: bugnet.router.v1.ReportEgressUsageRequest.X402UnpaidEntry
+	nil,                                  // 94: bugnet.router.v1.ReportEgressUsageResponse.BytesRemainingEntry
+	nil,                                  // 95: bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry
+	nil,                                  // 96: bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry
+	nil,                                  // 97: bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry
+	nil,                                  // 98: bugnet.router.v1.X402Config.UnpaidUsedEntry
+	nil,                                  // 99: bugnet.router.v1.X402UnpaidByHost.HostsEntry
+	(*timestamppb.Timestamp)(nil),        // 100: google.protobuf.Timestamp
+	(TransferDirection)(0),               // 101: bugnet.router.v1.TransferDirection
+	(*SecretSpec)(nil),                   // 102: bugnet.router.v1.SecretSpec
+	(*SealingKey)(nil),                   // 103: bugnet.router.v1.SealingKey
+	(*SealedValue)(nil),                  // 104: bugnet.router.v1.SealedValue
+	(*SecretInfo)(nil),                   // 105: bugnet.router.v1.SecretInfo
+	(OutputStream)(0),                    // 106: bugnet.router.v1.OutputStream
+	(*JobSkip)(nil),                      // 107: bugnet.router.v1.JobSkip
+	(*JobExit)(nil),                      // 108: bugnet.router.v1.JobExit
 }
 var file_bugnet_router_v1_edge_proto_depIdxs = []int32{
 	3,   // 0: bugnet.router.v1.GateUpstream.headers:type_name -> bugnet.router.v1.HeaderValue
 	3,   // 1: bugnet.router.v1.GateUpstream.cookies:type_name -> bugnet.router.v1.HeaderValue
 	0,   // 2: bugnet.router.v1.PlacementEnded.reason:type_name -> bugnet.router.v1.EndReason
-	98,  // 3: bugnet.router.v1.DeadlineMoved.deadline:type_name -> google.protobuf.Timestamp
+	100, // 3: bugnet.router.v1.DeadlineMoved.deadline:type_name -> google.protobuf.Timestamp
 	1,   // 4: bugnet.router.v1.BudgetSpent.kind:type_name -> bugnet.router.v1.BudgetKind
 	7,   // 5: bugnet.router.v1.EdgeEvent.placement_ended:type_name -> bugnet.router.v1.PlacementEnded
 	8,   // 6: bugnet.router.v1.EdgeEvent.deadline_moved:type_name -> bugnet.router.v1.DeadlineMoved
@@ -6135,136 +6251,138 @@ var file_bugnet_router_v1_edge_proto_depIdxs = []int32{
 	12,  // 10: bugnet.router.v1.EdgeEvent.secrets_changed:type_name -> bugnet.router.v1.SecretsChanged
 	13,  // 11: bugnet.router.v1.EdgeEvent.resync:type_name -> bugnet.router.v1.Resync
 	4,   // 12: bugnet.router.v1.ResolvePreviewResponse.upstream:type_name -> bugnet.router.v1.GateUpstream
-	98,  // 13: bugnet.router.v1.ResolvePreviewResponse.expires_at:type_name -> google.protobuf.Timestamp
+	100, // 13: bugnet.router.v1.ResolvePreviewResponse.expires_at:type_name -> google.protobuf.Timestamp
 	5,   // 14: bugnet.router.v1.ResolvePreviewResponse.budget:type_name -> bugnet.router.v1.EdgeBudget
-	98,  // 15: bugnet.router.v1.ResolvePreviewResponse.started_at:type_name -> google.protobuf.Timestamp
-	99,  // 16: bugnet.router.v1.OpenTransferRequest.direction:type_name -> bugnet.router.v1.TransferDirection
-	98,  // 17: bugnet.router.v1.OpenTransferResponse.modified_at:type_name -> google.protobuf.Timestamp
-	98,  // 18: bugnet.router.v1.OpenTransferResponse.hard_stop:type_name -> google.protobuf.Timestamp
-	98,  // 19: bugnet.router.v1.OpenTransferResponse.expires_at:type_name -> google.protobuf.Timestamp
+	100, // 15: bugnet.router.v1.ResolvePreviewResponse.started_at:type_name -> google.protobuf.Timestamp
+	101, // 16: bugnet.router.v1.OpenTransferRequest.direction:type_name -> bugnet.router.v1.TransferDirection
+	100, // 17: bugnet.router.v1.OpenTransferResponse.modified_at:type_name -> google.protobuf.Timestamp
+	100, // 18: bugnet.router.v1.OpenTransferResponse.hard_stop:type_name -> google.protobuf.Timestamp
+	100, // 19: bugnet.router.v1.OpenTransferResponse.expires_at:type_name -> google.protobuf.Timestamp
 	5,   // 20: bugnet.router.v1.OpenTransferResponse.budget:type_name -> bugnet.router.v1.EdgeBudget
-	98,  // 21: bugnet.router.v1.GetSecretLinkResponse.sandbox_created_at:type_name -> google.protobuf.Timestamp
-	98,  // 22: bugnet.router.v1.GetSecretLinkResponse.expires_at:type_name -> google.protobuf.Timestamp
-	100, // 23: bugnet.router.v1.GetSecretLinkResponse.suggested:type_name -> bugnet.router.v1.SecretSpec
-	101, // 24: bugnet.router.v1.GetSecretLinkResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
-	100, // 25: bugnet.router.v1.SubmitSecretLinkRequest.spec:type_name -> bugnet.router.v1.SecretSpec
-	102, // 26: bugnet.router.v1.SubmitSecretLinkRequest.value:type_name -> bugnet.router.v1.SealedValue
-	103, // 27: bugnet.router.v1.SubmitSecretLinkResponse.secret:type_name -> bugnet.router.v1.SecretInfo
-	101, // 28: bugnet.router.v1.GetBridgeSealingKeyResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
-	100, // 29: bugnet.router.v1.PutBridgeSecretRequest.spec:type_name -> bugnet.router.v1.SecretSpec
-	102, // 30: bugnet.router.v1.PutBridgeSecretRequest.value:type_name -> bugnet.router.v1.SealedValue
-	103, // 31: bugnet.router.v1.PutBridgeSecretResponse.secret:type_name -> bugnet.router.v1.SecretInfo
+	100, // 21: bugnet.router.v1.GetSecretLinkResponse.sandbox_created_at:type_name -> google.protobuf.Timestamp
+	100, // 22: bugnet.router.v1.GetSecretLinkResponse.expires_at:type_name -> google.protobuf.Timestamp
+	102, // 23: bugnet.router.v1.GetSecretLinkResponse.suggested:type_name -> bugnet.router.v1.SecretSpec
+	103, // 24: bugnet.router.v1.GetSecretLinkResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
+	102, // 25: bugnet.router.v1.SubmitSecretLinkRequest.spec:type_name -> bugnet.router.v1.SecretSpec
+	104, // 26: bugnet.router.v1.SubmitSecretLinkRequest.value:type_name -> bugnet.router.v1.SealedValue
+	105, // 27: bugnet.router.v1.SubmitSecretLinkResponse.secret:type_name -> bugnet.router.v1.SecretInfo
+	103, // 28: bugnet.router.v1.GetBridgeSealingKeyResponse.sealing_keys:type_name -> bugnet.router.v1.SealingKey
+	102, // 29: bugnet.router.v1.PutBridgeSecretRequest.spec:type_name -> bugnet.router.v1.SecretSpec
+	104, // 30: bugnet.router.v1.PutBridgeSecretRequest.value:type_name -> bugnet.router.v1.SealedValue
+	105, // 31: bugnet.router.v1.PutBridgeSecretResponse.secret:type_name -> bugnet.router.v1.SecretInfo
 	3,   // 32: bugnet.router.v1.DeliverHookRequest.headers:type_name -> bugnet.router.v1.HeaderValue
 	6,   // 33: bugnet.router.v1.ReportEdgeUsageRequest.usage:type_name -> bugnet.router.v1.PlacementUsage
-	87,  // 34: bugnet.router.v1.ReportEdgeUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportEdgeUsageResponse.BytesRemainingEntry
-	88,  // 35: bugnet.router.v1.ReportEdgeUsageResponse.bytes_per_second:type_name -> bugnet.router.v1.ReportEdgeUsageResponse.BytesPerSecondEntry
+	89,  // 34: bugnet.router.v1.ReportEdgeUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportEdgeUsageResponse.BytesRemainingEntry
+	90,  // 35: bugnet.router.v1.ReportEdgeUsageResponse.bytes_per_second:type_name -> bugnet.router.v1.ReportEdgeUsageResponse.BytesPerSecondEntry
 	6,   // 36: bugnet.router.v1.ReportSshUsageRequest.usage:type_name -> bugnet.router.v1.PlacementUsage
-	89,  // 37: bugnet.router.v1.ReportSshUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportSshUsageResponse.BytesRemainingEntry
-	90,  // 38: bugnet.router.v1.ReportSshUsageResponse.bytes_per_second:type_name -> bugnet.router.v1.ReportSshUsageResponse.BytesPerSecondEntry
+	91,  // 37: bugnet.router.v1.ReportSshUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportSshUsageResponse.BytesRemainingEntry
+	92,  // 38: bugnet.router.v1.ReportSshUsageResponse.bytes_per_second:type_name -> bugnet.router.v1.ReportSshUsageResponse.BytesPerSecondEntry
 	6,   // 39: bugnet.router.v1.ReportEgressUsageRequest.usage:type_name -> bugnet.router.v1.PlacementUsage
-	91,  // 40: bugnet.router.v1.ReportEgressUsageRequest.x402_unpaid:type_name -> bugnet.router.v1.ReportEgressUsageRequest.X402UnpaidEntry
-	92,  // 41: bugnet.router.v1.ReportEgressUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportEgressUsageResponse.BytesRemainingEntry
-	41,  // 42: bugnet.router.v1.CheckEdgeLeasesRequest.previews:type_name -> bugnet.router.v1.HeldPreview
-	98,  // 43: bugnet.router.v1.EdgeLease.deadline:type_name -> google.protobuf.Timestamp
-	93,  // 44: bugnet.router.v1.CheckEdgeLeasesResponse.leases:type_name -> bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry
-	98,  // 45: bugnet.router.v1.EgressLease.deadline:type_name -> google.protobuf.Timestamp
-	94,  // 46: bugnet.router.v1.CheckEgressLeasesResponse.leases:type_name -> bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry
+	93,  // 40: bugnet.router.v1.ReportEgressUsageRequest.x402_unpaid:type_name -> bugnet.router.v1.ReportEgressUsageRequest.X402UnpaidEntry
+	94,  // 41: bugnet.router.v1.ReportEgressUsageResponse.bytes_remaining:type_name -> bugnet.router.v1.ReportEgressUsageResponse.BytesRemainingEntry
+	43,  // 42: bugnet.router.v1.CheckEdgeLeasesRequest.previews:type_name -> bugnet.router.v1.HeldPreview
+	100, // 43: bugnet.router.v1.EdgeLease.deadline:type_name -> google.protobuf.Timestamp
+	95,  // 44: bugnet.router.v1.CheckEdgeLeasesResponse.leases:type_name -> bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry
+	100, // 45: bugnet.router.v1.EgressLease.deadline:type_name -> google.protobuf.Timestamp
+	96,  // 46: bugnet.router.v1.CheckEgressLeasesResponse.leases:type_name -> bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry
 	14,  // 47: bugnet.router.v1.WatchEdgeEventsResponse.event:type_name -> bugnet.router.v1.EdgeEvent
 	14,  // 48: bugnet.router.v1.WatchSshEventsResponse.event:type_name -> bugnet.router.v1.EdgeEvent
 	14,  // 49: bugnet.router.v1.WatchEgressEventsResponse.event:type_name -> bugnet.router.v1.EdgeEvent
-	98,  // 50: bugnet.router.v1.AuthorizeSshKeyResponse.deadline:type_name -> google.protobuf.Timestamp
-	98,  // 51: bugnet.router.v1.AcquireSshConnectionResponse.lease_expires_at:type_name -> google.protobuf.Timestamp
+	100, // 50: bugnet.router.v1.AuthorizeSshKeyResponse.deadline:type_name -> google.protobuf.Timestamp
+	100, // 51: bugnet.router.v1.AcquireSshConnectionResponse.lease_expires_at:type_name -> google.protobuf.Timestamp
 	5,   // 52: bugnet.router.v1.AcquireSshConnectionResponse.budget:type_name -> bugnet.router.v1.EdgeBudget
-	98,  // 53: bugnet.router.v1.RenewSshConnectionResponse.lease_expires_at:type_name -> google.protobuf.Timestamp
+	100, // 53: bugnet.router.v1.RenewSshConnectionResponse.lease_expires_at:type_name -> google.protobuf.Timestamp
 	3,   // 54: bugnet.router.v1.WebSocketUpstream.headers:type_name -> bugnet.router.v1.HeaderValue
 	3,   // 55: bugnet.router.v1.WebSocketUpstream.cookies:type_name -> bugnet.router.v1.HeaderValue
-	63,  // 56: bugnet.router.v1.OpenSshUpstreamResponse.websocket:type_name -> bugnet.router.v1.WebSocketUpstream
-	64,  // 57: bugnet.router.v1.OpenSshUpstreamResponse.tcp:type_name -> bugnet.router.v1.TcpUpstream
-	98,  // 58: bugnet.router.v1.OpenSshUpstreamResponse.deadline:type_name -> google.protobuf.Timestamp
-	95,  // 59: bugnet.router.v1.CheckSshGrantsResponse.deadlines:type_name -> bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry
+	65,  // 56: bugnet.router.v1.OpenSshUpstreamResponse.websocket:type_name -> bugnet.router.v1.WebSocketUpstream
+	66,  // 57: bugnet.router.v1.OpenSshUpstreamResponse.tcp:type_name -> bugnet.router.v1.TcpUpstream
+	100, // 58: bugnet.router.v1.OpenSshUpstreamResponse.deadline:type_name -> google.protobuf.Timestamp
+	97,  // 59: bugnet.router.v1.CheckSshGrantsResponse.deadlines:type_name -> bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry
 	2,   // 60: bugnet.router.v1.TunnelSourceCheck.mode:type_name -> bugnet.router.v1.SourceCheckMode
-	100, // 61: bugnet.router.v1.EgressSecret.spec:type_name -> bugnet.router.v1.SecretSpec
-	102, // 62: bugnet.router.v1.EgressSecret.value:type_name -> bugnet.router.v1.SealedValue
-	98,  // 63: bugnet.router.v1.ResolveTunnelResponse.deadline:type_name -> google.protobuf.Timestamp
-	70,  // 64: bugnet.router.v1.ResolveTunnelResponse.secrets:type_name -> bugnet.router.v1.EgressSecret
-	69,  // 65: bugnet.router.v1.ResolveTunnelResponse.source_check:type_name -> bugnet.router.v1.TunnelSourceCheck
-	74,  // 66: bugnet.router.v1.ResolveTunnelResponse.x402:type_name -> bugnet.router.v1.X402Config
-	72,  // 67: bugnet.router.v1.X402Config.services:type_name -> bugnet.router.v1.X402Service
-	96,  // 68: bugnet.router.v1.X402Config.unpaid_used:type_name -> bugnet.router.v1.X402Config.UnpaidUsedEntry
-	97,  // 69: bugnet.router.v1.X402UnpaidByHost.hosts:type_name -> bugnet.router.v1.X402UnpaidByHost.HostsEntry
-	98,  // 70: bugnet.router.v1.X402Event.at:type_name -> google.protobuf.Timestamp
-	76,  // 71: bugnet.router.v1.AppendX402EventsRequest.events:type_name -> bugnet.router.v1.X402Event
-	104, // 72: bugnet.router.v1.SessionText.stream:type_name -> bugnet.router.v1.OutputStream
-	84,  // 73: bugnet.router.v1.WatchSessionJobResponse.text:type_name -> bugnet.router.v1.SessionText
-	105, // 74: bugnet.router.v1.WatchSessionJobResponse.skip:type_name -> bugnet.router.v1.JobSkip
-	106, // 75: bugnet.router.v1.WatchSessionJobResponse.exit:type_name -> bugnet.router.v1.JobExit
-	85,  // 76: bugnet.router.v1.WatchSessionJobResponse.end:type_name -> bugnet.router.v1.SessionEnd
-	75,  // 77: bugnet.router.v1.ReportEgressUsageRequest.X402UnpaidEntry.value:type_name -> bugnet.router.v1.X402UnpaidByHost
-	43,  // 78: bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry.value:type_name -> bugnet.router.v1.EdgeLease
-	46,  // 79: bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry.value:type_name -> bugnet.router.v1.EgressLease
-	98,  // 80: bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry.value:type_name -> google.protobuf.Timestamp
-	73,  // 81: bugnet.router.v1.X402Config.UnpaidUsedEntry.value:type_name -> bugnet.router.v1.X402Unpaid
-	73,  // 82: bugnet.router.v1.X402UnpaidByHost.HostsEntry.value:type_name -> bugnet.router.v1.X402Unpaid
+	102, // 61: bugnet.router.v1.EgressSecret.spec:type_name -> bugnet.router.v1.SecretSpec
+	104, // 62: bugnet.router.v1.EgressSecret.value:type_name -> bugnet.router.v1.SealedValue
+	100, // 63: bugnet.router.v1.ResolveTunnelResponse.deadline:type_name -> google.protobuf.Timestamp
+	72,  // 64: bugnet.router.v1.ResolveTunnelResponse.secrets:type_name -> bugnet.router.v1.EgressSecret
+	71,  // 65: bugnet.router.v1.ResolveTunnelResponse.source_check:type_name -> bugnet.router.v1.TunnelSourceCheck
+	76,  // 66: bugnet.router.v1.ResolveTunnelResponse.x402:type_name -> bugnet.router.v1.X402Config
+	74,  // 67: bugnet.router.v1.X402Config.services:type_name -> bugnet.router.v1.X402Service
+	98,  // 68: bugnet.router.v1.X402Config.unpaid_used:type_name -> bugnet.router.v1.X402Config.UnpaidUsedEntry
+	99,  // 69: bugnet.router.v1.X402UnpaidByHost.hosts:type_name -> bugnet.router.v1.X402UnpaidByHost.HostsEntry
+	100, // 70: bugnet.router.v1.X402Event.at:type_name -> google.protobuf.Timestamp
+	78,  // 71: bugnet.router.v1.AppendX402EventsRequest.events:type_name -> bugnet.router.v1.X402Event
+	106, // 72: bugnet.router.v1.SessionText.stream:type_name -> bugnet.router.v1.OutputStream
+	86,  // 73: bugnet.router.v1.WatchSessionJobResponse.text:type_name -> bugnet.router.v1.SessionText
+	107, // 74: bugnet.router.v1.WatchSessionJobResponse.skip:type_name -> bugnet.router.v1.JobSkip
+	108, // 75: bugnet.router.v1.WatchSessionJobResponse.exit:type_name -> bugnet.router.v1.JobExit
+	87,  // 76: bugnet.router.v1.WatchSessionJobResponse.end:type_name -> bugnet.router.v1.SessionEnd
+	77,  // 77: bugnet.router.v1.ReportEgressUsageRequest.X402UnpaidEntry.value:type_name -> bugnet.router.v1.X402UnpaidByHost
+	45,  // 78: bugnet.router.v1.CheckEdgeLeasesResponse.LeasesEntry.value:type_name -> bugnet.router.v1.EdgeLease
+	48,  // 79: bugnet.router.v1.CheckEgressLeasesResponse.LeasesEntry.value:type_name -> bugnet.router.v1.EgressLease
+	100, // 80: bugnet.router.v1.CheckSshGrantsResponse.DeadlinesEntry.value:type_name -> google.protobuf.Timestamp
+	75,  // 81: bugnet.router.v1.X402Config.UnpaidUsedEntry.value:type_name -> bugnet.router.v1.X402Unpaid
+	75,  // 82: bugnet.router.v1.X402UnpaidByHost.HostsEntry.value:type_name -> bugnet.router.v1.X402Unpaid
 	15,  // 83: bugnet.router.v1.EdgeService.ResolvePreview:input_type -> bugnet.router.v1.ResolvePreviewRequest
 	17,  // 84: bugnet.router.v1.EdgeService.RepairPreview:input_type -> bugnet.router.v1.RepairPreviewRequest
 	19,  // 85: bugnet.router.v1.EdgeService.OpenTransfer:input_type -> bugnet.router.v1.OpenTransferRequest
 	21,  // 86: bugnet.router.v1.EdgeService.ReadTransfer:input_type -> bugnet.router.v1.ReadTransferRequest
 	23,  // 87: bugnet.router.v1.EdgeService.WriteTransfer:input_type -> bugnet.router.v1.WriteTransferRequest
-	33,  // 88: bugnet.router.v1.EdgeService.DeliverHook:input_type -> bugnet.router.v1.DeliverHookRequest
-	35,  // 89: bugnet.router.v1.EdgeService.ReportEdgeUsage:input_type -> bugnet.router.v1.ReportEdgeUsageRequest
-	42,  // 90: bugnet.router.v1.EdgeService.CheckEdgeLeases:input_type -> bugnet.router.v1.CheckEdgeLeasesRequest
-	48,  // 91: bugnet.router.v1.EdgeService.WatchEdgeEvents:input_type -> bugnet.router.v1.WatchEdgeEventsRequest
-	25,  // 92: bugnet.router.v1.SecretsRouteService.GetSecretLink:input_type -> bugnet.router.v1.GetSecretLinkRequest
-	27,  // 93: bugnet.router.v1.SecretsRouteService.SubmitSecretLink:input_type -> bugnet.router.v1.SubmitSecretLinkRequest
-	29,  // 94: bugnet.router.v1.SecretsRouteService.GetBridgeSealingKey:input_type -> bugnet.router.v1.GetBridgeSealingKeyRequest
-	31,  // 95: bugnet.router.v1.SecretsRouteService.PutBridgeSecret:input_type -> bugnet.router.v1.PutBridgeSecretRequest
-	54,  // 96: bugnet.router.v1.SshGatewayService.AuthorizeSshKey:input_type -> bugnet.router.v1.AuthorizeSshKeyRequest
-	56,  // 97: bugnet.router.v1.SshGatewayService.AcquireSshConnection:input_type -> bugnet.router.v1.AcquireSshConnectionRequest
-	58,  // 98: bugnet.router.v1.SshGatewayService.RenewSshConnection:input_type -> bugnet.router.v1.RenewSshConnectionRequest
-	60,  // 99: bugnet.router.v1.SshGatewayService.ReleaseSshConnection:input_type -> bugnet.router.v1.ReleaseSshConnectionRequest
-	62,  // 100: bugnet.router.v1.SshGatewayService.OpenSshUpstream:input_type -> bugnet.router.v1.OpenSshUpstreamRequest
-	66,  // 101: bugnet.router.v1.SshGatewayService.CheckSshGrants:input_type -> bugnet.router.v1.CheckSshGrantsRequest
-	37,  // 102: bugnet.router.v1.SshGatewayService.ReportSshUsage:input_type -> bugnet.router.v1.ReportSshUsageRequest
-	50,  // 103: bugnet.router.v1.SshGatewayService.WatchSshEvents:input_type -> bugnet.router.v1.WatchSshEventsRequest
-	68,  // 104: bugnet.router.v1.EgressService.ResolveTunnel:input_type -> bugnet.router.v1.ResolveTunnelRequest
-	39,  // 105: bugnet.router.v1.EgressService.ReportEgressUsage:input_type -> bugnet.router.v1.ReportEgressUsageRequest
-	45,  // 106: bugnet.router.v1.EgressService.CheckEgressLeases:input_type -> bugnet.router.v1.CheckEgressLeasesRequest
-	52,  // 107: bugnet.router.v1.EgressService.WatchEgressEvents:input_type -> bugnet.router.v1.WatchEgressEventsRequest
-	77,  // 108: bugnet.router.v1.EgressService.AppendX402Events:input_type -> bugnet.router.v1.AppendX402EventsRequest
-	79,  // 109: bugnet.router.v1.SessionPageService.GetSessionRecord:input_type -> bugnet.router.v1.GetSessionRecordRequest
-	81,  // 110: bugnet.router.v1.SessionPageService.DeleteSessionRecord:input_type -> bugnet.router.v1.DeleteSessionRecordRequest
-	83,  // 111: bugnet.router.v1.SessionPageService.WatchSessionJob:input_type -> bugnet.router.v1.WatchSessionJobRequest
-	16,  // 112: bugnet.router.v1.EdgeService.ResolvePreview:output_type -> bugnet.router.v1.ResolvePreviewResponse
-	18,  // 113: bugnet.router.v1.EdgeService.RepairPreview:output_type -> bugnet.router.v1.RepairPreviewResponse
-	20,  // 114: bugnet.router.v1.EdgeService.OpenTransfer:output_type -> bugnet.router.v1.OpenTransferResponse
-	22,  // 115: bugnet.router.v1.EdgeService.ReadTransfer:output_type -> bugnet.router.v1.ReadTransferResponse
-	24,  // 116: bugnet.router.v1.EdgeService.WriteTransfer:output_type -> bugnet.router.v1.WriteTransferResponse
-	34,  // 117: bugnet.router.v1.EdgeService.DeliverHook:output_type -> bugnet.router.v1.DeliverHookResponse
-	36,  // 118: bugnet.router.v1.EdgeService.ReportEdgeUsage:output_type -> bugnet.router.v1.ReportEdgeUsageResponse
-	44,  // 119: bugnet.router.v1.EdgeService.CheckEdgeLeases:output_type -> bugnet.router.v1.CheckEdgeLeasesResponse
-	49,  // 120: bugnet.router.v1.EdgeService.WatchEdgeEvents:output_type -> bugnet.router.v1.WatchEdgeEventsResponse
-	26,  // 121: bugnet.router.v1.SecretsRouteService.GetSecretLink:output_type -> bugnet.router.v1.GetSecretLinkResponse
-	28,  // 122: bugnet.router.v1.SecretsRouteService.SubmitSecretLink:output_type -> bugnet.router.v1.SubmitSecretLinkResponse
-	30,  // 123: bugnet.router.v1.SecretsRouteService.GetBridgeSealingKey:output_type -> bugnet.router.v1.GetBridgeSealingKeyResponse
-	32,  // 124: bugnet.router.v1.SecretsRouteService.PutBridgeSecret:output_type -> bugnet.router.v1.PutBridgeSecretResponse
-	55,  // 125: bugnet.router.v1.SshGatewayService.AuthorizeSshKey:output_type -> bugnet.router.v1.AuthorizeSshKeyResponse
-	57,  // 126: bugnet.router.v1.SshGatewayService.AcquireSshConnection:output_type -> bugnet.router.v1.AcquireSshConnectionResponse
-	59,  // 127: bugnet.router.v1.SshGatewayService.RenewSshConnection:output_type -> bugnet.router.v1.RenewSshConnectionResponse
-	61,  // 128: bugnet.router.v1.SshGatewayService.ReleaseSshConnection:output_type -> bugnet.router.v1.ReleaseSshConnectionResponse
-	65,  // 129: bugnet.router.v1.SshGatewayService.OpenSshUpstream:output_type -> bugnet.router.v1.OpenSshUpstreamResponse
-	67,  // 130: bugnet.router.v1.SshGatewayService.CheckSshGrants:output_type -> bugnet.router.v1.CheckSshGrantsResponse
-	38,  // 131: bugnet.router.v1.SshGatewayService.ReportSshUsage:output_type -> bugnet.router.v1.ReportSshUsageResponse
-	51,  // 132: bugnet.router.v1.SshGatewayService.WatchSshEvents:output_type -> bugnet.router.v1.WatchSshEventsResponse
-	71,  // 133: bugnet.router.v1.EgressService.ResolveTunnel:output_type -> bugnet.router.v1.ResolveTunnelResponse
-	40,  // 134: bugnet.router.v1.EgressService.ReportEgressUsage:output_type -> bugnet.router.v1.ReportEgressUsageResponse
-	47,  // 135: bugnet.router.v1.EgressService.CheckEgressLeases:output_type -> bugnet.router.v1.CheckEgressLeasesResponse
-	53,  // 136: bugnet.router.v1.EgressService.WatchEgressEvents:output_type -> bugnet.router.v1.WatchEgressEventsResponse
-	78,  // 137: bugnet.router.v1.EgressService.AppendX402Events:output_type -> bugnet.router.v1.AppendX402EventsResponse
-	80,  // 138: bugnet.router.v1.SessionPageService.GetSessionRecord:output_type -> bugnet.router.v1.GetSessionRecordResponse
-	82,  // 139: bugnet.router.v1.SessionPageService.DeleteSessionRecord:output_type -> bugnet.router.v1.DeleteSessionRecordResponse
-	86,  // 140: bugnet.router.v1.SessionPageService.WatchSessionJob:output_type -> bugnet.router.v1.WatchSessionJobResponse
-	112, // [112:141] is the sub-list for method output_type
-	83,  // [83:112] is the sub-list for method input_type
+	25,  // 88: bugnet.router.v1.EdgeService.EndTransfer:input_type -> bugnet.router.v1.EndTransferRequest
+	35,  // 89: bugnet.router.v1.EdgeService.DeliverHook:input_type -> bugnet.router.v1.DeliverHookRequest
+	37,  // 90: bugnet.router.v1.EdgeService.ReportEdgeUsage:input_type -> bugnet.router.v1.ReportEdgeUsageRequest
+	44,  // 91: bugnet.router.v1.EdgeService.CheckEdgeLeases:input_type -> bugnet.router.v1.CheckEdgeLeasesRequest
+	50,  // 92: bugnet.router.v1.EdgeService.WatchEdgeEvents:input_type -> bugnet.router.v1.WatchEdgeEventsRequest
+	27,  // 93: bugnet.router.v1.SecretsRouteService.GetSecretLink:input_type -> bugnet.router.v1.GetSecretLinkRequest
+	29,  // 94: bugnet.router.v1.SecretsRouteService.SubmitSecretLink:input_type -> bugnet.router.v1.SubmitSecretLinkRequest
+	31,  // 95: bugnet.router.v1.SecretsRouteService.GetBridgeSealingKey:input_type -> bugnet.router.v1.GetBridgeSealingKeyRequest
+	33,  // 96: bugnet.router.v1.SecretsRouteService.PutBridgeSecret:input_type -> bugnet.router.v1.PutBridgeSecretRequest
+	56,  // 97: bugnet.router.v1.SshGatewayService.AuthorizeSshKey:input_type -> bugnet.router.v1.AuthorizeSshKeyRequest
+	58,  // 98: bugnet.router.v1.SshGatewayService.AcquireSshConnection:input_type -> bugnet.router.v1.AcquireSshConnectionRequest
+	60,  // 99: bugnet.router.v1.SshGatewayService.RenewSshConnection:input_type -> bugnet.router.v1.RenewSshConnectionRequest
+	62,  // 100: bugnet.router.v1.SshGatewayService.ReleaseSshConnection:input_type -> bugnet.router.v1.ReleaseSshConnectionRequest
+	64,  // 101: bugnet.router.v1.SshGatewayService.OpenSshUpstream:input_type -> bugnet.router.v1.OpenSshUpstreamRequest
+	68,  // 102: bugnet.router.v1.SshGatewayService.CheckSshGrants:input_type -> bugnet.router.v1.CheckSshGrantsRequest
+	39,  // 103: bugnet.router.v1.SshGatewayService.ReportSshUsage:input_type -> bugnet.router.v1.ReportSshUsageRequest
+	52,  // 104: bugnet.router.v1.SshGatewayService.WatchSshEvents:input_type -> bugnet.router.v1.WatchSshEventsRequest
+	70,  // 105: bugnet.router.v1.EgressService.ResolveTunnel:input_type -> bugnet.router.v1.ResolveTunnelRequest
+	41,  // 106: bugnet.router.v1.EgressService.ReportEgressUsage:input_type -> bugnet.router.v1.ReportEgressUsageRequest
+	47,  // 107: bugnet.router.v1.EgressService.CheckEgressLeases:input_type -> bugnet.router.v1.CheckEgressLeasesRequest
+	54,  // 108: bugnet.router.v1.EgressService.WatchEgressEvents:input_type -> bugnet.router.v1.WatchEgressEventsRequest
+	79,  // 109: bugnet.router.v1.EgressService.AppendX402Events:input_type -> bugnet.router.v1.AppendX402EventsRequest
+	81,  // 110: bugnet.router.v1.SessionPageService.GetSessionRecord:input_type -> bugnet.router.v1.GetSessionRecordRequest
+	83,  // 111: bugnet.router.v1.SessionPageService.DeleteSessionRecord:input_type -> bugnet.router.v1.DeleteSessionRecordRequest
+	85,  // 112: bugnet.router.v1.SessionPageService.WatchSessionJob:input_type -> bugnet.router.v1.WatchSessionJobRequest
+	16,  // 113: bugnet.router.v1.EdgeService.ResolvePreview:output_type -> bugnet.router.v1.ResolvePreviewResponse
+	18,  // 114: bugnet.router.v1.EdgeService.RepairPreview:output_type -> bugnet.router.v1.RepairPreviewResponse
+	20,  // 115: bugnet.router.v1.EdgeService.OpenTransfer:output_type -> bugnet.router.v1.OpenTransferResponse
+	22,  // 116: bugnet.router.v1.EdgeService.ReadTransfer:output_type -> bugnet.router.v1.ReadTransferResponse
+	24,  // 117: bugnet.router.v1.EdgeService.WriteTransfer:output_type -> bugnet.router.v1.WriteTransferResponse
+	26,  // 118: bugnet.router.v1.EdgeService.EndTransfer:output_type -> bugnet.router.v1.EndTransferResponse
+	36,  // 119: bugnet.router.v1.EdgeService.DeliverHook:output_type -> bugnet.router.v1.DeliverHookResponse
+	38,  // 120: bugnet.router.v1.EdgeService.ReportEdgeUsage:output_type -> bugnet.router.v1.ReportEdgeUsageResponse
+	46,  // 121: bugnet.router.v1.EdgeService.CheckEdgeLeases:output_type -> bugnet.router.v1.CheckEdgeLeasesResponse
+	51,  // 122: bugnet.router.v1.EdgeService.WatchEdgeEvents:output_type -> bugnet.router.v1.WatchEdgeEventsResponse
+	28,  // 123: bugnet.router.v1.SecretsRouteService.GetSecretLink:output_type -> bugnet.router.v1.GetSecretLinkResponse
+	30,  // 124: bugnet.router.v1.SecretsRouteService.SubmitSecretLink:output_type -> bugnet.router.v1.SubmitSecretLinkResponse
+	32,  // 125: bugnet.router.v1.SecretsRouteService.GetBridgeSealingKey:output_type -> bugnet.router.v1.GetBridgeSealingKeyResponse
+	34,  // 126: bugnet.router.v1.SecretsRouteService.PutBridgeSecret:output_type -> bugnet.router.v1.PutBridgeSecretResponse
+	57,  // 127: bugnet.router.v1.SshGatewayService.AuthorizeSshKey:output_type -> bugnet.router.v1.AuthorizeSshKeyResponse
+	59,  // 128: bugnet.router.v1.SshGatewayService.AcquireSshConnection:output_type -> bugnet.router.v1.AcquireSshConnectionResponse
+	61,  // 129: bugnet.router.v1.SshGatewayService.RenewSshConnection:output_type -> bugnet.router.v1.RenewSshConnectionResponse
+	63,  // 130: bugnet.router.v1.SshGatewayService.ReleaseSshConnection:output_type -> bugnet.router.v1.ReleaseSshConnectionResponse
+	67,  // 131: bugnet.router.v1.SshGatewayService.OpenSshUpstream:output_type -> bugnet.router.v1.OpenSshUpstreamResponse
+	69,  // 132: bugnet.router.v1.SshGatewayService.CheckSshGrants:output_type -> bugnet.router.v1.CheckSshGrantsResponse
+	40,  // 133: bugnet.router.v1.SshGatewayService.ReportSshUsage:output_type -> bugnet.router.v1.ReportSshUsageResponse
+	53,  // 134: bugnet.router.v1.SshGatewayService.WatchSshEvents:output_type -> bugnet.router.v1.WatchSshEventsResponse
+	73,  // 135: bugnet.router.v1.EgressService.ResolveTunnel:output_type -> bugnet.router.v1.ResolveTunnelResponse
+	42,  // 136: bugnet.router.v1.EgressService.ReportEgressUsage:output_type -> bugnet.router.v1.ReportEgressUsageResponse
+	49,  // 137: bugnet.router.v1.EgressService.CheckEgressLeases:output_type -> bugnet.router.v1.CheckEgressLeasesResponse
+	55,  // 138: bugnet.router.v1.EgressService.WatchEgressEvents:output_type -> bugnet.router.v1.WatchEgressEventsResponse
+	80,  // 139: bugnet.router.v1.EgressService.AppendX402Events:output_type -> bugnet.router.v1.AppendX402EventsResponse
+	82,  // 140: bugnet.router.v1.SessionPageService.GetSessionRecord:output_type -> bugnet.router.v1.GetSessionRecordResponse
+	84,  // 141: bugnet.router.v1.SessionPageService.DeleteSessionRecord:output_type -> bugnet.router.v1.DeleteSessionRecordResponse
+	88,  // 142: bugnet.router.v1.SessionPageService.WatchSessionJob:output_type -> bugnet.router.v1.WatchSessionJobResponse
+	113, // [113:143] is the sub-list for method output_type
+	83,  // [83:113] is the sub-list for method input_type
 	83,  // [83:83] is the sub-list for extension type_name
 	83,  // [83:83] is the sub-list for extension extendee
 	0,   // [0:83] is the sub-list for field type_name
@@ -6285,15 +6403,15 @@ func file_bugnet_router_v1_edge_proto_init() {
 		(*EdgeEvent_SecretsChanged)(nil),
 		(*EdgeEvent_Resync)(nil),
 	}
-	file_bugnet_router_v1_edge_proto_msgTypes[62].OneofWrappers = []any{
+	file_bugnet_router_v1_edge_proto_msgTypes[64].OneofWrappers = []any{
 		(*OpenSshUpstreamResponse_Websocket)(nil),
 		(*OpenSshUpstreamResponse_Tcp)(nil),
 	}
-	file_bugnet_router_v1_edge_proto_msgTypes[65].OneofWrappers = []any{
+	file_bugnet_router_v1_edge_proto_msgTypes[67].OneofWrappers = []any{
 		(*ResolveTunnelRequest_TokenSha256)(nil),
 		(*ResolveTunnelRequest_FetchPlacementId)(nil),
 	}
-	file_bugnet_router_v1_edge_proto_msgTypes[83].OneofWrappers = []any{
+	file_bugnet_router_v1_edge_proto_msgTypes[85].OneofWrappers = []any{
 		(*WatchSessionJobResponse_Text)(nil),
 		(*WatchSessionJobResponse_Skip)(nil),
 		(*WatchSessionJobResponse_Exit)(nil),
@@ -6306,7 +6424,7 @@ func file_bugnet_router_v1_edge_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bugnet_router_v1_edge_proto_rawDesc), len(file_bugnet_router_v1_edge_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   95,
+			NumMessages:   97,
 			NumExtensions: 0,
 			NumServices:   5,
 		},
