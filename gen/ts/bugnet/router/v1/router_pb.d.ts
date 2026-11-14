@@ -434,6 +434,13 @@ export declare type PricePackageRequest = Message<"bugnet.router.v1.PricePackage
    * @generated from field: bugnet.router.v1.Requirements requirements = 2;
    */
   requirements?: Requirements | undefined;
+
+  /**
+   * The Estimate this price was quoted in, whose locked price it returns while the quote holds
+   *
+   * @generated from field: string estimate_id = 3;
+   */
+  estimateId: string;
 };
 
 /**

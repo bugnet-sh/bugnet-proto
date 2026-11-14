@@ -1837,9 +1837,11 @@ func (x *EstimateResponse) GetPartial() bool {
 }
 
 type PricePackageRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PackageId     string                 `protobuf:"bytes,1,opt,name=package_id,json=packageId,proto3" json:"package_id,omitempty"`
-	Requirements  *Requirements          `protobuf:"bytes,2,opt,name=requirements,proto3" json:"requirements,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	PackageId    string                 `protobuf:"bytes,1,opt,name=package_id,json=packageId,proto3" json:"package_id,omitempty"`
+	Requirements *Requirements          `protobuf:"bytes,2,opt,name=requirements,proto3" json:"requirements,omitempty"`
+	// The Estimate this price was quoted in, whose locked price it returns while the quote holds
+	EstimateId    string `protobuf:"bytes,3,opt,name=estimate_id,json=estimateId,proto3" json:"estimate_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1886,6 +1888,13 @@ func (x *PricePackageRequest) GetRequirements() *Requirements {
 		return x.Requirements
 	}
 	return nil
+}
+
+func (x *PricePackageRequest) GetEstimateId() string {
+	if x != nil {
+		return x.EstimateId
+	}
+	return ""
 }
 
 type PricePackageResponse struct {
@@ -6775,11 +6784,13 @@ const file_bugnet_router_v1_router_proto_rawDesc = "" +
 	"\n" +
 	"confidence\x18\v \x01(\x0e2\x1c.bugnet.router.v1.ConfidenceR\n" +
 	"confidence\x12\x18\n" +
-	"\apartial\x18\f \x01(\bR\apartial\"x\n" +
+	"\apartial\x18\f \x01(\bR\apartial\"\x99\x01\n" +
 	"\x13PricePackageRequest\x12\x1d\n" +
 	"\n" +
 	"package_id\x18\x01 \x01(\tR\tpackageId\x12B\n" +
-	"\frequirements\x18\x02 \x01(\v2\x1e.bugnet.router.v1.RequirementsR\frequirements\"O\n" +
+	"\frequirements\x18\x02 \x01(\v2\x1e.bugnet.router.v1.RequirementsR\frequirements\x12\x1f\n" +
+	"\vestimate_id\x18\x03 \x01(\tR\n" +
+	"estimateId\"O\n" +
 	"\x14PricePackageResponse\x127\n" +
 	"\x06option\x18\x01 \x01(\v2\x1f.bugnet.router.v1.PackageOptionR\x06option\"\xb3\x01\n" +
 	"\fSandboxImage\x12\x18\n" +

@@ -257,6 +257,8 @@ message EstimateResponse {
 message PricePackageRequest {
   string package_id = 1;
   Requirements requirements = 2;
+  // The Estimate this price was quoted in, whose locked price it returns while the quote holds
+  string estimate_id = 3;
 }
 
 message PricePackageResponse {
